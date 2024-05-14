@@ -1294,7 +1294,37 @@ end
 // If all shots in the TargetSeries have been evaluated and the patient has reached immunity for every disease handled by this Series, mark in the TargetSeries that
 // the patient is immune to all diseases.
 ///////// ***
-rule "HistoryEvaluation: Set Immunity Flag in Series to True if Immune to All Diseases Tracked by this Series as of the Evaluation Time" ruleflow-group "HistoryEvaluation"
+rule "HistoryEvaluation: If all shots have been evaluated, take immunity dates into account to determine if series is complete" ruleflow-group "HistoryEvaluation"
+	dialect "mvel"
+	when
+		$ts : TargetSeries(isSeriesComplete() == false)
+		not TargetDose(hasBeenEvaluated == false) from $ts.targetDoses
+		$diseaseImmunitiesRecordedForTargetSeries : List(size > 0) from accumulate(DiseaseImmunity($diseaseacc : disease memberOf $ts.diseasesSupportedByThisSeries), collectList($diseaseacc))
+		TargetSeries(this == $ts, $numberOfDosesInSeries : seriesRules.numberOfDosesInSeries, $diseasesOfInterest : allEvaluationValidityCountsByDisease.keySet())
+		eval($diseasesOfInterest.removeAll($diseaseImmunitiesRecordedForTargetSeries) == true && $ts.determineEffectiveNumberOfDosesInSeriesForSpecifiedDiseasesOnly($diseasesOfInterest) == $ts.seriesRules.numberOfDosesInSeries)
+	then
+		String _RULENAME = kcontext.rule.name;
+		modify($ts) {
+			setSeriesComplete(true);
+		}
+		for (String diseaseImmunityRecorded : $diseaseImmunitiesRecordedForTargetSeries) {
+			ICELogicHelper.logDRLDebugMessage(_RULENAME, "in TargetSeries " + $ts + "; Disease Immunity Recorded: " + diseaseImmunityRecorded);
+		} 
+		Set lDiseasesOfInterest = $ts.getAllEvaluationValidityCountsByDisease.keySet();
+		lDiseasesOfInterest.removeAll($diseaseImmunitiesRecordedForTargetSeries);
+		for (String disease : lDiseasesOfInterest) {
+			ICELogicHelper.logDRLDebugMessage(_RULENAME, "in TargetSeries " + $ts + "; disease of interest: " + disease);
+		}
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "in TargetSeries " + $ts + "; determineEffective..." + $ts.determineEffectiveNumberOfDosesInSeriesForSpecifiedDiseasesOnly(lDiseasesOfInterest));
+end
+ 
+
+///////// ***
+// Supplemental Series Table rule... modifying this rule not suggested
+// If all shots in the TargetSeries have been evaluated and the patient has reached immunity for every disease handled by this Series, mark in the TargetSeries that
+// the patient is immune to all diseases.
+///////// ***
+rule "HistoryEvaluation: Set Disease Immunity Flag in Series to True and Series Complete if Immune to All Diseases Tracked by this Series as of the Evaluation Time" ruleflow-group "HistoryEvaluation"
 	dialect "mvel"
 	when
 		$ts : TargetSeries($diseasesSupportedByThisSeries : diseasesSupportedByThisSeries, isImmunityToAllDiseasesRecorded() == false)
@@ -1303,7 +1333,8 @@ rule "HistoryEvaluation: Set Immunity Flag in Series to True if Immune to All Di
 	then
 		String _RULENAME = kcontext.rule.name;
 		modify($ts) {
-			setImmunityToAllDiseasesRecorded(true);
+			setImmunityToAllDiseasesRecorded(true),
+			setSeriesComplete(true);
 		}
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeries immunityToAllDiseasesRecorded set to true for " + $ts); 
 end
