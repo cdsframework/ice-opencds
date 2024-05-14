@@ -1221,7 +1221,7 @@ public class TargetSeries {
 		else {
 			diseasesOfInterestSpecified = true;
 			for (String lDiseaseOfInterest : pDiseasesOfInterest) {
-				evaluationValidiityCountsBySpecifiedDiseases.put(lDiseaseOfInterest, getEvaluationValidityCountByDisease(lDiseaseOfInterest));
+				evaluationValidiityCountsBySpecifiedDiseases.put(lDiseaseOfInterest, getInterimDiseaseEvaluationValidityCount(lDiseaseOfInterest));
 			}
 		}
 
@@ -3692,19 +3692,20 @@ public class TargetSeries {
 		return seriesRulesProcessed;
 	}
 
+
 	public void addSeriesRuleProcessed(String ruleName) {
 		if (ruleName != null) {
 			seriesRulesProcessed.add(ruleName);
 		}
 	}
 
-	public Collection<String> getDiseasesSupportedByThisSeries() {
 
+	public Collection<String> getDiseasesSupportedByThisSeries() {
 		return interimEvaluationValidityCountByDisease.keySet();
 	}
 
-	private int getInterimDiseaseEvaluationValidityCount(String disease) {
 
+	private int getInterimDiseaseEvaluationValidityCount(String disease) {
 		if (disease == null) {
 			return 0;
 		}
