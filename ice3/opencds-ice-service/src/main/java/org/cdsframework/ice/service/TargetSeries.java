@@ -1200,14 +1200,14 @@ public class TargetSeries {
 	 * @return effective number of valid and accepted doses, taking immunity and skip doses into account
 	 */
 	public int determineEffectiveNumberOfDosesInSeries() {
-
 		return determineEffectiveNumberOfDosesInSeriesForSpecifiedDiseasesOnly(new ArrayList<>());
-
 	}
 
 
 	/**
 	 * If diseasesOfInterest parameter is empty, assume interest is in all diseases.
+	 *
+	 * @return effective number of valid and accepted doses, taking immunity and skip doses into account
 	 */
 	public int determineEffectiveNumberOfDosesInSeriesForSpecifiedDiseasesOnly(Collection<String> pDiseasesOfInterest) {
 		String _METHODNAME = "determineEffectiveNumberOfDosesInSeriesForSpecifiedDiseasesOnly()";
