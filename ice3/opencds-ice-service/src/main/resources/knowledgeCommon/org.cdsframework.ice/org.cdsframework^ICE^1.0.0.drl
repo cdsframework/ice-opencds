@@ -1354,7 +1354,7 @@ rule "SeriesSelection: Insert TargetSeriesSelection (Tracker) on to the Fact Lis
 		not (TargetSeriesSelection(getSeriesSelectionVaccineGroup() == $vg, getSeriesSelectionSeason() == $tseason))
 	then
 		String _RULENAME = drools.getRule().getName();
-		TargetSeriesSelection tss = new TargetSeriesSelection($vg, $tseason, schedule);
+		TargetSeriesSelection tss = new TargetSeriesSelection($tseries, schedule);
 		insert(tss);
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeriesSelection added to fact list: " + tss.toString());
 end
