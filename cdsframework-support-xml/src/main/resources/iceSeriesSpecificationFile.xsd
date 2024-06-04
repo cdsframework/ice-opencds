@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-
     /**
      * Copyright (C) 2019 New York City Department of Health and Mental Hygiene, Bureau of Immunization
      * Contributions by HLN Consulting, LLC
@@ -26,7 +25,6 @@
      * For more information about this software, see http://www.hln.com/ice or send
      * correspondence to ice@hln.com.
      */
-
 -->
 <xs:schema version="1.0"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
