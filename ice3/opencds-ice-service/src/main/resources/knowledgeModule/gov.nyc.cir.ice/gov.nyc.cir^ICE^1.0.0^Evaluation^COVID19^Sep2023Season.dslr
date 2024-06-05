@@ -283,16 +283,30 @@ rule "COVID-19(Sep2023 >= 5yrs Series): If a CVX 313 dose was administered in th
 end
 
 /*************************************************************************************************************************************************************************************
- ===> Series: >= 5 yrs, Pfizer < 5 yrs, Moderna < 5 yrs or Mixed Product < 5 yrs
- ===> Evaluation Interval Rules
- If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, evaluate and recommend using the following intervals from the last season's most recent shot 
- in the >= 5 yrs series, Pfizer < 5 yrs, Moderna < 5 yrs or Mixed Product < 5 yrs.
+ ===> Series: >= 5 yrs 
+ If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, evaluate and recommend using the following intervals from the last shot, if none of the following exceptions apply: the shot has been ignored (due to the CVX Code Absolute Maximum Age rule or due to an inadvertent bivalent shot administered in the previous season):  
+    Absolute Minimum Interval = 8 weeks - 4 days
+    Minimum Interval = 8 weeks
+    Recommended Interval = 8 weeks
+ Exceptions:
+    Exception 1: If a shot has been ignored (due to the CVX Code Absolute Maximum Age rule or due to an inadvertent bivalent shot administered in the previous season), there is no minimum interval to the next target dose. 
+    Exception 2: If a dose of CVX 313 is administered and it is the only dose on record, target dose 1 is not fulfilled, evaluate as Accepted with reason code VACCINE_NOT_PART_OF_THIS_SERIES.
+        Absolute minimum interval to fulfill target dose 1 = 24 days
+    Exception 3: If a dose of CVX 211 is administered this season (i.e., between 9/12/23 and 10/3/23), evaluate as Accepted with reason code VACCINE_NOT_PART_OF_THIS_SERIES.
+        Absolute minimum interval to fulfill target dose 1 = 24 days
+        Minimum interval = 28 days
+        Recommended interval = 28 days
+ 
+ ===> Series: Pfizer < 5 yrs, Moderna < 5 yrs or Mixed Product < 5 yrs
+ 
+ AI: If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, evaluate and recommend using the following intervals from the last season's most recent shot 
+ AI: in the >= 5 yrs series, Pfizer < 5 yrs, Moderna < 5 yrs or Mixed Product < 5 yrs.
     + Absolute Minimum Interval = 8 weeks - 4 days
  
  ===> Series: Mixed Product  < 5 yrs --- Evaluation/Recommendation Rules for CVX 313 shot administered for target dose 1 or target dose 2 
 /************************************************************************************************************************************************************************************/
 
-rule "COVID-19(Sep2023 >= 5yrs Series): If a shot was administered for any dose number and the series is not complete, the absolute minimum interval from the prior shot to the current target dose is 8w-4d"
+rule "COVID-19(Sep2023 >= 5yrs Series): If a shot was administered for any dose number and the series is not complete, the absolute minimum interval from the prior (unignored) shot to the current target dose is 8w-4d"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	no-loop true
@@ -309,6 +323,7 @@ rule "COVID-19(Sep2023 >= 5yrs Series): If a shot was administered for any dose 
 		There is an administered shot $previousShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the administration date of the shot is < $currentShotDate
+			- the shot is not ignored
 			- make note of the date this shot was administered as $previousShotDate
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
