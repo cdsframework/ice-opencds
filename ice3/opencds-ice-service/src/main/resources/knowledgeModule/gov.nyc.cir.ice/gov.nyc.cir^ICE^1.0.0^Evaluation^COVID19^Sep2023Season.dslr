@@ -284,23 +284,28 @@ end
 
 
 /*************************************************************************************************************************************************************************************
- ===> Series: >= 5 yrs 
- 
- Target Dose 1 Evaluation Logic
- 
- If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, evaluate and recommend using the following intervals from the last shot, if none of the following exceptions apply: the shot has been ignored (due to the CVX Code Absolute Maximum Age rule or due to an inadvertent bivalent shot administered in the previous season):  
-    Absolute Minimum Interval = 8 weeks - 4 days
-    Minimum Interval = 8 weeks
-    Recommended Interval = 8 weeks
- Exceptions:
-    Exception 1: If a shot has been ignored (due to the CVX Code Absolute Maximum Age rule or due to an inadvertent bivalent shot administered in the previous season), there is no minimum interval to the next target dose. 
-    Exception 2: If a dose of CVX 313 is administered and it is the only dose on record, target dose 1 is not fulfilled, evaluate as Accepted with reason code VACCINE_NOT_PART_OF_THIS_SERIES.
-        Absolute minimum interval to fulfill target dose 1 = 24 days
-    Exception 3: If a dose of CVX 211 is administered this season (i.e., between 9/12/23 and 10/3/23), evaluate as Accepted with reason code VACCINE_NOT_PART_OF_THIS_SERIES.
-        Absolute minimum interval to fulfill target dose 1 = 24 days
-        Minimum interval = 28 days
-        Recommended interval = 28 days
- /************************************************************************************************************************************************************************************/
+ ===> Series: >= 5 yrs
+/************************************************************************************************************************************************************************************/
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ===> Series: >= 5 yrs 
+//
+// Target Dose 1 Evaluation Logic
+// 
+// If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, evaluate and recommend using the following intervals from the last shot, if none of the following exceptions apply: 
+//     Absolute Minimum Interval = 8 weeks - 4 days
+//     Minimum Interval = 8 weeks
+//     Recommended Interval = 8 weeks
+//
+// Exceptions:
+//     Exception 1: If a shot has been ignored (due to the CVX Code Absolute Maximum Age rule or due to an inadvertent bivalent shot administered in the previous season), there is no minimum interval to the next target dose. 
+//     Exception 2: If a dose of CVX 313 is administered and it is the only dose on record, target dose 1 is not fulfilled, evaluate as Accepted with reason code VACCINE_NOT_PART_OF_THIS_SERIES.
+//        Absolute minimum interval to fulfill target dose 1 = 24 days
+//     Exception 3: If a dose of CVX 211 is administered this season (i.e., between 9/12/23 and 10/3/23), evaluate as Accepted with reason code VACCINE_NOT_PART_OF_THIS_SERIES.
+//        Absolute minimum interval to fulfill target dose 1 = 24 days
+//        Minimum interval = 28 days
+//        Recommended interval = 28 days
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 1: If a shot was administered and the series is not complete, the absolute minimum interval from the prior shot (unignored, as per exception 1) to the current target dose is 8w-4d"
 	dialect "mvel"
@@ -447,16 +452,18 @@ rule "COVID-19(Sept 2023 >= 5yrs Series)-->TargetDose 1/Exception 3: If a shot o
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ===> Series: >= 5 yrs
+// 
+// Target Dose 2 Evaluation Logic 
+//     If a shot listed as a "Valid CVX Code(s) per Dose for this Series" is administered before the absolute minimum age, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES.
+//     If a shot listed as a "Valid CVX Code(s) per Dose for this Series" is administered before the absolute minimum age, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*************************************************************************************************************************************************************************************
- ===> Series: >= 5 yrs
- 
- Target Dose 2 Evaluation Logic
- 
- If a shot listed as a "Valid CVX Code(s) per Dose for this Series" is administered before the absolute minimum age, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES.
- 
- If a shot listed as a "Valid CVX Code(s) per Dose for this Series" is administered before the absolute minimum age, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES
+ END ===> Series: >= 5 yrs
 /************************************************************************************************************************************************************************************/
+
 
 
 /*************************************************************************************************************************************************************************************
