@@ -122,6 +122,11 @@ end
  END - PRIOR FORMULATION of COVID-19 Vaccine Administered on or after 9/12/2023   
 /************************************************************************************************************************************************************************************/
 
+
+/*************************************************************************************************************************************************************************************
+ START- Specialized logic for marking vaccines Accepted for CVX  211 and or vaccines not permitted for a specific dose according to the series tables.    
+/************************************************************************************************************************************************************************************/
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // START ACCEPTED vaccines in a wrong FDA-approved series
 // FDA-approved vaccines in the wrong FDA-approved series that is not complete always get evaluated as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN rather than Invalid. 
@@ -176,6 +181,16 @@ rule "COVID-19(Sep2023 >= 5yrs Series): If CVX 211 is administered in the >= 5 y
 		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
 end
 
+/*************************************************************************************************************************************************************************************
+ END - Specialized logic for marking vaccines Accepted for CVX  211 and or vaccines not permitted for a specific dose according to the series tables.    
+/************************************************************************************************************************************************************************************/
+
+
+/*************************************************************************************************************************************************************************************
+ * Extra Dose Logic in Sep2023 >= 5yrs Series that is no longer needed, due to the fact that a CVX 313 as the first dose in the series is marked Accepted rather than Valid
+ * AI: REMOVE this block after confirmation that it is no longer needed.
+ *
+ *
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // If an extra dose (2 doses or more) is required for the >= 5y Series,
@@ -219,12 +234,6 @@ rule "COVID-19(Sep2023 >= 5yrs Series): If the number of doses administered is >
 		Log that this Series Rule fired for the Series $targetSeries
 end
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ===> Series: >= 5y Series and Mixed Product Series
-// If a Novavax dose was administered and there are no mRNA doses in the current season's series, then the series is not complete even if 
-// the number of effective doses to complete theseries has been reached. Therefore, another dose should be recommended 8 weeks later.
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 rule "COVID-19(Sep2023 >= 5yrs Series): If a CVX 313 dose was administered for target dose 1 in the >= 5 yrs of age series, no doses in the prior season was administered, and no mRNA vaccines have been administered in the current season, mark series is NOT complete"
  	dialect "mvel"
@@ -281,6 +290,8 @@ rule "COVID-19(Sep2023 >= 5yrs Series): If a CVX 313 dose was administered in th
 		Record that this Series Rule was Processed for the TargetSeries $associatedTargetSeries
 		Log that this Series Rule fired for the Series $associatedTargetSeries
 end
+
+/************************************************************************************************************************************************************************************/
 
 
 /*************************************************************************************************************************************************************************************
@@ -473,12 +484,10 @@ rule "COVID-19((Sept 2023 >= 5yrs Series)-->TargetDose 2: If a shot is administe
 			- make note of the date this shot was administered as $currentShotDate
 			- make note of the associated series as $associatedTargetSeries
 		There is a Series $targetSeries identified by $associatedTargetSeries
-			- make note of the absolute minimum age for dose 2 this Series as $absMinAgeOfDose2
+			- make note of the absolute minimum age for dose 2 in this Series as $absMininimumAgeForDoseTwo
 		The patient information $patientInformation must be known to complete writing this rule
-			- make note of the date as $dtDateAtAbsMinAgeOfDose2 when the patient is $absMinAgeOfDose2
-		There is an administered shot $sameShot
-			- that is the same shot as $currentShot
-			- the administration date of the shot is < $dtDateAtAbsMinAgeOfDose2
+			- make note of the patient's birthdate as $dtBirthDate
+		Confirm elapsed time between $dtBirthDate and $currentShotDate < $absMininimumAgeForDoseTwo
 	then
 		Include the reason for shot $currentShot Accepted due to "Shot Administered Outside of a Routine Series"
 		Record that this dose rule was Processed for the TargetDose $currentShot
