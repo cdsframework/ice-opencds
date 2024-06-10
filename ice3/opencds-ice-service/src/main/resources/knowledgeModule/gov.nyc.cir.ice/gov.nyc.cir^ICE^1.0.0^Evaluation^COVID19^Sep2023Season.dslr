@@ -761,10 +761,10 @@ end
 
 
 /*****************************************************************************************************************************************************************************************************************
- ===> Series: Pfizer < 5 yrs, Moderna < 5 yrs or Mixed Product < 5 yrs ==> Evaluation Interval Rules from Prior Season
+ ===> Series: Pfizer < 5 yrs, Moderna < 5 yrs, Mixed Product < 5 yrs, Novavax ==> Evaluation Interval Rules from Prior Season
 /*****************************************************************************************************************************************************************************************************************/
 
-rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series): If a shot was administered prior to target dose 1 (prior season) but has never received any (valid) doses, the absolute minimum interval from the prior shot to the current shot is 8w-4d"
+rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs; Novavax Series): If a shot was administered prior to target dose 1 (prior season) but has never received any (valid) doses, the absolute minimum interval from the prior shot to the current shot is 8w-4d"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheckFromPreviousSeason"
@@ -772,7 +772,7 @@ rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series): If a shot wa
 	when
 		There is an administered shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the shot belongs to the Series with name a member of ("COVID19Sep2023PfizerLT5ySeries", "COVID19Sep2023ModernaLT5ySeries", "COVID19Sep2023MixedProductLT5ySeries")
+			- the shot belongs to the Series with name a member of ("COVID19Sep2023PfizerLT5ySeries", "COVID19Sep2023ModernaLT5ySeries", "COVID19Sep2023MixedProductLT5ySeries", "COVID19Sep2023NovavaxSeries")
 			- make note of the date this shot was administered as $currentShotDate
 			- make note of the associated series as $associatedTargetSeries
 		There does not exist an IceFact
@@ -1027,12 +1027,6 @@ end
  END __SKIP DOSE__ Logic for patients < 5 yrs Series for Series: Pfizer < 5yrs, Moderna < 5yrs, Mixed Product < 5yrs
 /*****************************************************************************************************************************************************************************************************************/
 
-
-/*****************************************************************************************************************************************************************************************************************
- ===> Series: Mixed Product < 5yrs Series
-/*****************************************************************************************************************************************************************************************************************/
-
-
 /*****************************************************************************************************************************************************************************************************************
  END Series Completion Logic for doses administered; Series: Pfizer < 5y, Mixedx Product < 5y
 /*****************************************************************************************************************************************************************************************************************/
@@ -1135,7 +1129,7 @@ rule "COVID-19(Sep2023 Novavax Series): If no CVX 313 doses were administered an
 end
 
 /*
- AI:::::::
+ AI:::::::  No longer needed; taken care of by series table.
 rule "COVID-19(Sep2023 >= 5yrs Series): If the number of doses administered is >= 2, the series is not complete, and at least one of the doses is CVX 313, mark the series complete"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
@@ -1156,7 +1150,6 @@ rule "COVID-19(Sep2023 >= 5yrs Series): If the number of doses administered is >
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
 		Log that this Series Rule fired for the Series $targetSeries
 end
-*/
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1192,16 +1185,19 @@ rule "COVID-19(Sep2023 Novavax Series): If there have been >= 2 doses administer
 		Record that this dose rule was Processed for the TargetDose $currentShot
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
+*/
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // If the patient is age >= 5 years and < 12 years and CVX 313 is administered as dose 1, evaluate and recommend using the following intervals:  
 //     Absolute Minimum Interval = 17 days
-//     Minimum Interval = 8 weeks
-//     Recommended Interval = 8 weeks
+//     Minimum Interval = 4 weeks
+//     Recommended Interval = 4 weeks
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/////// Nothing to do for evaluation. Taken care of by Series Table Rules
+// Nothing needs to be done here, since the absolute minimum interval of 17 days matches what is in the series table. Changes need to be made on the recommendation side, however, as they do not match there.
+
+
 
 /*************************************************************************************************************************************************************************************
  END Novavax Series Special Rules
