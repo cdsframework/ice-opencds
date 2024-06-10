@@ -317,7 +317,8 @@ end
 //        Recommended interval = 28 days
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 1: If a shot was administered and the series is not complete, the absolute minimum interval from the prior shot (unignored, as per exception 1) to the current target dose is 8w-4d"
+// Absolute Minimum Interval is 8 weeks from previous, unignored shot (if any). (Shots would previously have been marked ignored due to incorrect bivalent or vaccine administered > the absolute maximum age for the vaccine.)
+rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 1/Happy Path & Exception 1: If a shot was administered and the series is not complete, the absolute minimum interval from the prior shot (unignored, as per exception 1) to the current target dose is 8w-4d"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	/////// activation-group "doseIntervalCheck"
