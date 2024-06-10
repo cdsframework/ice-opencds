@@ -379,6 +379,43 @@ end
 //     + Recommended interval = 28 days. If the patient is < 12 years as of the evaluation date and is < 12 years at the recommended due date), return recommended reason code ADMINISTER_mRNA_VACCINE.
 ///////
 
+rule "COVID-19(Sep2023 >= 5yrs)->TargetDose 1/Exception 2: If a shot of CVX 313 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE, and there are no prior doses on record, the minimum/recommended interval from that shot to target dose 1 is 28 days"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
+	activation-group "recommendationIntervalCheck"
+	when
+		There is a Series $targetSeries that needs forecasting
+			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
+			- the name of the Series is "COVID19Sep2023gte5Series"
+			- the effective dose number in the series is == 1
+			- the Series is not complete
+		There does not exist an administered shot
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- that has already been evaluated and whose shot validity is VALID
+		There is an administered shot $previousShot
+			- the shot belongs to the Series $targetSeries
+			- the dose number in the series is == 1
+			- the vaccine administered is "ICE313"
+			- that has already been evaluated and whose shot validity is INVALID or ACCEPTED
+			- make note of Accepted evaluation reasons for this shot as $acceptedReasons
+			- the collection $acceptedReasons contains "EVALUATION_REASON_CONCEPT.VACCINE_NOT_ALLOWED_FOR_THIS_DOSE" 
+			- make note of the date this shot was administered as $previousShotDate
+		There does not exist an administered shot
+			- the shot belongs to the Series $targetSeries
+			- that has already been evaluated and whose shot validity is INVALID or ACCEPTED
+			- the dose number in the series is == 1
+			- the vaccine administered is "ICE313"
+			- the administration date of the shot is > $previousShotDate
+	then
+		Create a Recommendation as $r for the Series $targetSeries
+		Add "28d" to $previousShotDate and make note of the newly calculated date as $dtCalculated
+		Set the recommendation Earliest Forecast Date for $r to $dtCalculated
+		Set the recommendation Recommended Forecast Date for $r to $dtCalculated
+		Include the Recommendation $r for Consideration in the final forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+       	Log that this Series Rule fired for the Series $targetSeries
+end
+
 /*
 rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of CVX 313 is administered for target dose 1, and there are no previous doses on record, evaluate the shot as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE"
 	dialect "mvel"

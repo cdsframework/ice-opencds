@@ -398,9 +398,11 @@ rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of 
 			- that has finding SupportedFactConcept._BELOW_MINIMUM_INTERVAL.conceptCodeValue
 		There is an administered shot $previousShot
 			- the shot belongs to the Series $associatedTargetSeries
-			- that has already been evaluated and whose shot validity is INVALID or ACCEPTED
 			- the dose number in the series is == 1
 			- the vaccine administered is "ICE313"
+			- that has already been evaluated and whose shot validity is INVALID or ACCEPTED
+			- make note of Accepted evaluation reasons for this shot as $acceptedReasons
+			- the collection $acceptedReasons contains "EVALUATION_REASON_CONCEPT.VACCINE_NOT_ALLOWED_FOR_THIS_DOSE" 			
 			- the administration date of the shot is < $currentShotDate
 			- make note of the date this shot was administered as $previousShotDate
 		Confirm Elapsed time between $previousShotDate and $currentShotDate < "24d"
