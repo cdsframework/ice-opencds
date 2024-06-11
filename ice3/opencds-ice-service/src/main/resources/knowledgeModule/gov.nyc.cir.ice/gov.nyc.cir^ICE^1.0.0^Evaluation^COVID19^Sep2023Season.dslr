@@ -522,7 +522,7 @@ end
 //    If administered as target dose 3, follow series interval
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-rule "COVID-19(Sep 2023 Pfizer < 5yrs Series): If a shot was previously administered for target dose 1 or target dose 2 and evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES and the series is not complete, the absolute minimum interval from that shot to target dose 1 is 24 days"
+rule "COVID-19(Sep 2023 Pfizer < 5yrs Series): If a shot was previously administered for target dose 1 or target dose 2 and evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES and the series is not complete, the absolute minimum interval from that shot to this shot is 24 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	no-loop true
@@ -537,7 +537,7 @@ rule "COVID-19(Sep 2023 Pfizer < 5yrs Series): If a shot was previously administ
 			- make note of the associated series as $associatedTargetSeries
 		There does not exist an IceFact
 			- that has associated administered shot $currentShot
-			- that has finding SupportedFactConcept._BELOW_MINIMUM_AGE.conceptCodeValue
+			- that has finding SupportedFactConcept._BELOW_MINIMUM_INTERVAL.conceptCodeValue
 		There is an administered shot $previousShot
 			- the shot belongs to the series $associatedTargetSeries
 			- the dose number in the Series is == $targetDoseNumber
@@ -612,7 +612,7 @@ rule "COVID-19(Sep 2023 Moderna < 5yrs Series): If a shot was previously adminis
 			- make note of the associated series as $associatedTargetSeries
 		There does not exist an IceFact
 			- that has associated administered shot $currentShot
-			- that has finding SupportedFactConcept._BELOW_MINIMUM_AGE.conceptCodeValue
+			- that has finding SupportedFactConcept._BELOW_MINIMUM_INTERVAL.conceptCodeValue
 		There is an administered shot $previousShot
 			- the shot belongs to the series $associatedTargetSeries
 			- the dose number in the Series is == $targetDoseNumber
@@ -661,7 +661,7 @@ rule "COVID-19(Sep 2023 Mixed Product < 5yrs Series): If a shot was previously a
 			- make note of the associated series as $associatedTargetSeries
 		There does not exist an IceFact
 			- that has associated administered shot $currentShot
-			- that has finding SupportedFactConcept._BELOW_MINIMUM_AGE.conceptCodeValue
+			- that has finding SupportedFactConcept._BELOW_MINIMUM_INTERVAL.conceptCodeValue
 		There is an administered shot $previousShot
 			- the shot belongs to the series $associatedTargetSeries
 			- the dose number in the Series is == $targetDoseNumber
