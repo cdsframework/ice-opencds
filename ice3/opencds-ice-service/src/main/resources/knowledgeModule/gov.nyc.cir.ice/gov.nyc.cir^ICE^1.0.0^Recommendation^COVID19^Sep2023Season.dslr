@@ -55,7 +55,7 @@ global org.cdsframework.ice.service.Schedule schedule
 
 
 /*****************************************************************************************************************************************************************************************************************
- ===> Series: ALL; Prior formulation administered in this season
+ ===> Series: ALL; Prior formulation administered in this season ; v1.42 release logic, still applicable
 /****************************************************************************************************************************************************************************************************************/
 
 rule "COVID-19(Sep2023 >=5yrs; Pfizer/Moderna/Mixed Product < 5yrs): If a prior formulation is administered for target dose 1, recommend interval of 28 days to the next dose"
@@ -131,7 +131,7 @@ end
 
 
 /*****************************************************************************************************************************************************************************************************************
- Recommendation Age Rules ===> All Series
+ Recommendation Age Rules ===> All Series ; v1.42 release logic, still applicable
 *****************************************************************************************************************************************************************************************************************/
 
 rule "COVID-19(Sep2023): If there are no shots administered, set the earliest/recommended/overdue age to the latter of age 6 months or 9/12/2023 (*recommendationAgeCheck*)"
@@ -784,11 +784,105 @@ END Series: Mixed Product < 5 yrs
 
 
 
+/*************************************************************************************************************************************************************************************
+ ===> Series: Sep2023 Novavax
+/************************************************************************************************************************************************************************************/
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// If the series has not been completed but the number of doses to complete the Novavax series has been met, then the series must
+// have been completed with all prior CVX 211 vaccine. The minimum/recommended interval to the next dose (which should be a CVX 311) is 8w 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+rule "COVID-19(Sep2023 Novavax Series): If a shot was administered for any dose number and the series is not complete, recommend earliest and recommended interval of 8w to the next target dose"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
+	when
+		There is a Series $targetSeries that needs forecasting
+			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
+			- the name of the Series is "COVID19Sep2023NovavaxSeries"
+			- the Series is not complete
+			- the number of administered shots is >= 1
+			- make note of the number of doses required to complete this Series as $numberOfDosesInSeries
+			- the effective number of doses administered in the Series is >= $numberOfDosesInSeries
+			- make note of the last shot administered in the Series as $lastShotInSeries
+			- make note of the date that the most recent shot was administered as $lastShotDateInSeries
+	then
+		Create a Recommendation as $r for the Series $targetSeries
+		Add "8w" to $lastShotDateInSeries and make note of the newly calculated date as $dtCalculatedMinimum
+		Add "8w" to $lastShotDateInSeries and make note of the newly calculated date as $dtCalculatedRecommended
+		Set the recommendation Earliest Forecast Date for $r to $dtCalculatedMinimum
+		Set the recommendation Recommended Forecast Date for $r to $dtCalculatedRecommended
+		Include the Recommendation $r for Consideration in the final forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+       	Log that this Series Rule fired for the Series $targetSeries
+end
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// If the patient is age >= 5 years and < 12 years and CVX 313 is administered as dose 1, evaluate and recommend using the following intervals:  
+//     Minimum Interval = 8 weeks
+//     Recommended Interval = 8 weeks
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+rule "COVID-19(Sep2023 Novavax Series): If a CVX 313 is administered as (valid) dose 1 to a patient >= 5 yrs and < 12 yrs-4 days, recommend earliest/recommended interval of 8 weeks from dose 1"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
+	activation-group "recommendationAgeCheck"
+	when
+		There is a Series $targetSeries that needs forecasting
+			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
+			- the name of the Series is "COVID19Sep2023NovavaxSeries"
+			- the number of administered shots is >= 1
+			- the effective number of doses administered in the Series is == 1
+			- Make note of the last shot administered in the Series as $lastShotAdministered
+		There is an administered shot $CVX313Dose1
+			- the shot belongs to the Series $targetSeries
+			- the vaccine administered is "ICE313"
+			- that has already been evaluated and whose shot validity is VALID
+			- the dose number in the series is == 1
+		There is an administered shot $mostRecentShot
+			- that is the same shot as $lastShotAdministered
+			- make note of the date this shot was administered as $lastShotAdministrationDate
+		The patient information $oEvaluatedPerson must be known to complete writing this rule
+        	- make note of the patient's birthdate as $dtBirthDate
+        Confirm elapsed time between $dtBirthDate and $lastShotAdministrationDate >= "5y"
+        Confirm elapsed time between $dtBirthDate and $lastShotAdministrationDate < "12y-4d"
+	then
+		Create a Recommendation as $r for the Series $targetSeries
+		Add "8w" to $lastShotAdministrationDate and make note of the newly calculated date as $dtCalculatedMinimum
+		Add "8w" to $lastShotAdministrationDate and make note of the newly calculated date as $dtCalculatedRecommended
+		Set the recommendation Earliest Forecast Date for $r to $dtCalculatedMinimum
+		Set the recommendation Recommended Forecast Date for $r to $dtCalculatedRecommended
+		Include the Recommendation $r for Consideration in the final forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+       	Log that this Series Rule fired for the Series $targetSeries
+end
+
+
+rule "COVID-19(Sep2023 Novavax Series):activation-group extension => If a CVX 313 is administered as (valid) dose 1 to a patient >= 5 yrs and < 12 yrs, recommend earliest/recommended interval of 8 weeks from dose 1"
+		extends "COVID-19(Sep2023 Novavax Series): If a CVX 313 is administered as (valid) dose 1 to a patient >= 5 yrs and < 12 yrs-4 days, recommend earliest/recommended interval of 8 weeks from dose 1"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
+	activation-group "earliestAgeCheck"
+	when
+		// No condition required for this extension
+	then
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+       	Log that this Series Rule fired for the Series $targetSeries
+end
+
+
+/*************************************************************************************************************************************************************************************
+ END ===> Series: Sep2023 Novavax
+/************************************************************************************************************************************************************************************/
+
+
+
+
 /*****************************************************************************************************************************************************************************************************************
+ ===> Intervals from PRIOR Season ; v1.42 release logic, still applicable
  ===> Series: >= 5 yrs, Pfizer < 5 yrs, Moderna < 5 yrs or Mixed Product < 5 yrs
- ===> Recommendation Interval Rules
- ===> v1.42.1 
- If a prior formulation is administered for target dose 1, recommend interval of 28 days to the next dose  (See above)
+   If a prior formulation is administered for target dose 1, recommend interval of 28 days to the next dose  (See above)
  Otherwise:
  If the patient has >= 1 COVID-19 shot(s) on record prior to (a valid) dose 1, recommend using the following intervals from the last shot in the  
    >= 5 yrs, Pfizer < 5 yrs, Moderna < 5 yrs or Mixed Product < 5 yrs series.
@@ -953,10 +1047,8 @@ rule "COVID-19(Sep2023 __Moderna__ < 5yrs Series): For target dose > 1: If 2 or 
 		Create a Recommendation as $r for the Series $targetSeries
 		Add "8w" to $mostRecentShotDatePriorSeason and make note of the newly calculated date as $dtCalculatedMinimum
 		Add "8w" to $mostRecentShotDatePriorSeason and make note of the newly calculated date as $dtCalculatedRecommended
-		/////// Add $oLatestRecommendedInterval to $mostRecentShotDate and make note of the newly calculated date as $dtCalculatedRecommendedLatest
 		Set the recommendation Earliest Forecast Date for $r to $dtCalculatedMinimum
 		Set the recommendation Recommended Forecast Date for $r to $dtCalculatedRecommended
-		/////// Set the recommendation Overdue Forecast Date for $r to $dtCalculatedRecommendedLatest
 		Include the Recommendation $r for Consideration in the final forecast of the Series
 		// Now update the DoseRule for dose number 1, in case there are shots in the current season too
 		Obtain the existing DoseRule for Dose Number 1 in the Series $targetSeries as $oDoseRule
@@ -971,12 +1063,14 @@ rule "COVID-19(Sep2023 __Moderna__ < 5yrs Series): For target dose > 1: If 2 or 
 end
 
 /*****************************************************************************************************************************************************************************************************************
- END Recommendation Interval Rules from prior season; Series: >= 5 yrs, Pfizer < 5 yrs, Moderna < 5 yrs or Mixed Product < 5 yrs
+ END Recommendation Interval Rules from prior season; Series: >= 5 yrs, Pfizer < 5 yrs, Moderna < 5 yrs or Mixed Product < 5 yrs ; v1.42 release logic, still applicable
 *****************************************************************************************************************************************************************************************************************/
 
 
+
+
 /*************************************************************************************************************************************************************************************
- ___SKIP DOSE___
+ ===> Series: >= 5 yrs, Pfizer < 5 yrs, Moderna < 5 yrs or Mixed Product < 5 yrs ; v1.42 release logic, still applicable
  __SKIP DOSE__ Rules FOR < 5 yrs of age series: Pfizer < 5ys, Moderna < 5yrs, Mixed Product < 5yrs
  + Target Dose 1
      If the patient has 1 dose of any of the following prior formulations vaccines (CVX 207, CVX 208, CVX 217, CVX 218, CVX 219, CVX 221, CVX 227, CVX 228, CVX 229, CVX 230, 
@@ -1144,98 +1238,4 @@ end
 
 /*************************************************************************************************************************************************************************************
  END ====> Sep2023 Mixed Product Series - Series Special Rules
-/************************************************************************************************************************************************************************************/
-
-
-
-/*************************************************************************************************************************************************************************************
- Series Special Rules for Sep2023 Novavax Series
-/************************************************************************************************************************************************************************************/
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// If the series has not been completed but the number of doses to complete the Novavax series has been met, then the series must
-// have been completed with all prior CVX 211 vaccine. The minimum/recommended interval to the next dose (which should be a CVX 311) is 8w 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-rule "COVID-19(Sep2023 Novavax Series): If a shot was administered for any dose number and the series is not complete, recommend earliest and recommended interval of 8w to the next target dose"
-	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
-	when
-		There is a Series $targetSeries that needs forecasting
-			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series is "COVID19Sep2023NovavaxSeries"
-			- the Series is not complete
-			- the number of administered shots is >= 1
-			- make note of the number of doses required to complete this Series as $numberOfDosesInSeries
-			- the effective number of doses administered in the Series is >= $numberOfDosesInSeries
-			- make note of the last shot administered in the Series as $lastShotInSeries
-			- make note of the date that the most recent shot was administered as $lastShotDateInSeries
-	then
-		Create a Recommendation as $r for the Series $targetSeries
-		Add "8w" to $lastShotDateInSeries and make note of the newly calculated date as $dtCalculatedMinimum
-		Add "8w" to $lastShotDateInSeries and make note of the newly calculated date as $dtCalculatedRecommended
-		Set the recommendation Earliest Forecast Date for $r to $dtCalculatedMinimum
-		Set the recommendation Recommended Forecast Date for $r to $dtCalculatedRecommended
-		Include the Recommendation $r for Consideration in the final forecast of the Series
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-       	Log that this Series Rule fired for the Series $targetSeries
-end
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// If the patient is age >= 5 years and < 12 years and CVX 313 is administered as dose 1, evaluate and recommend using the following intervals:  
-//     Minimum Interval = 8 weeks
-//     Recommended Interval = 8 weeks
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-rule "COVID-19(Sep2023 Novavax Series): If a CVX 313 is administered as (valid) dose 1 to a patient >= 5 yrs and < 12 yrs-4 days, recommend earliest/recommended interval of 8 weeks from dose 1"
-	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
-	activation-group "recommendationAgeCheck"
-	when
-		There is a Series $targetSeries that needs forecasting
-			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series is "COVID19Sep2023NovavaxSeries"
-			- the number of administered shots is >= 1
-			- the effective number of doses administered in the Series is == 1
-			- Make note of the last shot administered in the Series as $lastShotAdministered
-		There is an administered shot $CVX313Dose1
-			- the shot belongs to the Series $targetSeries
-			- the vaccine administered is "ICE313"
-			- that has already been evaluated and whose shot validity is VALID
-			- the dose number in the series is == 1
-		There is an administered shot $mostRecentShot
-			- that is the same shot as $lastShotAdministered
-			- make note of the date this shot was administered as $lastShotAdministrationDate
-		The patient information $oEvaluatedPerson must be known to complete writing this rule
-        	- make note of the patient's birthdate as $dtBirthDate
-        Confirm elapsed time between $dtBirthDate and $lastShotAdministrationDate >= "5y"
-        Confirm elapsed time between $dtBirthDate and $lastShotAdministrationDate < "12y-4d"
-	then
-		Create a Recommendation as $r for the Series $targetSeries
-		Add "8w" to $lastShotAdministrationDate and make note of the newly calculated date as $dtCalculatedMinimum
-		Add "8w" to $lastShotAdministrationDate and make note of the newly calculated date as $dtCalculatedRecommended
-		Set the recommendation Earliest Forecast Date for $r to $dtCalculatedMinimum
-		Set the recommendation Recommended Forecast Date for $r to $dtCalculatedRecommended
-		Include the Recommendation $r for Consideration in the final forecast of the Series
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-       	Log that this Series Rule fired for the Series $targetSeries
-end
-
-
-rule "COVID-19(Sep2023 Novavax Series):activation-group extension => If a CVX 313 is administered as (valid) dose 1 to a patient >= 5 yrs and < 12 yrs, recommend earliest/recommended interval of 8 weeks from dose 1"
-		extends "COVID-19(Sep2023 Novavax Series): If a CVX 313 is administered as (valid) dose 1 to a patient >= 5 yrs and < 12 yrs-4 days, recommend earliest/recommended interval of 8 weeks from dose 1"
-	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
-	activation-group "earliestAgeCheck"
-	when
-		// No condition required for this extension
-	then
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-       	Log that this Series Rule fired for the Series $targetSeries
-end
-
-
-/*************************************************************************************************************************************************************************************
- END Series Special Rules for Sep2023 Novavax Series
 /************************************************************************************************************************************************************************************/

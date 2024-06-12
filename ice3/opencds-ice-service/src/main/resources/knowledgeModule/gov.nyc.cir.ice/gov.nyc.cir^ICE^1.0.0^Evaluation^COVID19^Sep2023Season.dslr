@@ -123,6 +123,8 @@ end
 /****************************************************************************************************************************************************************************************************************/
 
 
+
+
 /*****************************************************************************************************************************************************************************************************************
  START- Specialized logic for marking vaccines Accepted for CVX  211 and or vaccines not permitted for a specific dose according to the series tables.    
 /****************************************************************************************************************************************************************************************************************/
@@ -184,6 +186,8 @@ end
 /*****************************************************************************************************************************************************************************************************************
  END - Specialized logic for marking vaccines Accepted for CVX  211 and or vaccines not permitted for a specific dose according to the series tables.    
 /****************************************************************************************************************************************************************************************************************/
+
+
 
 
 /*****************************************************************************************************************************************************************************************************************
@@ -321,7 +325,7 @@ end
 rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 1/Happy Path & Exception 1: If a shot was administered and the series is not complete, the absolute minimum interval from the prior shot (unignored, as per exception 1) to the current target dose is 8w-4d"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
-	/////// activation-group "doseIntervalCheck"
+	activation-group "doseIntervalCheck"
 	no-loop true
 	when
 		There is an administered shot $currentShot that needs to be evaluated
@@ -379,7 +383,7 @@ end
 rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of CVX 313 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE, and there are no prior doses on record, the absolute minimum interval from that shot to target dose 1 is 24 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
-	/////// activation-group "doseIntervalCheck"
+	activation-group "doseIntervalCheck"
 	no-loop true
 	salience 10
 	when
@@ -434,7 +438,7 @@ end
 rule "COVID-19(Sept 2023 >= 5yrs Series)-->TargetDose 1/Exception 3: If a shot of CVX 211 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_PART_OF_THIS_SERIES, the absolute minimum interval from that shot to target dose 1 is 24 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
-	/////// activation-group "doseIntervalCheck"
+	activation-group "doseIntervalCheck"
 	no-loop true
 	salience 10
 	when
@@ -494,14 +498,18 @@ rule "COVID-19(Sept 2023 >= 5yrs Series)-->TargetDose 2: If a shot is administer
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Target Dose 2 Evaluation Logic; ===> Series: >= 5 yrs
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 ///////
 // rule "COVID-19(Sep 2023 >= 5rs Series)-->TargetDose 2: If a CVX 310 or CVX 311 is administered < the series absolute minimum age for the dose and <= the CVX code absolute maximum age, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES."
 // No rule needs to be implemented here, as it is subsumed by the rule above.
 ///////
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// END Target Dose 2 Evaluation Logic
-// ===> Series: >= 5 yrs
+// END Target Dose 2 Evaluation Logic; ===> Series: >= 5 yrs
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*****************************************************************************************************************************************************************************************************************
@@ -509,11 +517,14 @@ end
 /*****************************************************************************************************************************************************************************************************************/
 
 
+
+
 /*****************************************************************************************************************************************************************************************************************
  ===> Series: Pfizer < 5 yrs
 /*****************************************************************************************************************************************************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// START
 // Pfizer < 5 yrs Series: If a shot is administered below the series absolute minimum age (< 6m - 4 days) in this season (on or after 9/12/2023):  
 //    If administered as target dose 1 or target dose 2, intervals to the next target dose are:  
 //        Absolute minimum interval = 24 days
@@ -586,6 +597,8 @@ end
 /*****************************************************************************************************************************************************************************************************************/
 
 
+
+
 /*****************************************************************************************************************************************************************************************************************
  ===> Series: Moderna < 5 yrs
 /*****************************************************************************************************************************************************************************************************************/
@@ -631,6 +644,8 @@ end
 /*****************************************************************************************************************************************************************************************************************
  END ===> Series: Moderna < 5 yrs
 /*****************************************************************************************************************************************************************************************************************/
+
+
 
 
 /*****************************************************************************************************************************************************************************************************************
@@ -679,6 +694,7 @@ end
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// START
 // Mixed Product < 5 yrs Series: Series Completion Logic
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -765,8 +781,10 @@ end
 /*****************************************************************************************************************************************************************************************************************/
 
 
+
+
 /*****************************************************************************************************************************************************************************************************************
- ===> Series: Pfizer < 5 yrs, Moderna < 5 yrs, Mixed Product < 5 yrs, Novavax ==> Evaluation Interval Rules from Prior Season
+ ===> Series: Pfizer < 5 yrs, Moderna < 5 yrs, Mixed Product < 5 yrs, Novavax ==> Evaluation Interval Rules from Prior Season ; v1.42 release logic, still applicable
 /*****************************************************************************************************************************************************************************************************************/
 
 rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs; Novavax Series): If a shot was administered prior to target dose 1 (prior season) but has never received any (valid) doses, the absolute minimum interval from the prior shot to the current shot is 8w-4d"
@@ -837,12 +855,14 @@ rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series): If a shot wa
 end
 
 /*****************************************************************************************************************************************************************************************************************
- END Series: >= 5 yrs, Pfizer < 5 yrs, Moderna < 5 yrs or Mixed Product < 5 yrs ==> Evaluation Interval Rules from Prior Season
+ END Series: >= 5 yrs, Pfizer < 5 yrs, Moderna < 5 yrs or Mixed Product < 5 yrs ==> Evaluation Interval Rules from Prior Season; v1.42 release logic, still applicable
 /*****************************************************************************************************************************************************************************************************************/
 
 
+
+
 /*****************************************************************************************************************************************************************************************************************
- ___SKIP DOSE RULES___
+ ___SKIP DOSE RULES___ ; v1.42.1 release logic, still applicable
  ===> Series: Pfizer < 5ys, Moderna < 5yrs, Mixed Product < 5yrs
  ===> __SKIP DOSE__ Rules FOR patients < 5 yrs of age in series
 
@@ -1032,14 +1052,24 @@ end
  END __SKIP DOSE__ Logic for patients < 5 yrs Series for Series: Pfizer < 5yrs, Moderna < 5yrs, Mixed Product < 5yrs
 /*****************************************************************************************************************************************************************************************************************/
 
-/*****************************************************************************************************************************************************************************************************************
- END Series Completion Logic for doses administered; Series: Pfizer < 5y, Mixedx Product < 5y
-/*****************************************************************************************************************************************************************************************************************/
+
 
 
 /*****************************************************************************************************************************************************************************************************************
  ===> Series: Novavax Series Special Rules
 /*****************************************************************************************************************************************************************************************************************/
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// If the patient is age >= 5 years and < 12 years and CVX 313 is administered as dose 1, evaluate and recommend using the following intervals:  
+//     Absolute Minimum Interval = 17 days
+//     Minimum Interval = 4 weeks
+//     Recommended Interval = 4 weeks
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+///////
+// Nothing needs to be done here, since the absolute minimum interval of 17 days matches what is in the series table. Changes need to be made on the recommendation side, however, as they do not match there.
+///////
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // If a CVX 313 is administered for dose 1 in the Novavax 2023 series, then the absolute minimum age for dose 1 of the series is 5 years
@@ -1191,18 +1221,6 @@ rule "COVID-19(Sep2023 Novavax Series): If there have been >= 2 doses administer
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
 */
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// If the patient is age >= 5 years and < 12 years and CVX 313 is administered as dose 1, evaluate and recommend using the following intervals:  
-//     Absolute Minimum Interval = 17 days
-//     Minimum Interval = 4 weeks
-//     Recommended Interval = 4 weeks
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Nothing needs to be done here, since the absolute minimum interval of 17 days matches what is in the series table. Changes need to be made on the recommendation side, however, as they do not match there.
-
-
 
 /*************************************************************************************************************************************************************************************
  END Novavax Series Special Rules
