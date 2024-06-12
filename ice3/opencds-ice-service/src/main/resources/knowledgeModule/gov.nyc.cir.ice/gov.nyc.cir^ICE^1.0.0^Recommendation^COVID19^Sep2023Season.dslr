@@ -771,7 +771,7 @@ rule "COVID-19(Sep2023 Mixed Product < 5yrs Series): If the most recent shot adm
 		Confirm elapsed time between $birthDate and $shotAdministrationDate < "5y"
 	then
 		Create a Recommendation as $recommendation for the Series $targetSeries
-		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_COVID19_mRNA_VACCINE"
+		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_mRNA_VACCINE"
 		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
