@@ -820,8 +820,9 @@ end
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // If the patient is age >= 5 years and < 12 years and CVX 313 is administered as dose 1, evaluate and recommend using the following intervals:  
-//     Minimum Interval = 8 weeks
-//     Recommended Interval = 8 weeks
+//     Minimum Interval = 4 weeks
+//     Recommended Interval = 4 weeks. 
+// Furthermore, if the patient is < 12 years as of the evaluation date and is < 12 years at the recommended due date), return recommended reason code ADMINISTER_mRNA_VACCINE.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 rule "COVID-19(Sep2023 Novavax Series): If a CVX 313 is administered as (valid) dose 1 to a patient >= 5 yrs and < 12 yrs-4 days, recommend earliest/recommended interval of 8 weeks from dose 1"
@@ -849,8 +850,8 @@ rule "COVID-19(Sep2023 Novavax Series): If a CVX 313 is administered as (valid) 
         Confirm elapsed time between $dtBirthDate and $lastShotAdministrationDate < "12y-4d"
 	then
 		Create a Recommendation as $r for the Series $targetSeries
-		Add "8w" to $lastShotAdministrationDate and make note of the newly calculated date as $dtCalculatedMinimum
-		Add "8w" to $lastShotAdministrationDate and make note of the newly calculated date as $dtCalculatedRecommended
+		Add "4w" to $lastShotAdministrationDate and make note of the newly calculated date as $dtCalculatedMinimum
+		Add "4w" to $lastShotAdministrationDate and make note of the newly calculated date as $dtCalculatedRecommended
 		Set the recommendation Earliest Forecast Date for $r to $dtCalculatedMinimum
 		Set the recommendation Recommended Forecast Date for $r to $dtCalculatedRecommended
 		Include the Recommendation $r for Consideration in the final forecast of the Series
@@ -870,6 +871,21 @@ rule "COVID-19(Sep2023 Novavax Series):activation-group extension => If a CVX 31
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
 end
+
+
+rule "COVID-19(Sep2023 Novavax Series): If the patient is < 12 years as of the evaluation date and is < 12 years at the recommended due date), return recommended reason code ADMINISTER_mRNA_VACCINE."
+	dialect "mvel"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
+	when
+	
+	then
+
+end
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// END: If the patient is age >= 5 years and < 12 years and CVX 313 is administered as dose 1...
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 /*************************************************************************************************************************************************************************************
