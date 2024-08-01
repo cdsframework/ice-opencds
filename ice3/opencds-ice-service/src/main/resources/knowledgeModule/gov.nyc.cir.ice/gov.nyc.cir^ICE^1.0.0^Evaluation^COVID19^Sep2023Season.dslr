@@ -322,7 +322,7 @@ end
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Absolute Minimum Interval is 8 weeks from previous, unignored shot (if any). (Shots would previously have been marked ignored due to incorrect bivalent or vaccine administered > the absolute maximum age for the vaccine.)
-rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 1/Happy Path & Exception 1: If a shot was administered and the series is not complete, the absolute minimum interval from the prior shot (unignored, as per exception 1) to the current target dose is 8w-4d"
+rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 1/Happy Path & Exception 1: If >= 1 shot was administered and the series is not complete, the absolute minimum interval from the prior shot (unignored, as per exception 1) to the current target dose is 8w-4d"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheck"
@@ -372,7 +372,6 @@ rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of 
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- that has already been evaluated and whose shot validity is VALID
-		
 	then
 		Include the reason for shot $currentShot Accepted due to "Vaccine Not Allowed For This Dose"
 		Record that this dose rule was Processed for the TargetDose $currentShot
@@ -380,7 +379,7 @@ rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of 
 end
 
 
-rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of CVX 313 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE, and there are no prior doses on record, the absolute minimum interval from that shot to target dose 1 is 24 days"
+rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of CVX 313 previously administered for target dose 1 was evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE, and there are no prior doses on record, the absolute minimum interval from that shot to target dose 1 is 24 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheck"
@@ -499,18 +498,11 @@ rule "COVID-19(Sept 2023 >= 5yrs Series)-->TargetDose 2: If a shot is administer
 end
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Target Dose 2 Evaluation Logic; ===> Series: >= 5 yrs
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 ///////
 // rule "COVID-19(Sep 2023 >= 5rs Series)-->TargetDose 2: If a CVX 310 or CVX 311 is administered < the series absolute minimum age for the dose and <= the CVX code absolute maximum age, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES."
 // No rule needs to be implemented here, as it is subsumed by the rule above.
 ///////
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// END Target Dose 2 Evaluation Logic; ===> Series: >= 5 yrs
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*****************************************************************************************************************************************************************************************************************
  END ===> Series: >= 5 yrs
@@ -611,7 +603,7 @@ end
 //        Recommended interval = 28 days 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-rule "COVID-19(Sep 2023 Moderna < 5yrs Series): If a shot was previously administered and evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES and the series is not complete, the absolute minimum interval from that shot to target dose 1 is 24 days"
+rule "COVID-19(Sep 2023 Moderna < 5yrs Series): If a shot previously administered was evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES and the series is not complete, the absolute minimum interval from that shot to target dose 1 is 24 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	no-loop true
@@ -661,7 +653,7 @@ end
 //    If administered as target dose 3, follow series interval
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-rule "COVID-19(Sep 2023 Mixed Product < 5yrs Series): If a shot was previously administered for target dose 1 or target dose 2 and evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES, the absolute minimum interval from that shot to target dose 1 is 24 days"
+rule "COVID-19(Sep 2023 Mixed Product < 5yrs Series): If a shot previously administered for target dose 1 or target dose 2 was evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES, the absolute minimum interval from that shot to target dose 1 is 24 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	no-loop true
@@ -729,7 +721,7 @@ rule "COVID-19(Sep2023 Mixed Product < 5 yrs Series): If the patient has >= 1 do
 		There is an Administered Shot $validShot
 			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850" and the Series with name "COVID19Sep2023MixedProductLT5ySeries"
 			- that has already been evaluated and whose shot validity is VALID
-			- the vaccine administered a member of ("ICE213", "ICE308", "ICE309", "ICE310", "ICE311", "ICE312", "ICE313")
+			/////// - the vaccine administered a member of ("ICE213", "ICE308", "ICE309", "ICE310", "ICE311", "ICE312", "ICE313")
 			- make note of the Associated Series as $associatedTargetSeries
 		There is a Series $targetSeries identified by $associatedTargetSeries
 			- the series is not complete
