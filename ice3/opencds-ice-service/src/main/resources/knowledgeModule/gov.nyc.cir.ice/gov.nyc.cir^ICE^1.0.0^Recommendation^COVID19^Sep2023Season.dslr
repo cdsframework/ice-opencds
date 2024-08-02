@@ -55,9 +55,12 @@ global org.cdsframework.ice.service.Schedule schedule
 
 
 /*****************************************************************************************************************************************************************************************************************
- ===> Series: ALL; Prior formulation administered in this season ; v1.42 release logic, still applicable
+ ===> Series: ALL; Prior formulations
 /****************************************************************************************************************************************************************************************************************/
 
+/*
+ * Logic from v1.43 not carried over to v1.44
+ *
 rule "COVID-19(Sep2023 >=5yrs; Pfizer/Moderna/Mixed Product < 5yrs): If a prior formulation is administered for target dose 1, recommend interval of 28 days to the next dose"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
@@ -124,6 +127,17 @@ rule "COVID-19(Sep2023 Novavax Series): If a prior formulation is administered f
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
 end
+*/
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ===> PRIOR FORMULATION of COVID-19 vaccine administered on or after 9/12/2023
+// If the patient has a prior formulation COVID-19 shot that does not count towards U.S. vaccination (CVX 500, CVX 501, CVX 503, CVX 504, CVX 505, CVX 506, CVX 507, CVX 508, CVX 509, CVX 513, CVX 514, CVX 515, CVX 516, CVX 517, CVX 518, CVX 521) 
+// administered on or after 9/12/2023, the intervals to the next target dose are: 
+//    Minimum Interval = 8 weeks
+//    Recommended Interval = 8 weeks 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 /*****************************************************************************************************************************************************************************************************************
  END ===> Series: ALL; Prior formulation administered in this season
@@ -141,7 +155,6 @@ rule "COVID-19(Sep2023): If there are no shots administered, set the earliest/re
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
-			/////// - the name of the Series is "COVID19Sep2023gte5Series"
 			- the Series is not complete
 			- the number of administered shots is == 0
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
