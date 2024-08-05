@@ -199,7 +199,7 @@ rule "COVID-19(Sep2023 >= 5yrs): If the interval from the most recent shot admin
         There exists an administered shot
         	- that is the same shot as $mostRecentShot
         	- the administration date of the shot is < $dtDateAtAge5y
-        /////// Confirm elapsed time between $mostRecentShotDate and evalTime > "8w"   (previous interval)
+        /////// Confirm elapsed time between $mostRecentShotDate and evalTime > "8w"   (previous interval used)
         Confirm elapsed time between $mostRecentShotDate and evalTime > $recommendedInterval
 	then
 		Create a Recommendation as $r for the Series $targetSeries
