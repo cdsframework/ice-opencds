@@ -1,4 +1,4 @@
-/**
+`/**
  * Copyright (C) 2024 New York City Department of Health and Mental Hygiene, Bureau of Immunization
  * Contributions by HLN Consulting, LLC
  *
@@ -55,35 +55,37 @@ global org.cdsframework.ice.service.Schedule schedule
 
 
 /*****************************************************************************************************************************************************************************************************************
- ===> Series: ALL; Prior formulation administered in this season ; v1.42 release logic, still applicable
-/****************************************************************************************************************************************************************************************************************/
+===> PRIOR FORMULATION of COVID-19 Vaccine Administered on or after 9/12/2023   
+ If the patient has a prior formulation COVID-19 shot that does not count towards U.S. vaccination (CVX 500, CVX 501, CVX 503, CVX 504, CVX 505, CVX 506, CVX 507, CVX 508, CVX 509, CVX 513, CVX 514, CVX 515, CVX 516, CVX 517, CVX 518, CVX 521) administered on or after 9/12/2023, the intervals to the next target dose are: 
+     + Absolute Minimum Interval = 8 weeks - 4 days
+     + Minimum Interval = 8 weeks
+     + Recommended Interval = 8 weeks 
+ /****************************************************************************************************************************************************************************************************************/
 
-rule "COVID-19(Sep2023 >=5yrs; Pfizer/Moderna/Mixed Product < 5yrs): If a prior formulation is administered for target dose 1, recommend interval of 28 days to the next dose"
+
+rule "COVID-19(Sep2023 >=5yrs; Pfizer/Moderna/Mixed Product < 5yrs): If a prior formulation that does not count towards U.S. vaccination is administered, recommend earliest/recommended interval of 8 weeks to the next dose"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
-	activation-group "recommendationIntervalCheck"
+	/////// activation-group "recommendationIntervalCheck"
 	salience 10
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series a member of ("COVID19Sep2023gte5Series", "COVID19Sep2023PfizerLT5ySeries", "COVID19Sep2023ModernaLT5ySeries", "COVID19Sep2023MixedProductLT5ySeries")
+			/////// - the name of the Series a member of ("COVID19Sep2023gte5Series", "COVID19Sep2023PfizerLT5ySeries", "COVID19Sep2023ModernaLT5ySeries", "COVID19Sep2023MixedProductLT5ySeries")
 			- the Series is not Complete
-			- the effective dose number in the Series is == 1
 		There is an administered shot $priorShot
 			- the shot belongs to the Series $targetSeries
 			- that has already been evaluated
-			- the dose number in the series is == 1
-			- the vaccine administered a member of ("ICE207", "ICE208", "ICE210", "ICE212", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE300", "ICE301", "ICE302", "ICE500", "ICE501", "ICE502", "ICE503", "ICE504", "ICE505", "ICE506", "ICE507", "ICE508", "ICE509", "ICE510", "ICE511", "ICE512", "ICE519", "ICE520", "ICE521")
+			- the vaccine administered a member of ("ICE500", "ICE501", "ICE503", "ICE504", "ICE505", "ICE506", "ICE507", "ICE508", "ICE509", "ICE513", "ICE514", "ICE515", "ICE516", "ICE517", "ICE518", "ICE521")
 			- make note of the Date this Shot was Administered as $previousShotDate
 		There does not exist an administered shot
 			- the shot belongs to the Series $targetSeries
 			- that has already been evaluated
-			- the dose number in the series is == 1
 			- the administration date of the shot is > $previousShotDate
-			- the vaccine administered a member of ("ICE207", "ICE208", "ICE210", "ICE212", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE300", "ICE301", "ICE302", "ICE500", "ICE501", "ICE502", "ICE503", "ICE504", "ICE505", "ICE506", "ICE507", "ICE508", "ICE509", "ICE510", "ICE511", "ICE512", "ICE519", "ICE520", "ICE521")
+			- the vaccine administered a member of ("ICE500", "ICE501", "ICE503", "ICE504", "ICE505", "ICE506", "ICE507", "ICE508", "ICE509", "ICE513", "ICE514", "ICE515", "ICE516", "ICE517", "ICE518", "ICE521")
 	then
 		Create a Recommendation as $r for the Series $targetSeries
-		Add "28d" to $previousShotDate and make note of the newly calculated date as $dtCalculated
+		Add "8w" to $previousShotDate and make note of the newly calculated date as $dtCalculated
 		Set the recommendation Earliest Forecast Date for $r to $dtCalculated
 		Set the recommendation Recommended Forecast Date for $r to $dtCalculated
 		Include the Recommendation $r for Consideration in the final forecast of the Series
@@ -91,39 +93,6 @@ rule "COVID-19(Sep2023 >=5yrs; Pfizer/Moderna/Mixed Product < 5yrs): If a prior 
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
-
-rule "COVID-19(Sep2023 Novavax Series): If a prior formulation is administered for target dose 1, recommend interval of 28 days to the next dose"
-	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
-	activation-group "recommendationIntervalCheck"
-	salience 10
-	when
-		There is a Series $targetSeries that needs forecasting
-			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series is "COVID19Sep2023NovavaxSeries"
-			- the Series is not Complete
-			- the effective dose number in the Series is == 1
-		There is an administered shot $priorShot
-			- the shot belongs to the Series $targetSeries
-			- that has already been evaluated
-			- the dose number in the series is == 1
-			- the vaccine administered a member of ("ICE207", "ICE208", "ICE210", "ICE212", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE300", "ICE301", "ICE302", "ICE500", "ICE501", "ICE502", "ICE503", "ICE504", "ICE505", "ICE506", "ICE507", "ICE508", "ICE509", "ICE510", "ICE511", "ICE512", "ICE519", "ICE520", "ICE521")
-			- make note of the Date this Shot was Administered as $previousShotDate
-		There does not exist an administered shot
-			- the shot belongs to the Series $targetSeries
-			- that has already been evaluated
-			- the dose number in the series is == 1
-			- the administration date of the shot is > $previousShotDate
-			- the vaccine administered a member of ("ICE207", "ICE208", "ICE210", "ICE212", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE300", "ICE301", "ICE302", "ICE500", "ICE501", "ICE502", "ICE503", "ICE504", "ICE505", "ICE506", "ICE507", "ICE508", "ICE509", "ICE510", "ICE511", "ICE512", "ICE519", "ICE520", "ICE521")
-	then
-		Create a Recommendation as $r for the Series $targetSeries
-		Add "28d" to $previousShotDate and make note of the newly calculated date as $dtCalculated
-		Set the recommendation Earliest Forecast Date for $r to $dtCalculated
-		Set the recommendation Recommended Forecast Date for $r to $dtCalculated
-		Include the Recommendation $r for Consideration in the final forecast of the Series
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-       	Log that this Series Rule fired for the Series $targetSeries
-end
 
 /*****************************************************************************************************************************************************************************************************************
  END ===> Series: ALL; Prior formulation administered in this season
