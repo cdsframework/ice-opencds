@@ -1,4 +1,4 @@
-`/**
+/**
  * Copyright (C) 2024 New York City Department of Health and Mental Hygiene, Bureau of Immunization
  * Contributions by HLN Consulting, LLC
  *
@@ -188,7 +188,7 @@ rule "COVID-19(Sep2023 >= 5yrs): If the interval from the most recent shot admin
 			- make note of the date this shot was administered as $mostRecentShotDate
         	- the date $mostRecentShotDate >= "12-Sep-2023"
 			- the shot is not ignored
-			////// - make note of the recommended interval from this dose to the next dose as $recommendedInterval
+			- make note of the recommended interval from this dose to the next dose as $recommendedInterval
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the administration date of the shot is > $mostRecentShotDate
@@ -199,8 +199,8 @@ rule "COVID-19(Sep2023 >= 5yrs): If the interval from the most recent shot admin
         There exists an administered shot
         	- that is the same shot as $mostRecentShot
         	- the administration date of the shot is < $dtDateAtAge5y
-        /////// Confirm elapsed time between $mostRecentShotDate and evalTime > $recommendedInterval
-        Confirm elapsed time between $mostRecentShotDate and evalTime > "8w"
+        /////// Confirm elapsed time between $mostRecentShotDate and evalTime > "8w"   (previous interval)
+        Confirm elapsed time between $mostRecentShotDate and evalTime > $recommendedInterval
 	then
 		Create a Recommendation as $r for the Series $targetSeries
 		// Set the earliest date here to avoid redundant calculation in child earliestAgeCheck rule (below)
@@ -213,7 +213,7 @@ end
 
 
 rule "COVID-19(Sep2023 >= 5yrs): If 8 weeks from the last administered shot elapsed prior to the patient turning 5 years of age, set earliest and recommended age for target dose 1 to 9/12/2023 (*earliestAgeCheck*)"
-		extends "COVID-19(Sep2023 >= 5yrs): If the interval from the most recent shot administered >= 9/12/2023 has elapsed and the patient turns 5 years of age >= 9/23/2023, set the recommended age for target dose 1 to 9/12/2023 (*recommendationAgeCheck*)"
+		extends "COVID-19(Sep2023 >= 5yrs): If the interval from the most recent shot administered >= 9/12/2023 has elapsed and the patient turns 5 years of age >= 9/12/2023, set the recommended age for target dose 1 to 9/12/2023 (*recommendationAgeCheck*)"
 	// previously, rule was: "...set earliest and recommended age for target dose 1 to 8w from the last administered shot (*earliestAgeCheck*)", not to 9/12/2023
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
@@ -1289,7 +1289,7 @@ rule "COVID-19(Sep2023 __Novavax__ Series): If CVX 313 was administered for dose
 			- the name of the Series is "COVID19Sep2023NovavaxSeries"
 			- make note of the effective dose number in the Series as $effectiveDoseNumber
 			- the numeric $effectiveDoseNumber is == 3			
-		There is an administered dose $cvx313dose1Or2
+		There is an administered shot $cvx313dose1or2
 			- the shot belongs to the Series $targetSeries
 			- that has already been evaluated and whose shot validity is VALID
 			- the vaccine administered is "ICE313"
