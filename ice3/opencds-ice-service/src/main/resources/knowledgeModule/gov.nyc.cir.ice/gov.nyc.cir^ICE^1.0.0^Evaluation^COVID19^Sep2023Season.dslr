@@ -191,113 +191,6 @@ end
 
 
 /*****************************************************************************************************************************************************************************************************************
- * Extra Dose Logic in Sep2023 >= 5yrs Series that is no longer needed, due to the fact that a CVX 313 as the first dose in the series is marked Accepted rather than Valid
- * AI: REMOVE this block after confirmation that it is no longer needed.
- *
- *
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// If an extra dose (2 doses or more) is required for the >= 5y Series,
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-rule "COVID-19(Sep2023 >= 5yrs Series): If the target dose number is >= the number of doses required to complete the series, verify if the vaccine is allowed"
-	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
-	activation-group "allowableVaccineCheck"
-	when
-		There is an Administered Shot $currentShot that needs to be evaluated
-			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the shot belongs to the Series with name "COVID19Sep2023gte5Series"
-			- the series that the shot belongs to is not complete
-			- make note of the dose number as $targetDoseNumber
-			- make note of the administered vaccine as $vaccineAdministered
-			- make note of the associated series as $associatedTargetSeries
-		There is a Series $targetSeries identified by $associatedTargetSeries
-			- the number of doses required to complete this Series is < $targetDoseNumber
-			- the vaccine $vaccineAdministered is not permitted for dose number 1 in this Series
-	then
-		Include the reason for shot $currentShot Invalid due to "Vaccine not Permitted for this Dose"
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-		Log that this Series Rule fired for the Series $targetSeries
-end
-
-
-rule "COVID-19(Sep2023 >= 5yrs Series): If the number of doses administered is >= 2 and the series is not complete, mark the series complete"
-	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
-	when
-		There is a Series $targetSeries
-			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series is "COVID19Sep2023gte5Series"
-			- the Series is not complete
-			- the effective number of doses administered in the Series is >= 2
-	then
-		Mark the Series $targetSeries complete
-		Refresh all facts in the Series $targetSeries 
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-		Log that this Series Rule fired for the Series $targetSeries
-end
-
-
-rule "COVID-19(Sep2023 >= 5yrs Series): If a CVX 313 dose was administered for target dose 1 in the >= 5 yrs of age series, no doses in the prior season was administered, and no mRNA vaccines have been administered in the current season, mark series is NOT complete"
- 	dialect "mvel"
-	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
-	when
-		There is a Series $targetSeries
-			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series is "COVID19Sep2023gte5Series"
-			- the Series is Complete
-			- the number of doses administered is == 1
-		There does not exist an administered shot
-			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
-			- the administration date of the shot is < "12-Sep-2023"
-			- that has already been evaluated and whose shot validity is VALID
-		There exists an administered shot
-			- the shot belongs to the Series $targetSeries
-			- that has already been evaluated and whose shot validity is VALID
-			- the vaccine administered is "ICE313"
-		There does not exist an administered shot
-			- the shot belongs to the Series $targetSeries
-			- that has already been evaluated and whose shot validity is VALID
-			- the vaccine administered a member of ("ICE213", "ICE308", "ICE309", "ICE310", "ICE311", "ICE312")
-	then
-		Manually mark the Series $targetSeries Not Complete
-		Refresh all facts in the Series $targetSeries
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-		Log that this Series Rule fired for the Series $targetSeries
-end
-
-
-rule "COVID-19(Sep2023 >= 5yrs Series): If a CVX 313 dose was administered in the >= 5 yrs of age series, no doses in the prior season was administered, no mRNA vaccines have been administered in the current season and the series is not complete, override extraDoseCheck logic"
- 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
-	activation-group "extraDoseCheck"
-	when
-		There is an administered shot $currentShot that needs to be evaluated
-			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the shot belongs to the Series with name "COVID19Sep2023gte5Series"
-			- the series that the shot belongs to is not complete
-			- make note of the associated series as $associatedTargetSeries
-		There does not exist an administered shot
-			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
-			- the administration date of the shot is < "12-Sep-2023"
-			- that has already been evaluated and whose shot validity is VALID
-		There exists an administered shot
-			- the shot belongs to the Series $associatedTargetSeries
-			- that has already been evaluated and whose shot validity is VALID
-			- the vaccine administered is "ICE313"
-		There does not exist an administered shot
-			- the shot belongs to the Series $associatedTargetSeries
-			- that has already been evaluated and whose shot validity is VALID
-			- the vaccine administered a member of ("ICE213", "ICE308", "ICE309", "ICE310", "ICE311", "ICE312")
-	then
-		Record that this Series Rule was Processed for the TargetSeries $associatedTargetSeries
-		Log that this Series Rule fired for the Series $associatedTargetSeries
-end
-
-*****************************************************************************************************************************************************************************************************************/
-
-
-/*****************************************************************************************************************************************************************************************************************
  ===> Series: >= 5 yrs
 /****************************************************************************************************************************************************************************************************************/
 
@@ -312,7 +205,7 @@ end
 //     Recommended Interval = 8 weeks
 //
 // Exceptions:
-//     Exception 1: If a shot has been ignored (due to the CVX Code Absolute Maximum Age rule or due to an inadvertent bivalent shot administered in the previous season), there is no minimum interval to the next target dose. 
+//     Exception 1: If a shot has been ignored (due to the CVX Code Absolute Maximum Age rule or due to an inadvertent bivalent shot administered in the previous season), there is no absolute minimum interval to the next target dose. 
 //     Exception 2: If a dose of CVX 313 is administered and it is the only dose on record, target dose 1 is not fulfilled, evaluate as Accepted with reason code VACCINE_NOT_PART_OF_THIS_SERIES.
 //        Absolute minimum interval to fulfill target dose 1 = 24 days
 //     Exception 3: If a dose of CVX 211 is administered this season (i.e., between 9/12/23 and 10/3/23), evaluate as Accepted with reason code VACCINE_NOT_PART_OF_THIS_SERIES.
@@ -355,6 +248,11 @@ rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 1/Happy Path & Exception 1: 
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
 
+
+///////
+// Exception 1: If a shot has been ignored (due to the CVX Code Absolute Maximum Age rule or due to an inadvertent bivalent shot administered in the previous season), there is no absolute minimum interval to the next target dose. 
+// Handled by above rule
+///////
 
 rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of CVX 313 is administered for target dose 1, and there are no previous doses on record, evaluate the shot as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE"
 	dialect "mvel"
