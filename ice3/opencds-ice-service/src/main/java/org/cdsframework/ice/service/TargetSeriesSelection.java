@@ -79,9 +79,13 @@ public class TargetSeriesSelection {
 			this.seriesSelectionPriority = pSchedule.getSupportedVaccineGroups().getVaccineGroupItem(pTS.getVaccineGroup()).getPriority();
 		}
 		this.seriesSelectionVaccineGroup = pTS.getVaccineGroup();
-		this.seriesSelectionSeason = null;
+		if (pTS.getTargetSeason() != null) {
+			this.seriesSelectionSeason = pTS.getTargetSeason();
+		}
+		else {
+			seriesSelectionSeason = null;
+		}
 		this.seriesSelectionStatus = SeriesSelectionStatus.SERIES_SELECTION_NOT_STARTED;
-		this.selectedSeriesName = null;
 		this.seriesGroup = 0;	// TODO:
 	}
 
