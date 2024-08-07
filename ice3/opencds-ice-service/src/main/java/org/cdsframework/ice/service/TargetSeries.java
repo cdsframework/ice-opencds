@@ -2590,10 +2590,7 @@ public class TargetSeries {
 	/**
 	 *
 	 * @param pTD
-	 * @return TimePeriod representing the minimum age; null if the TargetDose
-	 *         supplied is null or there is no rule associated with this dose
-	 *         number; and finally, TimePeriod with duration set to 0 if there
-	 *         is no corresponding minimum age
+	 * @return TimePeriod representing the minimum age; null if the TargetDose supplied is null or there is no rule associated with this dose number; and finally, TimePeriod with duration set to 0 if there is no corresponding minimum age.
 	 */
 	public TimePeriod getAbsoluteMinimumAgeForTargetDose(int targetDoseNumber) {
 
@@ -2606,7 +2603,7 @@ public class TargetSeries {
 
 		DoseRule seriesDoseRule = obtainDoseRuleForSeriesByDoseNumber(targetDoseNumber);
 		if (seriesDoseRule == null) {
-			String str = "Corresponding series dose not found: " + getVaccineGroup() + "; " + getSeriesName() + "; " + getTargetSeriesIdentifier();
+			String str = "Corresponding series dose not found: " + getVaccineGroup() + "; " + getSeriesName() + "; target dose number: " + targetDoseNumber;
 			logger.info(_METHODNAME + str);
 			return null;
 		}
@@ -2642,10 +2639,7 @@ public class TargetSeries {
 	/**
 	 *
 	 * @param pTD
-	 * @return TimePeriod representing the minimum age; null if the TargetDose
-	 *         supplied is null or there is no rule associated with this dose
-	 *         number; and finally, TimePeriod with duration set to 0 if there
-	 *         is no corresponding minimum age
+	 * @return TimePeriod representing the minimum age; null if the TargetDose supplied is null or there is no rule associated with this dose number; and finally, TimePeriod with duration set to 0 if there is no corresponding minimum age.
 	 */
 	public TimePeriod getAbsoluteMinimumAgeForTargetDose(TargetDose pTD) {
 

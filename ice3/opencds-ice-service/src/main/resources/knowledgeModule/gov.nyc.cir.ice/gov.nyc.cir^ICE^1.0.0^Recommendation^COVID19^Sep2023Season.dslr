@@ -777,34 +777,6 @@ rule "COVID-19(Sep2023 Mixed Product < 5yrs Series): If the most recent shot adm
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
-
-///////
-// If CVX 313 was administered for target dose 1, recommend Minimum/Recommended interval of 8 weeks to the next dose
-///////
-
-rule "COVID-19(Sep2023 __Mixed Product__ < 5yrs Series): If CVX 313 was administered, recommend Minimum/Recommended interval of 8 weeks to the next dose"
-	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
-	when
-		There is a Series $targetSeries that needs forecasting
-			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the series is "COVID19Sep2023MixedProductLT5ySeries"
-			- the Series is not Complete
-		There is an Administered Shot $targetDose1CVX313
-			- the shot belongs to the Series $targetSeries
-			- that has already been evaluated 
-			- the vaccine administered is "ICE313"
-			- Make note of the date this shot was administered as $dtAdministrationDate
-	then
-		Create a Recommendation as $r for the Series $targetSeries
-		Add "8w" to $dtAdministrationDate and make note of the newly calculated date as $dtCalculated
-		Set the recommendation Earliest Forecast Date for $r to $dtCalculated
-		Set the recommendation Recommended Forecast Date for $r to $dtCalculated
-		Include the Recommendation $r for Consideration in the final forecast of the Series
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-       	Log that this Series Rule fired for the Series $targetSeries
-end
-
 /*****************************************************************************************************************************************************************************************************************
 END Series: Mixed Product < 5 yrs
 *****************************************************************************************************************************************************************************************************************/

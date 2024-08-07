@@ -397,7 +397,7 @@ rule "COVID-19(Sept 2023 >= 5yrs Series)-->TargetDose 2: If a shot is administer
 end
 
 
-rule "COVID-19(Sept 2023 >= 5yrs Series)-->TargetDose 2: If a CVX 310 or CVX 311 is administered before the absolute minimum age for target dose 4, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES (**allowableVaccineCheck** override)"
+rule "COVID-19(Sept 2023 >= 5yrs Series)-->TargetDose 2: If a CVX 310 or CVX 311 is administered before the absolute minimum age for target dose 2, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES (**allowableVaccineCheck** override)"
 		extends "COVID-19(Sept 2023 >= 5yrs Series)-->TargetDose 2: If a shot is administered before the absolute minimum age, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES (**doseAgeCheck** override)"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
