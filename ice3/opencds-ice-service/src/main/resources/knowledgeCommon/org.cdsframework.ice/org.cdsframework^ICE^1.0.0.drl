@@ -67,6 +67,8 @@ import org.cdsframework.ice.service.RecommendationStatus
 import org.cdsframework.ice.service.Schedule
 import org.cdsframework.ice.service.Season
 import org.cdsframework.ice.service.SeriesRules
+import org.cdsframework.ice.service.SeriesDisplaySelection
+import org.cdsframework.ice.service.SeriesDisplaySelection.SeriesDisplaySelectionType
 import org.cdsframework.ice.service.TargetDose
 import org.cdsframework.ice.service.TargetDoseInitializationTracker
 import org.cdsframework.ice.service.TargetSeasons
