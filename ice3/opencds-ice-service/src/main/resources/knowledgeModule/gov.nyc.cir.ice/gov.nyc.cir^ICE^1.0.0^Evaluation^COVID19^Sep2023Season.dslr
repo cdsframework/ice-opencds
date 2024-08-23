@@ -687,7 +687,7 @@ rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs; >= 5yrs; Novavax Ser
 	when
 		There is an administered shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the shot belongs to the Series with name a member of ("COVID19Sep2023gte5Series", "COVID19Sep2023PfizerLT5ySeries", "COVID19Sep2023ModernaLT5ySeries", "COVID19Sep2023MixedProductLT5ySeries", "COVID19Sep2023NovavaxSeries")
+			/////// - the shot belongs to the Series with name a member of ("COVID19Sep2023PfizerLT5ySeries", "COVID19Sep2023ModernaLT5ySeries", "COVID19Sep2023MixedProductLT5ySeries", "COVID19Sep2023NovavaxSeries")
 			- make note of the date this shot was administered as $currentShotDate
 			- make note of the associated series as $associatedTargetSeries
 		There does not exist an IceFact
