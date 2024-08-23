@@ -25,10 +25,6 @@
         </ns2:doseVaccine>
         <ns2:doseVaccine>
         	<ns2:preferred>true</ns2:preferred>
-            <ns2:vaccine code="308" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, XBB.1.5, mRNA, LNP-S, PF, tris-sucrose, 6 mos-4 yrs, Pfizer"/>
-        </ns2:doseVaccine>
-        <ns2:doseVaccine>
-        	<ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="309" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, XBB.1.5, mRNA, LNP-S, PF, tris-sucrose, 12+ yrs, Pfizer"/>
         </ns2:doseVaccine>
         <ns2:doseVaccine>
@@ -60,20 +56,8 @@
         </ns2:doseVaccine>
         <ns2:doseVaccine>
         	<ns2:preferred>true</ns2:preferred>
-            <ns2:vaccine code="308" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, XBB.1.5, mRNA, LNP-S, PF, tris-sucrose, 6 mos-4 yrs, Pfizer"/>
-        </ns2:doseVaccine>
-        <ns2:doseVaccine>
-        	<ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="309" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, XBB.1.5, mRNA, LNP-S, PF, tris-sucrose, 12+ yrs, Pfizer"/>
         </ns2:doseVaccine>
-        <ns2:doseVaccine>
-        	<ns2:preferred>true</ns2:preferred>
-            <ns2:vaccine code="310" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, XBB.1.5, mRNA, LNP-S, PF, tris-sucrose, 5-11 yrs, Pfizer"/>
-        </ns2:doseVaccine>
-        <ns2:doseVaccine>
-        	<ns2:preferred>false</ns2:preferred>
-            <ns2:vaccine code="311" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, XBB.1.5, mRNA, LNP-S, PF, 6 mos-11 yrs, Moderna"/>
-        </ns2:doseVaccine>        
         <ns2:doseVaccine>
         	<ns2:preferred>true</ns2:preferred>
             <ns2:vaccine code="312" codeSystem="2.16.840.1.113883.12.292" codeSystemName="CVX" displayName="COVID-19, XBB.1.5, mRNA, LNP-S, PF, 12+ yrs, Moderna"/>
