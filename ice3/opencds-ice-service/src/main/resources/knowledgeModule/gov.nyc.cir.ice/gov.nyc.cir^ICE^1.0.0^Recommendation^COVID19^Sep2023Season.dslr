@@ -469,7 +469,7 @@ end
 rule "COVID-19(Sep2023 >= 5yrs)->TargetDose 1/Exception 3: If a shot of CVX 211 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_PART_OF_THIS_SERIES, the recommended interval from that shot to target dose 1 is 28 days"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
-	activation-group "recommendedIntervalCheck"
+	activation-group "recommendationIntervalCheck"
 	salience 10
 	when
 		There is a Series $targetSeries that needs forecasting
