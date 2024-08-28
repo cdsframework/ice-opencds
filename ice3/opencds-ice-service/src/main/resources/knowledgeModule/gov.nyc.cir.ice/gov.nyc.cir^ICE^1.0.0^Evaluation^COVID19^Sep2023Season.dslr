@@ -686,15 +686,20 @@ end
  ===> Series: Pfizer < 5 yrs, Moderna < 5 yrs, Mixed Product < 5 yrs; >= 5yrs; Novavax ==> Evaluation Interval Rules from Prior Season ; v1.42 release logic, still applicable
 /*****************************************************************************************************************************************************************************************************************/
 
-rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series; >= 5yrs Series (Abstract)): If a shot was administered prior to target dose 1 (prior season), the absolute minimum interval from the prior shot to the current shot is 8w-4d"
+rule "COVID-19(Sep2023 >= 5yrs Series (Abstract)): If a shot was administered prior to target dose 1 (prior season), the absolute minimum interval from the prior shot to the current shot is 8w-4d"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the shot belongs to the Series with name a member of ("COVID19Sep2023PfizerLT5ySeries", "COVID19Sep2023ModernaLT5ySeries", "COVID19Sep2023MixedProductLT5ySeries")
+			- the shot belongs to the Series with name "COVID19Sep2023gte5Series"
+			// previously , also "COVID19Sep2023PfizerLT5ySeries", "COVID19Sep2023ModernaLT5ySeries", "COVID19Sep2023MixedProductLT5ySeries") 
 			- make note of the date this shot was administered as $currentShotDate
 			- make note of the associated series as $associatedTargetSeries
+			- make note of the unique ID of the shot as $uniqueShotId
+		//There does not exist an IceFact
+		//	- that has finding $uniqueShotId
+		//	- that has associated administered shot $currentShot
 		There does not exist an IceFact
 			- that has associated administered shot $currentShot
 			- that has finding SupportedFactConcept._BELOW_MINIMUM_INTERVAL.conceptCodeValue
@@ -707,13 +712,15 @@ rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series; >= 5yrs Serie
 			- the administration date of the shot is > $previousShotDate
 			- the administration date of the shot is < "12-Sep-2023"
 	then
+		// Insert an IceFact $uniqueShotId with TargetDose $currentShot into Working Memory
 		Record that this dose rule was Processed for the TargetDose $currentShot
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
 
 
 rule "COVID-19(Sep2023): If the absolute minimum interval from the prior season shot to the current shot is < 8w-4d, evaluate the shot as Invalid"
-		extends "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series; >= 5yrs Series (Abstract)): If a shot was administered prior to target dose 1 (prior season), the absolute minimum interval from the prior shot to the current shot is 8w-4d"
+		extends "COVID-19(Sep2023 >= 5yrs Series (Abstract)): If a shot was administered prior to target dose 1 (prior season), the absolute minimum interval from the prior shot to the current shot is 8w-4d"
+		// extends "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series; >= 5yrs Series (Abstract)): If a shot was administered prior to target dose 1 (prior season), the absolute minimum interval from the prior shot to the current shot is 8w-4d"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheckFromPreviousSeason"
@@ -728,7 +735,8 @@ end
 
 
 rule "COVID-19(Sep2023): If the absolute minimum interval from the prior season shot is administered between 8w-4d and the series table interval, evaluate the shot as Valid"
-		extends "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series; >= 5yrs Series (Abstract)): If a shot was administered prior to target dose 1 (prior season), the absolute minimum interval from the prior shot to the current shot is 8w-4d"
+		extends "COVID-19(Sep2023 >= 5yrs Series (Abstract)): If a shot was administered prior to target dose 1 (prior season), the absolute minimum interval from the prior shot to the current shot is 8w-4d"
+		// extends "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series; >= 5yrs Series (Abstract)): If a shot was administered prior to target dose 1 (prior season), the absolute minimum interval from the prior shot to the current shot is 8w-4d"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheckFromPreviousSeason"
