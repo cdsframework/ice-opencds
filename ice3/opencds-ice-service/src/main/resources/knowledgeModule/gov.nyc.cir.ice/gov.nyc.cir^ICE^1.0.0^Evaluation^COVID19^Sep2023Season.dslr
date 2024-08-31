@@ -688,9 +688,6 @@ rule "COVID-19(Sep2023 >= 5yrs Series (Abstract)): If a shot was administered pr
 			- the shot belongs to the Series with name "COVID19Sep2023gte5Series"
 			- make note of the date this shot was administered as $currentShotDate
 			- make note of the associated series as $associatedTargetSeries
-		There does not exist an IceFact
-			- that has associated administered shot $currentShot
-			- that has finding SupportedFactConcept._BELOW_MINIMUM_INTERVAL.conceptCodeValue
 		There is an administered shot $previousShot
 			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
 			- the administration date of the shot is < "12-Sep-2023"
@@ -712,6 +709,9 @@ rule "COVID-19(Sep2023 >= 5yrs): If the absolute minimum interval from the prior
 	activation-group "doseIntervalCheckFromPreviousSeason"
 	no-loop true
 	when
+		There does not exist an IceFact
+			- that has associated administered shot $currentShot
+			- that has finding SupportedFactConcept._BELOW_MINIMUM_INTERVAL.conceptCodeValue
 		Confirm Elapsed time between $previousShotDate and $currentShotDate < "8w-4d"
 	then
 		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
@@ -772,19 +772,25 @@ rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs; Novavax Series): If 
 end
 
 
-rule "COVID-19(Sep2023 Moderna < 5rs Series (Abstract)): If a shot was administered prior in the prior season and the target dose number is 2, the absolute minimum interval from the prior shot to the current shot is 8w-4d"
+rule "COVID-19(Sep2023 Moderna < 5rs Series (Abstract): For target dose 2 with no prior doses in this season (due to skip), if a shot was administered prior in the prior season, the absolute minimum interval from the prior shot to the current shot is 8w-4d"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
+	activation-group "doseIntervalCheckFromPreviousSeason"
+	no-loop true
 	when
 		There is an administered shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the shot belongs to the Series with name "COVID19Sep2023ModernaLT5ySeries"
+			- the dose number in the Series is == 2
 			- make note of the date this shot was administered as $currentShotDate
 			- make note of the associated series as $associatedTargetSeries
 		There does not exist an IceFact
 			- that has associated administered shot $currentShot
 			- that has finding SupportedFactConcept._BELOW_MINIMUM_INTERVAL.conceptCodeValue
-		There is an administered shot $previousShot
+		There does not exist an administered shot
+			- the shot belongs to the Series $associatedTargetSeries
+			- that has already been evaluated and whose shot validity is VALID
+ 		There is an administered shot $previousShot
 			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
 			- the administration date of the shot is < "12-Sep-2023"
 			- make note of the date this shot was administered as $previousShotDate
@@ -792,40 +798,9 @@ rule "COVID-19(Sep2023 Moderna < 5rs Series (Abstract)): If a shot was administe
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the administration date of the shot is > $previousShotDate
 			- the administration date of the shot is < "12-Sep-2023"
-	then
-		Record that this dose rule was Processed for the TargetDose $currentShot
-		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
-end
-
-
-rule "COVID-19(Sep2023 >= 5yrs): If the absolute minimum interval from the prior season shot to target dose 2 is < 8w-4d, evaluate the shot as Invalid"
-		extends "COVID-19(Sep2023 Moderna < 5rs Series (Abstract)): If a shot was administered prior in the prior season and the target dose number is 2, the absolute minimum interval from the prior shot to the current shot is 8w-4d"
-	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
-	activation-group "doseIntervalCheckFromPreviousSeason"
-	no-loop true
-	when
 		Confirm Elapsed time between $previousShotDate and $currentShotDate < "8w-4d"
 	then
 		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
-		Record that this dose rule was Processed for the TargetDose $currentShot
-		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
-end
-
-
-rule "COVID-19(Sep2023 Moderna < 5yrs): If the absolute minimum interval from the prior season shot is administered between 8w-4d and the series table interval for target dose 2, evaluate the shot as Valid"
-		extends "COVID-19(Sep2023 Moderna < 5rs Series (Abstract)): If a shot was administered prior in the prior season and the target dose number is 2, the absolute minimum interval from the prior shot to the current shot is 8w-4d"
-	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
-	activation-group "doseIntervalCheckFromPreviousSeason"
-	when
-		There is a Series $targetSeries identified by $associatedTargetSeries
-			- make note of the absolute minimum interval for dose 1 in this Series as $absMinimumInterval
-		Confirm that the following is true: $absMinimumInterval.isGreaterThan(new TimePeriod("8w-4d"))
-		Confirm Elapsed time between $previousShotDate and $currentShotDate >= "8w-4d"
-		Confirm Elapsed time between $previousShotDate and $currentShotDate < $absMinimumInterval
-	then
-		// Override general interval rule; do nothing
 		Record that this dose rule was Processed for the TargetDose $currentShot
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
