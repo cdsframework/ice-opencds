@@ -9,7 +9,7 @@
              xmlns:g="http://www.jboss.org/drools/flow/gpd"
              xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
              xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+             xmlns:di="http://www.omg.or_g/spec/DD/20100524/DI"
              xmlns:tns="http://www.jboss.org/drools">
 
   <process processType="Private" isExecutable="true" id="PrimaryProcess" name="PrimaryProcess" tns:packageName="Process_1" >
@@ -105,7 +105,7 @@
         </outputSet>
       </ioSpecification>
     </businessRuleTask>
-    <businessRuleTask id="4c006cc9-5bb9-4e35-87eb-04fd06068b9f" name="Combine Selected Series into Aggregate Series" g:ruleFlowGroup="SeriesAggregation" 
+    <businessRuleTask id="_20" name="Combine Selected Series into Aggregate Series" g:ruleFlowGroup="SeriesAggregation" 
  implementation="http://www.jboss.org/drools/rule" >
       <ioSpecification>
         <inputSet>
@@ -121,12 +121,12 @@
     <sequenceFlow id="_7-_4" sourceRef="_7" targetRef="_4" />
     <sequenceFlow id="_11-_5" sourceRef="_11" targetRef="_5" />
     <sequenceFlow id="_9-_6" sourceRef="_9" targetRef="_6" />
-    <sequenceFlow id="4c006cc9-5bb9-4e35-87eb-04fd06068b9f-_7" sourceRef="4c006cc9-5bb9-4e35-87eb-04fd06068b9f" targetRef="_7" />
+    <sequenceFlow id="_20_7" sourceRef="_20" targetRef="_7" />
     <sequenceFlow id="_6-_8" sourceRef="_6" targetRef="_8" />
     <sequenceFlow id="_10-_9" sourceRef="_10" targetRef="_9" />
     <sequenceFlow id="_5-_10" sourceRef="_5" targetRef="_10" />
     <sequenceFlow id="_3-_11" sourceRef="_3" targetRef="_11" />
-    <sequenceFlow id="_8-4c006cc9-5bb9-4e35-87eb-04fd06068b9f" sourceRef="_8" targetRef="4c006cc9-5bb9-4e35-87eb-04fd06068b9f" />
+    <sequenceFlow id="_8-_20" sourceRef="_8" targetRef="_20" />
 
   </process>
 
@@ -165,7 +165,7 @@
       <bpmndi:BPMNShape bpmnElement="_11" >
         <dc:Bounds x="619" y="22" width="202" height="48" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="4c006cc9-5bb9-4e35-87eb-04fd06068b9f" >
+      <bpmndi:BPMNShape bpmnElement="_20" >
         <dc:Bounds x="11" y="242" width="335" height="48" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_4-_2" >
@@ -188,7 +188,7 @@
         <di:waypoint x="854" y="158" />
         <di:waypoint x="529" y="153" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="4c006cc9-5bb9-4e35-87eb-04fd06068b9f-_7" >
+      <bpmndi:BPMNEdge bpmnElement="_20-_7" >
         <di:waypoint x="178" y="266" />
         <di:waypoint x="642" y="263" />
       </bpmndi:BPMNEdge>
@@ -208,7 +208,7 @@
         <di:waypoint x="346" y="47" />
         <di:waypoint x="720" y="46" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_8-4c006cc9-5bb9-4e35-87eb-04fd06068b9f" >
+      <bpmndi:BPMNEdge bpmnElement="_8-_20" >
         <di:waypoint x="178" y="150" />
         <di:waypoint x="178" y="266" />
       </bpmndi:BPMNEdge>
