@@ -9,7 +9,7 @@
              xmlns:g="http://www.jboss.org/drools/flow/gpd"
              xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
              xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-             xmlns:di="http://www.omg.or_g/spec/DD/20100524/DI"
+             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
              xmlns:tns="http://www.jboss.org/drools">
 
   <process processType="Private" isExecutable="true" id="PrimaryProcess" name="PrimaryProcess" tns:packageName="Process_1" >
@@ -121,7 +121,7 @@
     <sequenceFlow id="_7-_4" sourceRef="_7" targetRef="_4" />
     <sequenceFlow id="_11-_5" sourceRef="_11" targetRef="_5" />
     <sequenceFlow id="_9-_6" sourceRef="_9" targetRef="_6" />
-    <sequenceFlow id="_20_7" sourceRef="_20" targetRef="_7" />
+    <sequenceFlow id="_20-_7" sourceRef="_20" targetRef="_7" />
     <sequenceFlow id="_6-_8" sourceRef="_6" targetRef="_8" />
     <sequenceFlow id="_10-_9" sourceRef="_10" targetRef="_9" />
     <sequenceFlow id="_5-_10" sourceRef="_5" targetRef="_10" />
