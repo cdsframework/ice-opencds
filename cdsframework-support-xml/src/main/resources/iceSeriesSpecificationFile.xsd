@@ -75,6 +75,8 @@
             <xs:element name="vaccineGroup" type="dt:CD" minOccurs="1" maxOccurs="unbounded"/>
             <xs:element name="seriesGroup" type="xs:integer" minOccurs="0" maxOccurs="1"/>
             <xs:element name="nextSeriesGroup" type="xs:integer" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="seriesStartAge" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="seriesEndAge" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <xs:element name="iceSeriesDose" type="is:iceSeriesDoseSpecification" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="seasonCode" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="recurringDosesAfterSeriesComplete" type="xs:boolean" default="false" minOccurs="0" maxOccurs="1"/>
