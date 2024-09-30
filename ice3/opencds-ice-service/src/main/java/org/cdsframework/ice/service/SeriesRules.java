@@ -41,8 +41,8 @@ public class SeriesRules {
 	private String seriesName;
 	private CdsConcept vaccineGroupConcept;
 	private int numberOfDosesInSeries;
-	private TimePeriod patientStartAge;
-	private TimePeriod patientEndAge;
+	private TimePeriod seriesStartAge;
+	private TimePeriod seriesEndAge;
 	private boolean recurringDosesAfterSeriesComplete;
 	private boolean doseNumberCalculatedBasedOnDiseasesTargetedByEachVaccineAdministered;
 	private List<DoseRule> seriesDoseRules;
@@ -73,8 +73,8 @@ public class SeriesRules {
 		seriesDoseRules = new ArrayList<DoseRule>();
 		applicableSeasons = new ArrayList<Season>();
 		numberOfDosesInSeries = 0;
-		patientStartAge = null;
-		patientEndAge = null;
+		seriesStartAge = null;
+		seriesEndAge = null;
 		doseNumberCalculatedBasedOnDiseasesTargetedByEachVaccineAdministered = true;
 		recurringDosesAfterSeriesComplete = false;
 	}
@@ -111,8 +111,8 @@ public class SeriesRules {
 		lSR.seriesName = pSR.seriesName;
 		lSR.vaccineGroupConcept = CdsConcept.constructDeepCopyOfCdsConceptObject(pSR.getVaccineGroupConcept());
 		lSR.numberOfDosesInSeries = pSR.numberOfDosesInSeries;
-		lSR.patientStartAge = TimePeriod.constructDeepCopyOfTimePeriodObject(pSR.patientStartAge);
-		lSR.patientEndAge = TimePeriod.constructDeepCopyOfTimePeriodObject(pSR.patientEndAge);
+		lSR.seriesStartAge = TimePeriod.constructDeepCopyOfTimePeriodObject(pSR.seriesStartAge);
+		lSR.seriesEndAge = TimePeriod.constructDeepCopyOfTimePeriodObject(pSR.seriesEndAge);
 		lSR.recurringDosesAfterSeriesComplete = pSR.recurringDosesAfterSeriesComplete;
 		lSR.doseNumberCalculatedBasedOnDiseasesTargetedByEachVaccineAdministered = pSR.doseNumberCalculatedBasedOnDiseasesTargetedByEachVaccineAdministered;
 		lSR.applicableSeasons = new ArrayList<Season>();
@@ -167,20 +167,20 @@ public class SeriesRules {
 		return vaccineGroupConcept.getOpenCdsConceptCode();
 	}
 
-	public TimePeriod getPatientStartAge() {
-		return patientStartAge;
+	public TimePeriod getSeriesStartAge() {
+		return seriesStartAge;
 	}
 
-	public void setPatientStartAge(TimePeriod patientStartAgeInSeries) {
-		this.patientStartAge = patientStartAgeInSeries;
+	public void setSeriesStartAge(TimePeriod patientStartAgeInSeries) {
+		this.seriesStartAge = patientStartAgeInSeries;
 	}
 
-	public TimePeriod getPatientEndAge() {
-		return patientEndAge;
+	public TimePeriod getSeriesEndAge() {
+		return seriesEndAge;
 	}
 
-	public void setPatientEndAge(TimePeriod patientEndAgeInSeries) {
-		this.patientEndAge = patientEndAgeInSeries;
+	public void setSeriesEndAge(TimePeriod patientEndAgeInSeries) {
+		this.seriesEndAge = patientEndAgeInSeries;
 	}
 
 	public int getNumberOfDosesInSeries() {

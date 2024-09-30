@@ -36,6 +36,7 @@ import org.opencds.vmr.v1_0.internal.EvaluatedPerson
 import org.opencds.vmr.v1_0.internal.SubstanceAdministrationEvent
 import org.cdsframework.ice.service.ICEFactTypeFinding
 import org.cdsframework.ice.service.ICELogicHelper
+import org.cdsframework.ice.service.InconsistentConfigurationException
 import org.cdsframework.ice.service.Season
 import org.cdsframework.ice.service.Schedule
 import org.cdsframework.ice.service.SeriesRules
@@ -43,6 +44,8 @@ import org.cdsframework.ice.supportingdatatmp.SupportedFactConcept
 import org.cdsframework.ice.service.TargetDose
 import org.cdsframework.ice.service.TargetSeasons
 import org.cdsframework.ice.service.TargetSeries
+import org.cdsframework.ice.util.TimePeriod
+
 
 global java.util.Date evalTime
 global org.cdsframework.ice.service.Schedule schedule
@@ -136,6 +139,28 @@ end
 //     series for evaluation/forecasting.
 /////////////////////
 
-
+rule "CandidateSeriesIdentification(RSV): If there are not exactly 2 RSV series whereby the Infant Series has a patientEndAge that is 1 day less than the patientStartAge of the Adult Series, throw an exception"
+	dialect "mvel"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule"
+	when
+		accumulate($srrsv : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875"); $count : count($srrsv); $count == 2)
+		and
+		exists SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries")
+		and
+		exists SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVAdultSeries")
+		and
+		(
+			$rsvinfant : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries")
+			and
+			$rsvadult : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVAdultSeries")
+			and
+			eval($rsvinfant.seriesEndAge != null && $rsvadult.seriesStartAge != null && 
+				TimePeriod.differenceInDays(TimePeriod.addTimePeriod(evalTime, $rsvinfant.seriesEndAge), TimePeriod.addTimePeriod(evalTime, $rsvadult.seriesStartAge)) == 1) 
+		)
+	then
+		String _RULENAME = kcontext.rule.name;
+		insert(new ICEFactTypeFinding("RSV Series Patient Ages Criteria Met");
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Criteria of exactly 2 RSV series defined as required; RSV processing can continue");
+end
 
 

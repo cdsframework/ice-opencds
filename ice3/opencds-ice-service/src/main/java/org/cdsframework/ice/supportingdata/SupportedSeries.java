@@ -562,10 +562,10 @@ public class SupportedSeries implements SupportingData {
 		// Gather patient age information and the associated start/end ages for the series (if any), and add to the SeriesRules object
 		///////
 		if (pIceSeriesSpecificationFile.getPatientStartAge() != null) {
-			series1Rules.setPatientStartAge(new TimePeriod(pIceSeriesSpecificationFile.getPatientStartAge()));
+			series1Rules.setSeriesStartAge(new TimePeriod(pIceSeriesSpecificationFile.getPatientStartAge()));
 		}
 		if (pIceSeriesSpecificationFile.getPatientEndAge() != null) {
-			series1Rules.setPatientEndAge(new TimePeriod(pIceSeriesSpecificationFile.getPatientEndAge()));
+			series1Rules.setSeriesEndAge(new TimePeriod(pIceSeriesSpecificationFile.getPatientEndAge()));
 		}
 
 		///////
