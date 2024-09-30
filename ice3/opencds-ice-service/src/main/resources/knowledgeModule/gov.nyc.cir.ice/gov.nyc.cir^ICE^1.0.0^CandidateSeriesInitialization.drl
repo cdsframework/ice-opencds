@@ -48,7 +48,9 @@ global java.util.Date evalTime
 global org.cdsframework.ice.service.Schedule schedule
 
 
-///////////////////////////////////////////////////////////// Influenza TargetSeries Initialization Rules /////////////////////////////////////////////////
+/*************************************************************************************************************************************************************************************
+ Influenza TargetSeries Initialization Rules
+*************************************************************************************************************************************************************************************/
 
 rule "CandidateSeriesIdentification (Influenza): Initialize TargetSeries for *CURRENT* *Influenza* Season with Most Recent Prior Season Rules if Current Season Not Defined but Prior Season is Defined" 
 	dialect "mvel"
@@ -115,4 +117,25 @@ rule "CandidateSeriesIdentification (Influenza): Initialize TargetSeries for *PA
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "*Seasonal* TargetSeries initialized: " + ts.toString());
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "*Updated* TargetSeasons: " + $tseasons.toString());	
 end
+
+
+/*************************************************************************************************************************************************************************************
+ RSV TargetSeries Initialization Rules
+*************************************************************************************************************************************************************************************/
+
+/////////////////////
+// Logic to either select or combine the infant and/or adult series based on the current age of the patient and the age at which shots were administered. 
+// This logic will be generalized and extended for use with other vaccine groups (such as pneumococcal) at a later time. This initial implementation for RSV, all of which can be 
+// implemented in this agenda group, is as follows:  
+//   + If there are no shots administered <= the maxAge of a series, do not consider the series for evaluation or forecasting.  Simply remove it from the list to be examined.
+//   + If there are shots administered < minAge of a series and there does not exist a different series with a specified maxAge that is < minAge of this series, then add the 
+//     shots to the minAge series for evaluation/forecasting (even if there are shots administered < the minAge).
+//   + If there are shots administered < minAge of a series, no shots administered >= minAge, and there does exist a series with a specified maxAge that is < minAge of this series, 
+//     then do not include the series with the minAge for evaluation/forecasting (since there are no shots administered >= the minAge).
+//   + If shots were administered both < maxAge of one or more series and >= minAge of one or more other series, append each latter series to each earlier series and used combined 
+//     series for evaluation/forecasting.
+/////////////////////
+
+
+
 
