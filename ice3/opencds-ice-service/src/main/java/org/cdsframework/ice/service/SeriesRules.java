@@ -29,9 +29,11 @@ package org.cdsframework.ice.service;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cdsframework.cds.CdsConcept;
+import org.cdsframework.ice.util.TimePeriod;
 
 public class SeriesRules {
 
@@ -39,6 +41,8 @@ public class SeriesRules {
 	private String seriesName;
 	private CdsConcept vaccineGroupConcept;
 	private int numberOfDosesInSeries;
+	private TimePeriod patientStartAge;
+	private TimePeriod patientEndAge;
 	private boolean recurringDosesAfterSeriesComplete;
 	private boolean doseNumberCalculatedBasedOnDiseasesTargetedByEachVaccineAdministered;
 	private List<DoseRule> seriesDoseRules;
@@ -69,6 +73,8 @@ public class SeriesRules {
 		seriesDoseRules = new ArrayList<DoseRule>();
 		applicableSeasons = new ArrayList<Season>();
 		numberOfDosesInSeries = 0;
+		patientStartAge = null;
+		patientEndAge = null;
 		doseNumberCalculatedBasedOnDiseasesTargetedByEachVaccineAdministered = true;
 		recurringDosesAfterSeriesComplete = false;
 	}
@@ -91,8 +97,8 @@ public class SeriesRules {
 
 
 	/**
-	 * Construct a copy of this object and return i
-	 * @return
+	 * Construct a copy of this object and return it
+	 * @return SeriesRules full copy of the SeriesRules object passed into this method; null if there series passed in is null.
 	 */
 	public static SeriesRules constructDeepCopyOfSeriesRulesObject(SeriesRules pSR) {
 
@@ -104,6 +110,9 @@ public class SeriesRules {
 		lSR.seriesId = ICELogicHelper.generateUniqueString();
 		lSR.seriesName = pSR.seriesName;
 		lSR.vaccineGroupConcept = CdsConcept.constructDeepCopyOfCdsConceptObject(pSR.getVaccineGroupConcept());
+		lSR.numberOfDosesInSeries = pSR.numberOfDosesInSeries;
+		lSR.patientStartAge = TimePeriod.constructDeepCopyOfTimePeriodObject(pSR.patientStartAge);
+		lSR.patientEndAge = TimePeriod.constructDeepCopyOfTimePeriodObject(pSR.patientEndAge);
 		lSR.recurringDosesAfterSeriesComplete = pSR.recurringDosesAfterSeriesComplete;
 		lSR.doseNumberCalculatedBasedOnDiseasesTargetedByEachVaccineAdministered = pSR.doseNumberCalculatedBasedOnDiseasesTargetedByEachVaccineAdministered;
 		lSR.applicableSeasons = new ArrayList<Season>();
@@ -156,6 +165,22 @@ public class SeriesRules {
 
 	public String getVaccineGroup() {
 		return vaccineGroupConcept.getOpenCdsConceptCode();
+	}
+
+	public TimePeriod getPatientStartAge() {
+		return patientStartAge;
+	}
+
+	public void setPatientStartAge(TimePeriod patientStartAgeInSeries) {
+		this.patientStartAge = patientStartAgeInSeries;
+	}
+
+	public TimePeriod getPatientEndAge() {
+		return patientEndAge;
+	}
+
+	public void setPatientEndAge(TimePeriod patientEndAgeInSeries) {
+		this.patientEndAge = patientEndAgeInSeries;
 	}
 
 	public int getNumberOfDosesInSeries() {
