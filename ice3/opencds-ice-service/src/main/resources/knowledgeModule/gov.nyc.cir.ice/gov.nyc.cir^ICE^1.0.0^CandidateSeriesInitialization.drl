@@ -139,7 +139,10 @@ end
 //   + If there are shots administered both <= the maxAge of the infant series and >= the minAge of the adult series, combine them.
 /////////////////////
 
-rule "CandidateSeriesIdentification (RSV): Verify that there are exactly 2 RSV series whereby the Infant Series has a patientEndAge that is 1 day less than the patientStartAge of the Adult Series"
+///////
+// START - RSV CandidateSeriesIdentification Initial Checks and Workflow
+///////
+rule "CandidateSeriesIdentification (RSV): If there are exactly 2 RSV series whereby the Infant Series has a patientEndAge that is 1 day less than the patientStartAge of the Adult Series, invoke series identification workflow"
 	dialect "mvel"
 	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule"
 	when
@@ -149,17 +152,50 @@ rule "CandidateSeriesIdentification (RSV): Verify that there are exactly 2 RSV s
 		eval($rsvinfant.seriesEndAge != null && $rsvadult.seriesStartAge != null && TimePeriod.differenceInDays(TimePeriod.addTimePeriod(evalTime, $rsvinfant.seriesEndAge), TimePeriod.addTimePeriod(evalTime, $rsvadult.seriesStartAge)) == 1)
 	then
 		String _RULENAME = kcontext.rule.name;
-		insert(new ICEFactTypeFinding(SupportedFactconcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE));
+		insert(new ICEFactTypeFinding("All criteria necessary for RSV CandidiateSeriesIdentification met"));
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Criteria of exactly 2 RSV series defined as required; RSV processing can continue");
-		setFocus("CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV");
+		setFocus("CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^NoShotRules");
 end
 
-/*
-rule "CandidateSeriesIdentification(RSV): If there are no shots administered and the patient age is <= the maxAge of the infant series, then include the (seasonal) infant series for evaluation"
+
+rule "CandidateSeriesIdentification (RSV): If there are shots administered prior to the Infant Series end age, invoke series identifications for the Infant Series"
 	dialect "mvel"
 	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule"
 	when
-		exists ICEFactTypeFinding("RSV All Series Patient Age Criteria Met");
+		exists ICEFactTypeFinding(iceResultFinding == "All criteria necessary for RSV CandidiateSeriesIdentification met");
+		exists ICEFactTypeFinding(iceResultFinding == "RSV No Shot Rules Completed")
+	then
+		String _RULENAME = kcontext.rule.name;
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Shots were administered on or before the Infant Series end age");
+		setFocus("CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^InfantSeriesRules");
+		insert(new ICEFactTypeFinding("RSV Infant Series Rules Completed"));
+end
+
+
+rule "CandidateSeriesIdentification (RSV): If there are shots administered on or after the Adult Series start age, invoke series identifications for the Adult Series"
+	dialect "mvel"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule"
+	when
+		exists ICEFactTypeFinding(iceResultFinding == "All criteria necessary for RSV CandidiateSeriesIdentification met");
+		exists ICEFactTypeFinding(iceResultFinding == "RSV Infant Series Rules Completed")
+	then
+		String _RULENAME = kcontext.rule.name;
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Shots were administered on or after the Adult Series start age");
+		setFocus("CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^AdultSeriesRules");
+end
+
+///////
+// END - RSV CandidateSeriesIdentification Initial Checks and Workflow
+///////
+
+///////
+// START - RSV No Shot Rules
+///////
+
+rule "CandidateSeriesIdentification(RSV): If there are no shots administered and the patient age is <= the maxAge of the infant series, then include the (seasonal) infant series for evaluation"
+	dialect "mvel"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^NoShotRules"
+	when
 		not TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.875")
 		$rsvinfant : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries", seasons.size() > 0)
 		$tseasons : TargetSeasons()
@@ -170,10 +206,30 @@ rule "CandidateSeriesIdentification(RSV): If there are no shots administered and
 		TargetSeries ts = new TargetSeries($rsvinfant, schedule);
 		insert(ts);
 end
-*/
 
 
-rule "CandidateSeriesIdentification (RSV): Initialize TargetSeries for *CURRENT* *Influenza* Season with Most Recent Prior Season Rules if Current Season Not Defined but Prior Season is Defined" 
+rule "CandidateSeriesIdentification(RSV): If there are no shots administered and the patient age is <= the maxAge of the infant series, then include the (seasonal) infant series for evaluation"
+	dialect "mvel"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^NoShotRules"
+	when
+		not TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.875")
+		$rsvinfant : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries", seasons.size() > 0)
+		$tseasons : TargetSeasons()
+		EvaluatedPerson($birthDate : demographics.birthTime)
+		eval(TimePeriod.calculateElapsedTimePeriod($birthDate, evalTime, DurationType.DAYS).isLessThanEqualTo($rsvinfant.seriesEndAge))
+	then
+		String _RULENAME = kcontext.rule.name;
+		TargetSeries ts = new TargetSeries($rsvinfant, schedule);
+		insert(ts);
+end
+
+///////
+// END - RSV No Shot Rules
+///////
+
+
+
+rule "CandidateSeriesIdentification (RSV): Initialize TargetSeries for *CURRENT* *RSV* Season with Most Recent Prior Season Rules if Current Season Not Defined but Prior Season is Defined" 
 	dialect "mvel"
 	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	salience 190
