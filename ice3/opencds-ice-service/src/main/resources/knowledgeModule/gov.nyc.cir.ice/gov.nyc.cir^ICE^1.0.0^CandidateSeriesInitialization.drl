@@ -227,6 +227,20 @@ rule "CandidateSeriesIdentification (RSV): If there are exactly 2 RSV series whe
 end
 
 
+rule "CandidateSeriesIdentification (RSV): Prevent default CandidateSeriesIdentification rules from running any RSV SeriesRules"
+	dialect "mvel"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule"
+	when
+		$s : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875")
+		not ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules == $s)
+	then
+		String _RULENAME = kcontext.rule.name;
+		ICEFactTypeFinding iftf = new ICEFactTypeFinding(SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, $s);
+		insert(iftf);
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesRules \"" + $s.seriesName + "\" will not be examined by default CandidateSeriesIdentification rules");
+end
+
+
 ///////
 // RSV Adult TargetSeries Initializations
 ///////
