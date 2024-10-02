@@ -125,17 +125,6 @@ end
  RSV TargetSeries Initialization Rules
 *************************************************************************************************************************************************************************************/
 
-/////////////////////
-// Logic to either select or combine the infant and/or adult series based on the current age of the patient and the age at which shots were administered. 
-// This logic will be generalized and extended for use with other vaccine groups (such as pneumococcal) at a later time. This initial implementation for RSV, all of which can be 
-// implemented in this agenda group, is as follows:  
-//   + If there are no shots administered and the patient age is <= the maxAge of the infant series, add the infant series. Do not add the adult series.
-//   + If there are no shots administered and the patient age is >= the minAge of the adult series, add the adult series. Do not add the infant series.
-//   + If there are shots administered but they are all <= the max age of the infant series, simply add the infant series; do not add the adult series
-//   + If there are shots administered but they are all >= the min age of the adult series, simply add the adult series; do not add the infant series
-//   + If there are shots administered both <= the maxAge of the infant series and >= the minAge of the adult series, combine them.
-/////////////////////
-
 /*
 rule "CandidateSeriesIdentification (RSV): If there are shots administered prior to the Infant Series end age, invoke series identifications for the Infant Series"
 	dialect "mvel"
@@ -208,6 +197,17 @@ end
 // END - RSV No Shot Rules
 ///////
 
+/////////////////////
+// Logic to either select or combine the infant and/or adult series based on the current age of the patient and the age at which shots were administered. 
+// This logic will be generalized and extended for use with other vaccine groups (such as pneumococcal) at a later time. This initial implementation for RSV, all of which can be 
+// implemented in this agenda group, is as follows:  
+//   + If there are no shots administered and the patient age is <= the maxAge of the infant series, add the infant series. Do not add the adult series.
+//   + If there are no shots administered and the patient age is >= the minAge of the adult series, add the adult series. Do not add the infant series.
+//   + If there are shots administered but they are all <= the max age of the infant series, simply add the infant series; do not add the adult series
+//   + If there are shots administered but they are all >= the min age of the adult series, simply add the adult series; do not add the infant series
+//   + If there are shots administered both <= the maxAge of the infant series and >= the minAge of the adult series, combine them.
+/////////////////////
+
 
 ///////
 // START - RSV CandidateSeriesIdentification Initial Checks and Workflow
@@ -222,18 +222,55 @@ rule "CandidateSeriesIdentification (RSV): If there are exactly 2 RSV series whe
 		eval($rsvinfant.seriesEndAge != null && $rsvadult.seriesStartAge != null && TimePeriod.differenceInDays(TimePeriod.addTimePeriod(evalTime, $rsvinfant.seriesEndAge), TimePeriod.addTimePeriod(evalTime, $rsvadult.seriesStartAge)) == 1)
 	then
 		String _RULENAME = kcontext.rule.name;
-		/////// insert(new ICEFactTypeFinding("All criteria necessary for RSV CandidiateSeriesIdentification met"));
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Criteria of exactly 2 RSV series defined as required; RSV processing can continue");
-		setFocus("CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^InfantSeriesChecks");
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Criteria of exactly 2 RSV series defined as required; RSV series processing to continue");
+		setFocus("CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^infantSeriesChecks");
+		setFocus("CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^adultSeriesChecks");
+		setFocus("CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^combineInfantAndAdultSeries");
 end
 
 
-rule "CandidateSeriesIdentification (RSV): Initialize TargetSeries for *Current* *RSV* Season with Most Recent Prior Season Rules if Current Season Not Defined but Prior Season is Defined,  and the patient age is <= the seriesEndAge" 
+rule "CandidateSeriesIdentification(RSV): Initialize Adult TargetSeries if the patient age is >= the series start age for the adult series"
 	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^InfantSeriesChecks"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^adultSeriesChecks"
+	salience 10
+	when
+		$s : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVAdultSeries", seasons.isEmpty(), seriesStartAge != null)
+		not TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == $s.seriesName)
+		EvaluatedPerson($birthDate : demographics.birthTime)
+		eval(TimePeriod.calculateElapsedTimePeriod($birthDate, evalTime, DurationType.DAYS).isGreaterThanEqualTo($s.seriesStartAge))
+	then
+		String _RULENAME = kcontext.rule.name;
+		TargetSeries ts = new TargetSeries($s, schedule);
+		insert(ts);
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeries initialized: " + ts.toString());
+end
+
+
+rule "CandidateSeriesIdentification(RSV): Initialize Adult TargetSeries if shots were administered at >= the series start age for the adult series"
+	dialect "mvel"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^adultSeriesChecks"
+	when
+		$s : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVAdultSeries", seasons.isEmpty(), seriesStartAge != null)
+		not TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == $s.seriesName)
+		ImmunizationConcept($ctid : conceptTargetId, $occ : openCdsConceptCode)
+		SubstanceAdministrationEvent(id == $ctid, $shotDate : ICELogicHelper.extractSingularDateValueFromIVLDate(administrationTimeInterval))
+		eval(schedule.vaccineTargetsOneOrMoreOfSpecifiedDiseases(schedule.getVaccineByCdsConceptValue($occ), schedule.getDiseasesTargetedByVaccineGroup($s.vaccineGroup)) == true)	
+		EvaluatedPerson($birthDate : demographics.birthTime)
+		eval(TimePeriod.calculateElapsedTimePeriod($birthDate, evalTime, DurationType.DAYS).isGreaterThanEqualTo($s.seriesStartAge))
+	then
+		String _RULENAME = kcontext.rule.name;
+		TargetSeries ts = new TargetSeries($s, schedule);
+		insert(ts);
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeries initialized: " + ts.toString());
+end
+
+
+rule "CandidateSeriesIdentification(RSV): Initialize Infant TargetSeries for *Current* *RSV* Season with Most Recent Prior Season Rules if Current Season Not Defined but Prior Season is Defined,  and the patient age is <= the seriesEndAge" 
+	dialect "mvel"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^infantSeriesChecks"
 	salience 190
 	when
-		$rsvInfantSeries : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seasons.size() > 0)
+		$rsvInfantSeries : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries", seasons.size() > 0, seriesEndAge != null)
 		not Season(isDefaultSeason() == false, isDefinedBySeriesTableRules() == true, vaccineGroup == $rsvInfantSeries.vaccineGroup, dateIsApplicableToSeason(evalTime))
 		$mostRecentSeason: Season(isDefaultSeason() == false, isDefinedBySeriesTableRules() == true, vaccineGroup == $rsvInfantSeries.vaccineGroup, $mostRecentSeasonStart : fullySpecifiedSeasonStartDate, $mostRecentSeasonStart.toDate() < evalTime)
 		Number(intValue > 0) from accumulate($accseason : Season(this == $mostRecentSeason) from $rsvInfantSeries.seasons, count($accseason))
@@ -264,19 +301,19 @@ end
 
 rule "CandidateSeriesIdentification (RSV): Initialize TargetSeries for *Current* or *Past* *RSV* Season with Shots Administered with Most Recent Prior Season if No Applicable Season Defined at Time Shot Administered, and the shot was administered <= the seriesEndAge" 
 	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^InfantSeriesChecks"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^infantSeriesChecks"
 	salience 180
 	when
 		ImmunizationConcept($ctid : conceptTargetId, $occ : openCdsConceptCode)
 		SubstanceAdministrationEvent(id == $ctid, $shotDate : ICELogicHelper.extractSingularDateValueFromIVLDate(administrationTimeInterval))
-		$rsvInfantSeries : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seasons.size() > 0)
+		$rsvInfantSeries : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries", seasons.size() > 0, seriesEndAge != null)
 		$mostRecentSeason : Season(isDefaultSeason() == false, isDefinedBySeriesTableRules() == true, vaccineGroup == $rsvInfantSeries.vaccineGroup, $mostRecentSeasonStart : fullySpecifiedSeasonStartDate, $mostRecentSeasonStart.toDate() < $shotDate)
 		Number(intValue > 0) from accumulate($accseason : Season(this == $mostRecentSeason) from $rsvInfantSeries.seasons, count($accseason))
 		not Season(vaccineGroup == $rsvInfantSeries.vaccineGroup, isDefaultSeason() == false, isDefinedBySeriesTableRules() == true, fullySpecifiedSeasonStartDate.isAfter($mostRecentSeasonStart))
 		not (TargetSeries(seriesName == $rsvInfantSeries.seriesName, vaccineGroup == $rsvInfantSeries.vaccineGroup, targetSeason != null, 
 			targetSeason ==	Season.constructFullySpecifiedSeasonFromDefaultSeasonAndDate(new Season($mostRecentSeason.seasonName, $rsvInfantSeries.vaccineGroup, false, $mostRecentSeason.seasonStartMonth, $mostRecentSeason.seasonStartDay, 
 				$mostRecentSeason.seasonEndMonth, $mostRecentSeason.seasonEndDay), $shotDate)))
-		eval(schedule.vaccineTargetsOneOrMoreOfSpecifiedDiseases(schedule.getVaccineByCdsConceptValue($occ), schedule.getDiseasesTargetedByVaccineGroup($rsvInfantSeries.vaccineGroup)) == true)	
+		eval(schedule.vaccineTargetsOneOrMoreOfSpecifiedDiseases(schedule.getVaccineByCdsConceptValue($occ), schedule.getDiseasesTargetedByVaccineGroup($rsvInfantSeries.vaccineGroup)) == true)
 		EvaluatedPerson($birthDate : demographics.birthTime)
 		eval(TimePeriod.calculateElapsedTimePeriod($birthDate, $shotDate, DurationType.DAYS).isLessThanEqualTo($rsvInfantSeries.seriesEndAge))
 		$tseasons : TargetSeasons()
@@ -300,10 +337,10 @@ end
 
 rule "CandidateSeriesIdentification (RSV): Initialize TargetSeries for *Current* Season with Fully-Specified Season Parameters (if defined), and the patient age is <= the seriesEndAge"
 	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^InfantSeriesChecks"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^infantSeriesChecks"
 	salience 100
 	when
-		$rsvInfantSeries : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seasons.size() > 0)  
+		$rsvInfantSeries : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries", seasons.size() > 0, seriesEndAge != null)  
 		$season : Season(isDefaultSeason() == false, isDefinedBySeriesTableRules() == true, dateIsApplicableToSeason(evalTime)) from $rsvInfantSeries.seasons
 		not TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == $rsvInfantSeries.seriesName, targetSeason != null, targetSeason.isDefaultSeason() == false, targetSeason == $season)
 		EvaluatedPerson($birthDate : demographics.birthTime)
@@ -318,10 +355,10 @@ end
 
 rule "CandidateSeriesIdentification (RSV): Initialize *Current* Season TargetSeries with Default Season Parameters if Current Not Defined for the Vaccine Group, and the patient age is <= the seriesEndAge"
 	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^InfantSeriesChecks"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^infantSeriesChecks"
 	salience 90
 	when
-		$rsvInfantSeries : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seasons.size() > 0)
+		$rsvInfantSeries : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries", seasons.size() > 0, seriesEndAge != null)
 		$season : Season(isDefaultSeason() == true, dateIsApplicableToSeason(evalTime)) from $rsvInfantSeries.seasons
 		not Season(isDefaultSeason() == false, vaccineGroup == $rsvInfantSeries.vaccineGroup, dateIsApplicableToSeason(evalTime))
 		not TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == $rsvInfantSeries.seriesName, targetSeason != null, targetSeason == $season)
@@ -344,12 +381,12 @@ end
 
 rule "CandidateSeriesIdentification (RSV): Initialize *Past* Season TargetSeries when Shots Administered with Fully-Specified Season Parameters if Fully-Specified Season Parameters Defined for the Season, and the shot was administered <= the seriesEndAge"
 	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^InfantSeriesChecks"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^infantSeriesChecks"
 	salience 80
 	when
 		ImmunizationConcept($ctid : conceptTargetId, $occ : openCdsConceptCode)
 		SubstanceAdministrationEvent(id == $ctid, $shotDate : ICELogicHelper.extractSingularDateValueFromIVLDate(administrationTimeInterval))
-		$rsvInfantSeries : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seasons.size() > 0)
+		$rsvInfantSeries : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries", seasons.size() > 0, seriesEndAge != null)
 		$season : Season(isDefaultSeason() == false, isDefinedBySeriesTableRules() == true, $season.dateIsApplicableToSeason($shotDate)) from $rsvInfantSeries.seasons
 		not TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == $rsvInfantSeries.seriesName, targetSeason != null, targetSeason == $season)
 		eval(schedule.vaccineTargetsOneOrMoreOfSpecifiedDiseases(schedule.getVaccineByCdsConceptValue($occ), schedule.getDiseasesTargetedByVaccineGroup($rsvInfantSeries.vaccineGroup)) == true)
@@ -365,12 +402,12 @@ end
 
 rule "CandidateSeriesIdentification (RSV): Initialize *Past* Season TargetSeries when Shots Administered with Default Season Parameters if No Fully-Specified Season Parameters Defined for the Season, and the shot was administered <= the seriesEndAge"
 	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^InfantSeriesChecks"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^infantSeriesChecks"
 	salience 70
 	when
 		ImmunizationConcept($ctid : conceptTargetId, $occ : openCdsConceptCode)
 		SubstanceAdministrationEvent(id == $ctid, $shotDate : ICELogicHelper.extractSingularDateValueFromIVLDate(administrationTimeInterval))
-		$rsvInfantSeries : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seasons.size() > 0)
+		$rsvInfantSeries : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries", seasons.size() > 0, seriesEndAge != null)
 		$season : Season(isDefaultSeason() == true) from $rsvInfantSeries.seasons
 		not Season(isDefaultSeason() == false, vaccineGroup == $rsvInfantSeries.vaccineGroup, dateIsApplicableToSeason($shotDate))
 		// Note: for TargetSeries, do not match on series name when there is a default seasons because we do not want a TargetSeries created for the default season if another TargetSeries
@@ -397,12 +434,12 @@ end
 
 rule "CandidateSeriesIdentification (RSV): Initialize TargetSeries when Shots Administered when One and Only One Season for Vaccine Group exists and no matching Fully-Specified Season Parameters or Default Season Defined for the Season, and the shot was administered <= the seriesEndAge"
 	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^InfantSeriesChecks"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^infantSeriesChecks"
 	salience 70
 	when
 		ImmunizationConcept($ctid : conceptTargetId, $occ : openCdsConceptCode)
 		SubstanceAdministrationEvent(id == $ctid, $shotDate : ICELogicHelper.extractSingularDateValueFromIVLDate(administrationTimeInterval))
-		$rsvInfantSeries : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seasons.size() > 0)
+		$rsvInfantSeries : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries", seasons.size() > 0, seriesEndAge != null)
 		not Season(isDefaultSeason() == true, vaccineGroup == $rsvInfantSeries.vaccineGroup)
 		// Condition: If there is only one season and above TS does not match it, then we can conclude that there is no seasonal TS that will match
 		accumulate($accSeason : Season(vaccineGroup == $rsvInfantSeries.vaccineGroup); $count : count($accSeason); $count == 1)		
