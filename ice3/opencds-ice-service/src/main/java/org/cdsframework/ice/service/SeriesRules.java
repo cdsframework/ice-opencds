@@ -57,7 +57,6 @@ public class SeriesRules {
 	 * @param pVaccineGroup CdsConcept representing the vaccine group, must be provided
 	 * @throws IllegalArgumentException of series name or vaccine group is null
 	 */
-	/////// public SeriesRules(String pSeriesName, String pVaccineGroup) {
 	public SeriesRules(String pSeriesName, CdsConcept pVaccineGroup) {
 
 		String _METHODNAME = "Series(): ";

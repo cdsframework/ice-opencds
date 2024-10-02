@@ -119,10 +119,8 @@ rule "CandidateSeriesIdentification (Influenza): Initialize TargetSeries for *Cu
 end
 
 
-
-
 /*************************************************************************************************************************************************************************************
- RSV TargetSeries Initialization Rules
+ RSV TargetSeries Initialization Rules Try 1
 *************************************************************************************************************************************************************************************/
 
 /*
@@ -192,10 +190,11 @@ rule "CandidateSeriesIdentification(RSV): If there are no in the patient history
 		TargetSeries ts = new TargetSeries($rsvinfant, schedule);
 		insert(ts);
 end
-*/
+
 ///////
 // END - RSV No Shot Rules
 ///////
+*/
 
 /////////////////////
 // Logic to either select or combine the infant and/or adult series based on the current age of the patient and the age at which shots were administered. 
@@ -210,8 +209,9 @@ end
 
 
 ///////
-// START - RSV CandidateSeriesIdentification Initial Checks and Workflow
+// RSV CandidateSeriesIdentification Initial Checks and Workflow
 ///////
+
 rule "CandidateSeriesIdentification (RSV): If there are exactly 2 RSV series whereby the Infant Series has a patientEndAge that is 1 day less than the patientStartAge of the Adult Series, invoke series identification workflow"
 	dialect "mvel"
 	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule"
@@ -223,15 +223,17 @@ rule "CandidateSeriesIdentification (RSV): If there are exactly 2 RSV series whe
 	then
 		String _RULENAME = kcontext.rule.name;
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Criteria of exactly 2 RSV series defined as required; RSV series processing to continue");
-		setFocus("CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^infantSeriesChecks");
-		setFocus("CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^adultSeriesChecks");
-		setFocus("CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^combineInfantAndAdultSeries");
+		setFocus("CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV");
 end
 
 
+///////
+// RSV Adult TargetSeries Initializations
+///////
+
 rule "CandidateSeriesIdentification(RSV): Initialize Adult TargetSeries if the patient age is >= the series start age for the adult series"
 	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^adultSeriesChecks"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	salience 10
 	when
 		$s : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVAdultSeries", seasons.isEmpty(), seriesStartAge != null)
@@ -248,7 +250,7 @@ end
 
 rule "CandidateSeriesIdentification(RSV): Initialize Adult TargetSeries if shots were administered at >= the series start age for the adult series"
 	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^adultSeriesChecks"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	when
 		$s : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVAdultSeries", seasons.isEmpty(), seriesStartAge != null)
 		not TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == $s.seriesName)
@@ -265,9 +267,13 @@ rule "CandidateSeriesIdentification(RSV): Initialize Adult TargetSeries if shots
 end
 
 
+///////
+// RSV Infant TargetSeries Initializations
+///////
+
 rule "CandidateSeriesIdentification(RSV): Initialize Infant TargetSeries for *Current* *RSV* Season with Most Recent Prior Season Rules if Current Season Not Defined but Prior Season is Defined,  and the patient age is <= the seriesEndAge" 
 	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^infantSeriesChecks"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	salience 190
 	when
 		$rsvInfantSeries : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries", seasons.size() > 0, seriesEndAge != null)
@@ -301,7 +307,7 @@ end
 
 rule "CandidateSeriesIdentification (RSV): Initialize TargetSeries for *Current* or *Past* *RSV* Season with Shots Administered with Most Recent Prior Season if No Applicable Season Defined at Time Shot Administered, and the shot was administered <= the seriesEndAge" 
 	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^infantSeriesChecks"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	salience 180
 	when
 		ImmunizationConcept($ctid : conceptTargetId, $occ : openCdsConceptCode)
@@ -337,7 +343,7 @@ end
 
 rule "CandidateSeriesIdentification (RSV): Initialize TargetSeries for *Current* Season with Fully-Specified Season Parameters (if defined), and the patient age is <= the seriesEndAge"
 	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^infantSeriesChecks"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	salience 100
 	when
 		$rsvInfantSeries : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries", seasons.size() > 0, seriesEndAge != null)  
@@ -355,7 +361,7 @@ end
 
 rule "CandidateSeriesIdentification (RSV): Initialize *Current* Season TargetSeries with Default Season Parameters if Current Not Defined for the Vaccine Group, and the patient age is <= the seriesEndAge"
 	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^infantSeriesChecks"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	salience 90
 	when
 		$rsvInfantSeries : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries", seasons.size() > 0, seriesEndAge != null)
@@ -381,7 +387,7 @@ end
 
 rule "CandidateSeriesIdentification (RSV): Initialize *Past* Season TargetSeries when Shots Administered with Fully-Specified Season Parameters if Fully-Specified Season Parameters Defined for the Season, and the shot was administered <= the seriesEndAge"
 	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^infantSeriesChecks"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	salience 80
 	when
 		ImmunizationConcept($ctid : conceptTargetId, $occ : openCdsConceptCode)
@@ -402,7 +408,7 @@ end
 
 rule "CandidateSeriesIdentification (RSV): Initialize *Past* Season TargetSeries when Shots Administered with Default Season Parameters if No Fully-Specified Season Parameters Defined for the Season, and the shot was administered <= the seriesEndAge"
 	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^infantSeriesChecks"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	salience 70
 	when
 		ImmunizationConcept($ctid : conceptTargetId, $occ : openCdsConceptCode)
@@ -434,7 +440,7 @@ end
 
 rule "CandidateSeriesIdentification (RSV): Initialize TargetSeries when Shots Administered when One and Only One Season for Vaccine Group exists and no matching Fully-Specified Season Parameters or Default Season Defined for the Season, and the shot was administered <= the seriesEndAge"
 	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^infantSeriesChecks"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	salience 70
 	when
 		ImmunizationConcept($ctid : conceptTargetId, $occ : openCdsConceptCode)

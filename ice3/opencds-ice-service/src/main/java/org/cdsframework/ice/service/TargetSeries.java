@@ -256,15 +256,14 @@ public class TargetSeries {
 	 * @throws IllegalArgumentException if the series does not exist, or the dose number from which to switch to does not exist in the specified series
 	 */
 	public void convertToSpecifiedSeries(String seriesToConvertTo, int doseNumberFromWhichToBeginSwitch, boolean useDoseIntervalOfPriorDoseFromSwitchToSeries)
-			throws InconsistentConfigurationException {
+		throws InconsistentConfigurationException {
 
 		convertToSpecifiedSeries(seriesToConvertTo, doseNumberFromWhichToBeginSwitch, doseNumberFromWhichToBeginSwitch, useDoseIntervalOfPriorDoseFromSwitchToSeries);
 	}
 
 
-	private void convertToSpecifiedSeries(String seriesToConvertTo, int doseNumberOfSwitchFromSeriesFromWhichToBeginSwitch, int doseNumberOfSwitchToSeriesToWhichToSwitch,
-			boolean useDoseIntervalOfPriorDoseFromSwitchToSeries)
-					throws InconsistentConfigurationException {
+	private void convertToSpecifiedSeries(String seriesToConvertTo, int doseNumberOfSwitchFromSeriesFromWhichToBeginSwitch, int doseNumberOfSwitchToSeriesToWhichToSwitch, boolean useDoseIntervalOfPriorDoseFromSwitchToSeries)
+		throws InconsistentConfigurationException {
 
 		String _METHODNAME = "switchSeries(): ";
 		if (seriesToConvertTo == null) {
