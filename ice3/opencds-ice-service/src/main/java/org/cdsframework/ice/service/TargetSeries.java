@@ -262,7 +262,7 @@ public class TargetSeries {
 	}
 
 
-	private void convertToSpecifiedSeries(String seriesToConvertTo, int doseNumberOfSwitchFromSeriesFromWhichToBeginSwitch, int doseNumberOfSwitchToSeriesToWhichToSwitch, boolean useDoseIntervalOfPriorDoseFromSwitchToSeries)
+	private void convertToSpecifiedSeries(String seriesToConvertTo, int doseNumberFromWhichToBeginSwitch, int doseNumberToSwitchTo, boolean useDoseIntervalOfPriorDoseFromSwitchToSeries)
 		throws InconsistentConfigurationException {
 
 		String _METHODNAME = "switchSeries(): ";
@@ -272,33 +272,33 @@ public class TargetSeries {
 			throw new IllegalArgumentException(str);
 		}
 
-		if (doseNumberOfSwitchFromSeriesFromWhichToBeginSwitch != doseNumberOfSwitchToSeriesToWhichToSwitch) {
-			// For now, mechanims are not in place permit/support moving from one dose number to a different dose number; additionally, it does not fit into
+		if (doseNumberFromWhichToBeginSwitch != doseNumberToSwitchTo) {
+			// For now, mechanisms are not in place permit/support moving from one dose number to a different dose number; additionally, it does not fit into
 			// the definition of converting to a series. (E.g. - doesn't make sense to go from dose 3 of "from" series to dose 2 of "to" series)
 			String lErrStr = "Dose number from series to switch from does not equal the dose number of the series being switched to; cannot continue.";
 			logger.error(_METHODNAME + lErrStr);
 			throw new IllegalArgumentException(lErrStr);
 		}
 		// Get the specified SeriesRules
-		SeriesRules srOfSwitchSeries = scheduleBackingSeries.getScheduleSeriesByName(this.seriesRules.getVaccineGroup(), seriesToConvertTo);
-		if (srOfSwitchSeries == null) {
+		SeriesRules srOfSeriesToSwitchTo = scheduleBackingSeries.getScheduleSeriesByName(this.seriesRules.getVaccineGroup(), seriesToConvertTo);
+		if (srOfSeriesToSwitchTo == null) {
 			String str = _METHODNAME + "specified series not found; cannot continue.";
 			logger.error(str);
 			throw new IllegalArgumentException(str);
 		}
-		if (srOfSwitchSeries.getNumberOfDosesInSeries() < doseNumberOfSwitchToSeriesToWhichToSwitch) {
+		if (srOfSeriesToSwitchTo.getNumberOfDosesInSeries() < doseNumberToSwitchTo) {
 			String str = _METHODNAME + "number of doses in specified series is less than the specified dose number from which to begin the switch; cannot continue.";
 			logger.error(str);
 			throw new IllegalArgumentException(str);
 		}
-		List<DoseRule> doseRulesOfSwitchSeries = srOfSwitchSeries.getSeriesDoseRules();
-		if (doseRulesOfSwitchSeries == null) {
+		List<DoseRule> doseRulesOfSeriesToSwitchTo = srOfSeriesToSwitchTo.getSeriesDoseRules();
+		if (doseRulesOfSeriesToSwitchTo == null) {
 			String str = _METHODNAME + "List of DoseRules in switch series is null";
 			logger.error(str);
 			throw new InconsistentConfigurationException(str);
 		}
-		int sizeSwitchToSeries = srOfSwitchSeries.getNumberOfDosesInSeries();
-		if (doseRulesOfSwitchSeries.size() != sizeSwitchToSeries) {
+		int sizeOfSeriesToSwitchTo = srOfSeriesToSwitchTo.getNumberOfDosesInSeries();
+		if (doseRulesOfSeriesToSwitchTo.size() != sizeOfSeriesToSwitchTo) {
 			String str = _METHODNAME + "Length of DoseRulesList in switch series does not equal reported size in switch series";
 			logger.error(str);
 			throw new InconsistentConfigurationException(str);
@@ -313,11 +313,11 @@ public class TargetSeries {
 		}
 
 		// Remove existing DoseRules starting with the existing dose number.
-		int size = thisSeriesDoseRules.size();
-		thisSeriesDoseRules.subList(doseNumberOfSwitchFromSeriesFromWhichToBeginSwitch-1, size).clear();
+		int numberOfDosesDefinedInThisSeriesRules = thisSeriesDoseRules.size();
+		thisSeriesDoseRules.subList(doseNumberFromWhichToBeginSwitch-1, numberOfDosesDefinedInThisSeriesRules).clear();
 		if (logger.isDebugEnabled()) {
-			String debugStr = _METHODNAME + "Series to switch to: " + seriesToConvertTo + "; doseNumberFromWhichToBeginSwitch: " + doseNumberOfSwitchFromSeriesFromWhichToBeginSwitch + "; doseNumberToWhichToSwitch: " +
-					doseNumberOfSwitchToSeriesToWhichToSwitch + "; useDoseIntervalOfPriorDoseFromSwitchToSeries: " + useDoseIntervalOfPriorDoseFromSwitchToSeries;
+			String debugStr = _METHODNAME + "Series to switch to: " + seriesToConvertTo + "; doseNumberFromWhichToBeginSwitch: " + doseNumberFromWhichToBeginSwitch + "; doseNumberToWhichToSwitch: " +
+					doseNumberToSwitchTo + "; useDoseIntervalOfPriorDoseFromSwitchToSeries: " + useDoseIntervalOfPriorDoseFromSwitchToSeries;
 			logger.debug(debugStr);
 			debugStr = _METHODNAME + "After removing doseNumber-forward existing DoseRules from this Series, the following DoseRules remain: ";
 			for (DoseRule dr : this.seriesRules.getSeriesDoseRules()) {
@@ -328,9 +328,9 @@ public class TargetSeries {
 		}
 
 		// If the specified dose number is > 1, then modify the interval values from the series to switch to and change only those interval values leaving the remaining
-		if (useDoseIntervalOfPriorDoseFromSwitchToSeries && doseNumberOfSwitchFromSeriesFromWhichToBeginSwitch > 1) {
-			DoseRule thisSeriesLastDoseRuleFromPriorSeries = thisSeriesDoseRules.get(doseNumberOfSwitchFromSeriesFromWhichToBeginSwitch-2);
-			DoseRule newSeriesPriorDoseRuleForIntervalOnly = srOfSwitchSeries.getSeriesDoseRuleByDoseNumber((doseNumberOfSwitchToSeriesToWhichToSwitch <= 1) ? 1 : doseNumberOfSwitchToSeriesToWhichToSwitch-1);
+		if (useDoseIntervalOfPriorDoseFromSwitchToSeries && doseNumberFromWhichToBeginSwitch > 1) {
+			DoseRule thisSeriesLastDoseRuleFromPriorSeries = thisSeriesDoseRules.get(doseNumberFromWhichToBeginSwitch-2);
+			DoseRule newSeriesPriorDoseRuleForIntervalOnly = srOfSeriesToSwitchTo.getSeriesDoseRuleByDoseNumber((doseNumberToSwitchTo <= 1) ? 1 : doseNumberToSwitchTo-1);
 			thisSeriesLastDoseRuleFromPriorSeries.setAbsoluteMinimumInterval(newSeriesPriorDoseRuleForIntervalOnly.getAbsoluteMinimumInterval());
 			thisSeriesLastDoseRuleFromPriorSeries.setMinimumInterval(newSeriesPriorDoseRuleForIntervalOnly.getMinimumInterval());
 			thisSeriesLastDoseRuleFromPriorSeries.setEarliestRecommendedInterval(newSeriesPriorDoseRuleForIntervalOnly.getEarliestRecommendedInterval());
@@ -338,7 +338,7 @@ public class TargetSeries {
 		}
 
 		// Add new DoseRules starting with the existing dose number - properly set the dose number to ensure they are sequential
-		List<DoseRule> ssDoseRulesToAdd = srOfSwitchSeries.getSeriesDoseRules().subList(doseNumberOfSwitchToSeriesToWhichToSwitch-1, sizeSwitchToSeries);
+		List<DoseRule> ssDoseRulesToAdd = srOfSeriesToSwitchTo.getSeriesDoseRules().subList(doseNumberToSwitchTo-1, sizeOfSeriesToSwitchTo);
 		if (logger.isDebugEnabled()) {
 			String debugStr = _METHODNAME + "Switch series doses to add: ";
 			for (DoseRule dr : ssDoseRulesToAdd) {
@@ -348,7 +348,7 @@ public class TargetSeries {
 			logger.debug(debugStr);
 		}
 		// Change each DoseRule's doseNumber (the dose rules to add) to the proper dose number
-		int lDoseNumberFromWhichToSwitchInd = doseNumberOfSwitchFromSeriesFromWhichToBeginSwitch;
+		int lDoseNumberFromWhichToSwitchInd = doseNumberFromWhichToBeginSwitch;
 		for (DoseRule dr : ssDoseRulesToAdd) {
 			dr.setDoseNumber(lDoseNumberFromWhichToSwitchInd);
 			lDoseNumberFromWhichToSwitchInd++;
