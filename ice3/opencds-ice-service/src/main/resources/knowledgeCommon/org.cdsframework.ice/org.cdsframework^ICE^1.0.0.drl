@@ -370,6 +370,7 @@ rule "CandidateSeriesIdentification: Initialize TargetSeries Custom Rules Invoca
 	salience 110
 	when
 		$s : SeriesRules()
+		not ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, this == $s)
 	then
 		String _RULENAME = kcontext.rule.name;
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Invoke Custom CandidateSeriesIdentificationRule for SeriesRules: " + $s.getSeriesName());
@@ -385,6 +386,7 @@ rule "CandidateSeriesIdentification: Initialize TargetSeries for non-seasonal va
 	salience 100
 	when
 		$s : SeriesRules(seasons == null || seasons.isEmpty())
+		not ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, this == $s)
 	then
 		String _RULENAME = kcontext.rule.name;
 		TargetSeries ts = new TargetSeries($s, schedule);
@@ -400,7 +402,8 @@ rule "CandidateSeriesIdentification: Initialize TargetSeries for *Current* Seaso
 	dialect "mvel"
 	salience 100
 	when
-		$s : SeriesRules(seasons != null, seasons.size() > 0, $vg : vaccineGroup)  
+		$s : SeriesRules(seasons != null, seasons.size() > 0, $vg : vaccineGroup)
+		not ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, this == $s)  
 		$season : Season(isDefaultSeason() == false, isDefinedBySeriesTableRules() == true, dateIsApplicableToSeason(evalTime)) from $s.seasons
 		not (TargetSeries(seriesName == $s.seriesName, targetSeason != null, targetSeason.isDefaultSeason() == false, targetSeason == $season))
 	then
@@ -420,7 +423,8 @@ rule "CandidateSeriesIdentification: Initialize *Current* Season TargetSeries wi
 	when
 		$s : SeriesRules($vg : vaccineGroup, seasons != null, seasons.size() > 0)
 		$season : Season(isDefaultSeason() == true, dateIsApplicableToSeason(evalTime)) from $s.seasons
-		not (Season(isDefaultSeason() == false, vaccineGroup == $vg, dateIsApplicableToSeason(evalTime)))  
+		not (Season(isDefaultSeason() == false, vaccineGroup == $vg, dateIsApplicableToSeason(evalTime)))
+		not ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, this == $s)  
 		not (TargetSeries(seriesName == $s.seriesName, targetSeason != null, targetSeason == $season))
 		$tseasons : TargetSeasons()
 	then
@@ -447,6 +451,7 @@ rule "CandidateSeriesIdentification: Initialize *Past* Season TargetSeries when 
 		ImmunizationConcept($ctid : conceptTargetId, $occ : openCdsConceptCode)
 		SubstanceAdministrationEvent(id == $ctid, $shotDate : ICELogicHelper.extractSingularDateValueFromIVLDate(administrationTimeInterval))
 		$s : SeriesRules($vg : vaccineGroup, seasons.size() > 0)
+		not ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, this == $s)
 		$season : Season(isDefaultSeason() == false, isDefinedBySeriesTableRules() == true, $season.dateIsApplicableToSeason($shotDate)) from $s.seasons
 		not (TargetSeries(seriesName == $s.seriesName, targetSeason != null, targetSeason == $season))
 		eval(schedule.vaccineTargetsOneOrMoreOfSpecifiedDiseases(schedule.getVaccineByCdsConceptValue($occ), schedule.getDiseasesTargetedByVaccineGroup($vg)) == true)		
@@ -468,6 +473,7 @@ rule "CandidateSeriesIdentification: Initialize *Past* Season TargetSeries when 
 		ImmunizationConcept($ctid : conceptTargetId, $occ : openCdsConceptCode)
 		SubstanceAdministrationEvent(id == $ctid, $shotDate : ICELogicHelper.extractSingularDateValueFromIVLDate(administrationTimeInterval))
 		$s : SeriesRules($vg : vaccineGroup, seasons.size() > 0)
+		not ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, this == $s)
 		$season : Season(isDefaultSeason() == true) from $s.seasons
 		not Season(isDefaultSeason() == false, vaccineGroup == $vg, dateIsApplicableToSeason($shotDate))
 		// Note: for TargetSeries, do not match on series name when there is a default seasons because we do not want a TargetSeries created for the default season if another TargetSeries
@@ -500,6 +506,7 @@ rule "CandidateSeriesIdentification: Initialize TargetSeries when Shots Administ
 		ImmunizationConcept($ctid : conceptTargetId, $occ : openCdsConceptCode)
 		SubstanceAdministrationEvent(id == $ctid, $shotDate : ICELogicHelper.extractSingularDateValueFromIVLDate(administrationTimeInterval))
 		$s : SeriesRules($vg : vaccineGroup, seasons.size() > 0)
+		not ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, this == $s)
 		not Season(isDefaultSeason() == true, vaccineGroup == $vg)
 		// Condition: If there is only one season and above TS does not match it, then we can conclude that there is no seasonal TS that will match
 		accumulate($accSeason : Season(vaccineGroup == $vg); $count : count($accSeason); $count == 1)		
@@ -631,6 +638,25 @@ rule "CandidateDosesIdentification: Initialize Outlier TargetDose into Existing 
 		// ICELogicHelper.logDRLDebugMessage(_RULENAME, "completed; TargetSeries " + $ts);	
 end
 
+
+/*****************************************************************************************************************************************************************************/
+// 															Series Aggregation Ruleflow Group
+/*****************************************************************************************************************************************************************************/
+
+///////// ***
+// General Design rule... Do not Edit
+///////// ***
+rule "SeriesAggregation: Initialize Series Aggregation Custom Rules Invocation" ruleflow-group "SeriesAggregation"
+	dialect "mvel"
+	salience 110
+	when
+		$iftf : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue)
+		$s : SeriesRules(this == $iftf.associatedSeriesRules)
+	then
+		String _RULENAME = kcontext.rule.name;
+		setFocus("SeriesAggregation^customAggregateSeriesRule");
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Invoke Custom Aggregate Series for Series: " + $s);
+end
 
 
 /*****************************************************************************************************************************************************************************/

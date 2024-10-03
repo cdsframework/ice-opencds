@@ -1,0 +1,151 @@
+/**
+ * Copyright (C) 2024 New York City Department of Health and Mental Hygiene, Bureau of Immunization
+ * Contributions by HLN Consulting, LLC
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * Lesser General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version. You should have received a copy of the GNU Lesser
+ * General Public License along with this program. If not, see <http://www.gnu.org/licenses/> for more
+ * details.
+ *
+ * The above-named contributors (HLN Consulting, LLC) are also licensed by the New York City
+ * Department of Health and Mental Hygiene, Bureau of Immunization to have (without restriction,
+ * limitation, and warranty) complete irrevocable access and rights to this project.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; THE
+ *
+ * SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING,
+ * BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDERS, IF ANY, OR DEVELOPERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES, OR OTHER LIABILITY OF ANY KIND, ARISING FROM, OUT OF, OR IN CONNECTION WITH
+ * THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * For more information about this software, see http://www.hln.com/ice or send
+ * correspondence to ice@hln.com.
+ */
+ 
+package knowledgeModule.gov.nyc.cir.ice
+
+import java.util.Date
+import java.util.Iterator
+import java.util.List
+import java.util.Set
+import org.opencds.vmr.v1_0.internal.EvalTime
+import org.opencds.vmr.v1_0.internal.EvaluatedPerson
+import org.opencds.vmr.v1_0.internal.SubstanceAdministrationEvent
+import org.opencds.vmr.v1_0.internal.concepts.ImmunizationConcept
+import org.cdsframework.cds.CdsConcept
+import org.cdsframework.ice.service.DiseaseImmunity
+import org.cdsframework.ice.service.DoseStatus
+import org.cdsframework.ice.service.ICEFactTypeFinding
+import org.cdsframework.ice.service.ICELogicHelper
+import org.cdsframework.ice.service.Recommendation
+import org.cdsframework.ice.service.RecommendationStatus
+import org.cdsframework.ice.service.Schedule
+import org.cdsframework.ice.service.SeriesRules
+import org.cdsframework.ice.supportingdatatmp.SupportedFactConcept
+import org.cdsframework.ice.service.TargetDose
+import org.cdsframework.ice.service.TargetDoseInitializationTracker
+import org.cdsframework.ice.service.TargetSeries
+import org.cdsframework.ice.util.TimePeriod
+import org.cdsframework.ice.util.TimePeriod.DurationType
+import org.cdsframework.ice.service.Vaccine
+import org.cdsframework.ice.service.VaccineComponent
+
+global java.util.Date evalTime
+global org.cdsframework.ice.service.Schedule schedule
+
+
+
+/*************************************************************************************************************************************************************************************
+ RSV Series Aggregation Initialization Rules
+*************************************************************************************************************************************************************************************/
+
+/////////////////////
+// Logic to either select or combine the infant and/or adult series based on the current age of the patient and the age at which shots were administered. 
+// This logic will be generalized and extended for use with other vaccine groups (such as pneumococcal) at a later time. This initial implementation for RSV, all of which can be 
+// implemented in this agenda group, is as follows:  
+//   + If there are no shots administered and the patient age is <= the maxAge of the infant series, add the infant series. Do not add the adult series.
+//   + If there are no shots administered and the patient age is >= the minAge of the adult series, add the adult series. Do not add the infant series.
+//   + If there are shots administered but they are all <= the max age of the infant series, simply add the infant series; do not add the adult series
+//   + If there are shots administered but they are all >= the min age of the adult series, simply add the adult series; do not add the infant series
+//   + If there are shots administered both <= the maxAge of the infant series and >= the minAge of the adult series, combine them.
+/////////////////////
+
+rule "SeriesAggregation (RSV): If there are no shots administered in the current season of the Infant Series and <= to the Series end age, remove the TargetSeries from consideration"
+	dialect "mvel"
+	agenda-group "SeriesAggregation^customAggregateSeriesRule"
+	when
+		$iftf : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875",
+			associatedSeriesRules!.seriesName == "RSVInfantSeries")
+		$ts : TargetSeries(seriesRules == $iftf.associatedSeriesRules, numberOfShotsAdministeredInSeries == 0, seasonStartDate != null, seasonStartDate <= evalTime, seasonEndDate != null, seasonEndDate >= evalTime)
+		EvaluatedPerson($birthDate : demographics.birthTime)
+		eval(TimePeriod.calculateElapsedTimePeriod($birthDate, evalTime, DurationType.DAYS).isLessThanEqualTo($iftf.associatedSeriesRules.seriesEndAge))
+	then
+		String _RULENAME = kcontext.rule.name;
+		retract($ts);		
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "RSV Infant Series' TargetSeries removed: " + $ts);
+end
+
+
+rule "CandidateSeriesIdentification (RSV): If there are shots administered >= the Adult Series start age, remove the TargetSeries from consideration"
+	dialect "mvel"
+	agenda-group "SeriesAggregation^customAggregateSeriesRule"
+	when
+		$iftf : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875",
+			associatedSeriesRules!.seriesName == "RSVAdultSeries")
+		$ts : TargetSeries(seriesRules == $iftf.associatedSeriesRules, numberOfShotsAdministeredInSeries == 0, seasonStartDate == null)
+		EvaluatedPerson($birthDate : demographics.birthTime)
+		eval(TimePeriod.calculateElapsedTimePeriod($birthDate, evalTime, DurationType.DAYS).isGreaterThanEqualTo($iftf.associatedSeriesRules.seriesStartAge))
+	then
+		String _RULENAME = kcontext.rule.name;
+		retract($ts);
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "RSV Adult Series' TargetSeries removed: " + $ts);
+end
+
+
+///////
+// END - RSV CandidateSeriesIdentification Initial Checks and Workflow
+///////
+
+///////
+// START - RSV No Shot Rules
+///////
+/*
+rule "CandidateSeriesIdentification(RSV): If there are no shots in the patient history and the patient age is <= the maxAge of the infant series, then include the (seasonal) infant series for evaluation"
+	dialect "mvel"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
+	when
+		not TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.875")
+		$rsvinfant : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries", seasons.size() > 0)
+		$tseasons : TargetSeasons()
+		EvaluatedPerson($birthDate : demographics.birthTime)
+		eval(TimePeriod.calculateElapsedTimePeriod($birthDate, evalTime, DurationType.DAYS).isLessThanEqualTo($rsvinfant.seriesEndAge))
+	then
+		String _RULENAME = kcontext.rule.name;
+		TargetSeries ts = new TargetSeries($rsvinfant, schedule);
+		insert(ts);
+end
+
+
+rule "CandidateSeriesIdentification(RSV): If there are no in the patient history and the patient age is <= the maxAge of the infant series, then include the (seasonal) infant series for evaluation"
+	dialect "mvel"
+	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
+	when
+		not TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.875")
+		$rsvinfant : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries", seasons.size() > 0)
+		$tseasons : TargetSeasons()
+		EvaluatedPerson($birthDate : demographics.birthTime)
+		eval(TimePeriod.calculateElapsedTimePeriod($birthDate, evalTime, DurationType.DAYS).isLessThanEqualTo($rsvinfant.seriesEndAge))
+	then
+		String _RULENAME = kcontext.rule.name;
+		TargetSeries ts = new TargetSeries($rsvinfant, schedule);
+		insert(ts);
+end
+
+///////
+// END - RSV No Shot Rules
+///////
+*/
+
+

@@ -120,81 +120,8 @@ end
 
 
 /*************************************************************************************************************************************************************************************
- RSV TargetSeries Initialization Rules Try 1
+ RSV TargetSeries Initialization Rules
 *************************************************************************************************************************************************************************************/
-
-/*
-rule "CandidateSeriesIdentification (RSV): If there are shots administered prior to the Infant Series end age, invoke series identifications for the Infant Series"
-	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule"
-	when
-		exists ICEFactTypeFinding(iceResultFinding == "All criteria necessary for RSV CandidiateSeriesIdentification met");
-		exists ICEFactTypeFinding(iceResultFinding == "RSV No Shot Rules Completed")
-	then
-		String _RULENAME = kcontext.rule.name;
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Shots were administered on or before the Infant Series end age");
-		setFocus("CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^InfantSeriesRules");
-		insert(new ICEFactTypeFinding("RSV Infant Series Rules Completed"));
-end
-
-
-rule "CandidateSeriesIdentification (RSV): If there are shots administered on or after the Adult Series start age, invoke series identifications for the Adult Series"
-	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule"
-	when
-		exists ICEFactTypeFinding(iceResultFinding == "All criteria necessary for RSV CandidiateSeriesIdentification met");
-		exists ICEFactTypeFinding(iceResultFinding == "RSV Infant Series Rules Completed")
-	then
-		String _RULENAME = kcontext.rule.name;
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Shots were administered on or after the Adult Series start age");
-		setFocus("CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV^AdultSeriesRules");
-end
-*/
-
-
-///////
-// END - RSV CandidateSeriesIdentification Initial Checks and Workflow
-///////
-
-///////
-// START - RSV No Shot Rules
-///////
-/*
-rule "CandidateSeriesIdentification(RSV): If there are no shots in the patient history and the patient age is <= the maxAge of the infant series, then include the (seasonal) infant series for evaluation"
-	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
-	when
-		not TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.875")
-		$rsvinfant : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries", seasons.size() > 0)
-		$tseasons : TargetSeasons()
-		EvaluatedPerson($birthDate : demographics.birthTime)
-		eval(TimePeriod.calculateElapsedTimePeriod($birthDate, evalTime, DurationType.DAYS).isLessThanEqualTo($rsvinfant.seriesEndAge))
-	then
-		String _RULENAME = kcontext.rule.name;
-		TargetSeries ts = new TargetSeries($rsvinfant, schedule);
-		insert(ts);
-end
-
-
-rule "CandidateSeriesIdentification(RSV): If there are no in the patient history and the patient age is <= the maxAge of the infant series, then include the (seasonal) infant series for evaluation"
-	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
-	when
-		not TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.875")
-		$rsvinfant : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries", seasons.size() > 0)
-		$tseasons : TargetSeasons()
-		EvaluatedPerson($birthDate : demographics.birthTime)
-		eval(TimePeriod.calculateElapsedTimePeriod($birthDate, evalTime, DurationType.DAYS).isLessThanEqualTo($rsvinfant.seriesEndAge))
-	then
-		String _RULENAME = kcontext.rule.name;
-		TargetSeries ts = new TargetSeries($rsvinfant, schedule);
-		insert(ts);
-end
-
-///////
-// END - RSV No Shot Rules
-///////
-*/
 
 /////////////////////
 // Logic to either select or combine the infant and/or adult series based on the current age of the patient and the age at which shots were administered. 
