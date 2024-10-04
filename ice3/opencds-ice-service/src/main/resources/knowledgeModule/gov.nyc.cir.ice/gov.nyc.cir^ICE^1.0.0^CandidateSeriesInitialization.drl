@@ -139,7 +139,7 @@ end
 // RSV CandidateSeriesIdentification Initial Checks and Workflow
 ///////
 
-rule "CandidateSeriesIdentification (RSV): If there are exactly 2 RSV series whereby the Infant Series has a patientEndAge that is 1 day less than the patientStartAge of the Adult Series, invoke series identification workflow"
+rule "CandidateSeriesIdentification(RSV): If there are exactly 2 RSV series whereby the Infant Series has a patientEndAge that is 1 day less than the patientStartAge of the Adult Series, invoke series identification workflow"
 	dialect "mvel"
 	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule"
 	when
@@ -154,7 +154,7 @@ rule "CandidateSeriesIdentification (RSV): If there are exactly 2 RSV series whe
 end
 
 
-rule "CandidateSeriesIdentification (RSV): Prevent default CandidateSeriesIdentification rules from running any RSV SeriesRules"
+rule "CandidateSeriesIdentification(RSV): Prevent default CandidateSeriesIdentification rules from running any RSV SeriesRules"
 	dialect "mvel"
 	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule"
 	when

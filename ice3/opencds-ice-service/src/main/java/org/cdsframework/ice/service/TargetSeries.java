@@ -378,9 +378,7 @@ public class TargetSeries {
 
 	/**
 	 * Check to see if any of the shots administered was a live virus vaccine
-	 *
-	 * @return true if any of the shots administered was a live virus vaccine,
-	 *         false if not
+	 * @return true if any of the shots administered was a live virus vaccine, false if not
 	 */
 	public boolean oneOrMoreShotsAdministeredIsALiveVirusVaccine() {
 
