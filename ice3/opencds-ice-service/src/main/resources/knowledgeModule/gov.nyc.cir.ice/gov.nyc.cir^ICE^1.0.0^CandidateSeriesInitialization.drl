@@ -189,7 +189,7 @@ rule "CandidateSeriesIdentification(RSV): Initialize Adult TargetSeries if the p
 end
 
 
-rule "CandidateSeriesIdentification(RSV): Initialize Adult TargetSeries if shots were administered at >= the series start age for the adult series"
+rule "CandidateSeriesIdentification(RSV): Initialize Adult TargetSeries if the shot administered is >= the series start age for the adult series"
 	dialect "mvel"
 	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	when
@@ -212,7 +212,7 @@ end
 // RSV Infant TargetSeries Initializations
 ///////
 
-rule "CandidateSeriesIdentification(RSV): Initialize Infant TargetSeries for *Current* *RSV* Season with Most Recent Prior Season Rules if Current Season Not Defined but Prior Season is Defined,  and the patient age is <= the seriesEndAge" 
+rule "CandidateSeriesIdentification(RSV): If the patient age is <= the RSV Infant Series end age, initialize a TargetSeries for *Current* *RSV* Season with Most Recent Prior Season Rules if Current Season Not Defined but Prior Season is Defined" 
 	dialect "mvel"
 	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	salience 190
@@ -246,7 +246,7 @@ rule "CandidateSeriesIdentification(RSV): Initialize Infant TargetSeries for *Cu
 end
 
 
-rule "CandidateSeriesIdentification (RSV): Initialize TargetSeries for *Current* or *Past* *RSV* Season with Shots Administered with Most Recent Prior Season if No Applicable Season Defined at Time Shot Administered, and the shot was administered <= the seriesEndAge" 
+rule "CandidateSeriesIdentification (RSV): If a shot was administered <= the RSV Infant Series end age, initialize a TargetSeries for *Current* or *Past* *RSV* Season if Shots were Administered, using with Most Recent Prior Season if No Applicable Season Defined at Time Shot was Administered" 
 	dialect "mvel"
 	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	salience 180
@@ -282,7 +282,7 @@ rule "CandidateSeriesIdentification (RSV): Initialize TargetSeries for *Current*
 end
 
 
-rule "CandidateSeriesIdentification (RSV): Initialize TargetSeries for *Current* Season with Fully-Specified Season Parameters (if defined), and the patient age is <= the seriesEndAge"
+rule "CandidateSeriesIdentification (RSV): If the patient age is <= the RSV Infant Series end age, initialize a TargetSeries for *Current* Season with Fully-Specified Season Parameters (if defined)"
 	dialect "mvel"
 	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	salience 100
@@ -300,7 +300,7 @@ rule "CandidateSeriesIdentification (RSV): Initialize TargetSeries for *Current*
 end
 
 
-rule "CandidateSeriesIdentification (RSV): Initialize *Current* Season TargetSeries with Default Season Parameters if Current Not Defined for the Vaccine Group, and the patient age is <= the seriesEndAge"
+rule "CandidateSeriesIdentification (RSV): If the patient age is <= the RSV Infant Series end age, initialize a *Current* Season TargetSeries using Default Season Parameters if Fully-Specified Season Parameters were Not Defined"
 	dialect "mvel"
 	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	salience 90
@@ -326,7 +326,7 @@ rule "CandidateSeriesIdentification (RSV): Initialize *Current* Season TargetSer
 end
 
 
-rule "CandidateSeriesIdentification (RSV): Initialize *Past* Season TargetSeries when Shots Administered with Fully-Specified Season Parameters if Fully-Specified Season Parameters Defined for the Season, and the shot was administered <= the seriesEndAge"
+rule "CandidateSeriesIdentification (RSV): If a shot was administered <= the RSV Infant Series ends age, initialize a *Past* Season TargetSeries when Shots were Administered within Fully-Specified Season Parameters if Fully-Specified Season Parameters Defined for the Season"
 	dialect "mvel"
 	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	salience 80
@@ -347,7 +347,7 @@ rule "CandidateSeriesIdentification (RSV): Initialize *Past* Season TargetSeries
 end
 
 
-rule "CandidateSeriesIdentification (RSV): Initialize *Past* Season TargetSeries when Shots Administered with Default Season Parameters if No Fully-Specified Season Parameters Defined for the Season, and the shot was administered <= the seriesEndAge"
+rule "CandidateSeriesIdentification (RSV): If a shot was administered <= the RSV Infant Series end age, initialize *Past* Season TargetSeries when Shots were Administered, using Default Season Parameters if No Fully-Specified Season Parameters were Defined for the Season"
 	dialect "mvel"
 	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	salience 70
@@ -379,7 +379,7 @@ rule "CandidateSeriesIdentification (RSV): Initialize *Past* Season TargetSeries
 end
 
 
-rule "CandidateSeriesIdentification (RSV): Initialize TargetSeries when Shots Administered when One and Only One Season for Vaccine Group exists and no matching Fully-Specified Season Parameters or Default Season Defined for the Season, and the shot was administered <= the seriesEndAge"
+rule "CandidateSeriesIdentification (RSV): If a shot was administered <= the RSV Infant Series end age, initialize a TargetSeries if Shots were Administered, there is One and Only One Season for the Vaccine Group, and no matching Fully-Specified Season Parameters or Default Season were Defined for the Season"
 	dialect "mvel"
 	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	salience 70

@@ -41,6 +41,8 @@ public class SeriesRules {
 	private String seriesName;
 	private CdsConcept vaccineGroupConcept;
 	private int numberOfDosesInSeries;
+	private int seriesGroup;
+	private int seriesGroupToTransitionTo;
 	private TimePeriod seriesStartAge;
 	private TimePeriod seriesEndAge;
 	private boolean recurringDosesAfterSeriesComplete;
@@ -68,6 +70,8 @@ public class SeriesRules {
 		// seriesId = pSeriesName;
 		seriesId = ICELogicHelper.generateUniqueString();
 		seriesName = pSeriesName;
+		seriesGroup = 0;
+		seriesGroupToTransitionTo = 0;
 		vaccineGroupConcept = pVaccineGroup;
 		seriesDoseRules = new ArrayList<DoseRule>();
 		applicableSeasons = new ArrayList<Season>();
@@ -108,6 +112,7 @@ public class SeriesRules {
 		SeriesRules lSR = new SeriesRules(pSR.getSeriesName(), pSR.getVaccineGroupConcept());
 		lSR.seriesId = ICELogicHelper.generateUniqueString();
 		lSR.seriesName = pSR.seriesName;
+		lSR.seriesGroup = pSR.seriesGroup;
 		lSR.vaccineGroupConcept = CdsConcept.constructDeepCopyOfCdsConceptObject(pSR.getVaccineGroupConcept());
 		lSR.numberOfDosesInSeries = pSR.numberOfDosesInSeries;
 		lSR.seriesStartAge = TimePeriod.constructDeepCopyOfTimePeriodObject(pSR.seriesStartAge);
@@ -142,9 +147,25 @@ public class SeriesRules {
 		return seriesId;
 	}
 
-
 	public String getSeriesName() {
 		return seriesName;
+	}
+
+
+	public int getSeriesGroup() {
+		return seriesGroup;
+	}
+
+	public void setSeriesGroup(int seriesGroup) {
+		this.seriesGroup = seriesGroup;
+	}
+
+	public int getSeriesGroupToTransitionTo() {
+		return seriesGroupToTransitionTo;
+	}
+
+	public void setSeriesGroupToTransitionTo(int seriesGroupToTransitionTo) {
+		this.seriesGroupToTransitionTo = seriesGroupToTransitionTo;
 	}
 
 	/**

@@ -72,7 +72,8 @@ global org.cdsframework.ice.service.Schedule schedule
 //   + If there are shots administered both <= the maxAge of the infant series and >= the minAge of the adult series, combine them.
 /////////////////////
 
-rule "SeriesAggregation (RSV): If there are no shots administered in the current season of the Infant Series and <= to the Series end age, remove the TargetSeries from consideration"
+/*
+rule "SeriesAggregation(RSV): If there are no shots administered in the current season of the Infant Series and <= to the Series end age, remove the TargetSeries from consideration"
 	dialect "mvel"
 	agenda-group "SeriesAggregation^customAggregateSeriesRule"
 	when
@@ -88,7 +89,7 @@ rule "SeriesAggregation (RSV): If there are no shots administered in the current
 end
 
 
-rule "CandidateSeriesIdentification (RSV): If there are shots administered >= the Adult Series start age, remove the TargetSeries from consideration"
+rule "SeriesAggregation(RSV): If there are no shots administered >= the Adult Series start age, remove the TargetSeries from consideration"
 	dialect "mvel"
 	agenda-group "SeriesAggregation^customAggregateSeriesRule"
 	when
@@ -101,6 +102,23 @@ rule "CandidateSeriesIdentification (RSV): If there are shots administered >= th
 		String _RULENAME = kcontext.rule.name;
 		retract($ts);
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "RSV Adult Series' TargetSeries removed: " + $ts);
+end
+*/
+
+rule "SeriesAggregation(RSV): If there are shots adminstered both <= the maxAge of the infant series and >= the minAge of the adult series, remove the shots from each TargetSeries that fall out of these date bounds"
+	dialect "mvel"
+	agenda-group "SeriesAggregation^customAggregateSeriesRule"
+	when
+		$iftfinfant : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875",
+			associatedSeriesRules!.seriesName == "RSVInfantSeries")
+		$iftfadult : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875",
+			associatedSeriesRules!.seriesName == "RSVAdultSeries")
+		$tsinfant : TargetSeries(seriesRules == $iftfinfant.associatedSeriesRules, numberOfShotsAdministeredInSeries > 0, seasonStartDate != null, seasonStartDate <= evalTime, seasonEndDate != null, seasonEndDate >= evalTime)
+		$tsadult : TargetSeries(seriesRules == $iftfadult.associatedSeriesRules, numberOfShotsAdministeredInSeries > 0, seasonStartDate != null, seasonStartDate <= evalTime, seasonEndDate != null, seasonEndDate >= evalTime)
+		EvaluatedPerson($birthDate : demographics.birthTime)
+		
+	then
+	
 end
 
 
