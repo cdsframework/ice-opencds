@@ -154,7 +154,7 @@ rule "CandidateSeriesIdentification(RSV): If there are exactly 2 RSV series wher
 end
 
 
-rule "CandidateSeriesIdentification(RSV): Prevent Default CandidateSeriesIdentification rules from running on the RSV Adult Series"
+rule "CandidateSeriesIdentification(RSV): Prevent the default CandidateSeriesIdentification rules from running on the RSV Adult Series"
 	dialect "mvel"
 	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule"
 	when
@@ -187,7 +187,7 @@ end
 // RSV Adult TargetSeries Initializations
 ///////
 
-rule "CandidateSeriesIdentification(RSV): Initialize a RSV Adult TargetSeries if the patient age is >= the Series Start Age of the Series"
+rule "CandidateSeriesIdentification(RSV): Initialize an Adult RSV TargetSeries if the patient age is >= the Series Start Age"
 	dialect "mvel"
 	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	salience 10
@@ -204,7 +204,7 @@ rule "CandidateSeriesIdentification(RSV): Initialize a RSV Adult TargetSeries if
 end
 
 
-rule "CandidateSeriesIdentification(RSV): Initialize a RSV Adult TargetSeries if there is a shot administered is >= the Series Start Age of the Series"
+rule "CandidateSeriesIdentification(RSV): Initialize an Adult RSV TargetSeries if there is a shot administered is >= the Series Start Age"
 	dialect "mvel"
 	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule^RSV"
 	when
