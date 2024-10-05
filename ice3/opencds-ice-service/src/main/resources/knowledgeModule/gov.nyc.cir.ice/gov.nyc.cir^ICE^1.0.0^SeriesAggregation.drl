@@ -105,7 +105,7 @@ rule "SeriesAggregation(RSV): If there are no shots administered >= the Adult Se
 end
 */
 
-rule "SeriesAggregation(RSV): If there are shots adminstered both <= the maxAge of the infant series and >= the minAge of the adult series, remove the shots from each TargetSeries that fall out of these date bounds"
+rule "SeriesAggregation(RSV): If there are shots adminstered both <= the maxAge of the infant series and >= the minAge of the adult series, remove the shots from any TargetSeries that fall out of these date bounds"
 	dialect "mvel"
 	agenda-group "SeriesAggregation^customAggregateSeriesRule"
 	when
