@@ -3,6 +3,7 @@ package org.cdsframework.ice.service;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.cdsframework.ice.util.TimePeriod;
 
@@ -22,10 +23,6 @@ public interface TargetSeriesInterface {
 
 	public int determineNumberOfDosesAdministeredInSeriesByDate(Date asOfDate, boolean includeShotsOnDate);
 
-	public String getSeriesName();
-
-	public String getVaccineGroup();
-
 	public Date getAdministrationDateOfTargetDoseByShotNumberNumber(int shotNumber);
 
 	public TimePeriod getAbsoluteMinimunIntervalForTargetDose(int doseNumber);
@@ -35,6 +32,10 @@ public interface TargetSeriesInterface {
 	public TimePeriod getAbsoluteMinimumAgeForTargetDose(int doseNumber);
 
 	public String getAbsoluteMinimumAgeForTargetDoseInStringFormat(int doseNumber);
+
+	public Map<String, Integer> getAllEvaluationValidityCountsByDisease();
+
+	public Map<String, Integer> getEvaluationValidityCountsByDiseasesSpecified(List<String> pDiseasesOfInterest);
 
 	public List<Vaccine> getAllPermittedVaccinesForTargetDose(int doseNumber);
 
@@ -48,19 +49,21 @@ public interface TargetSeriesInterface {
 
 	public int getDoseNumberToRecommend();
 
+	public List<Date> getLiveVirusDatesAccountedForInRecommendedFinalEarliestDate();
+
+	public List<Date> getLiveVirusDatesAccountedForInRecommendedFinalDate();
+
+	public List<Date> getAdjuvantDatesAccountedForInRecommendedFinalEarliestDate();
+
+	public List<Date> getAdjuvantDatesAccountedForInRecommendedFinalDate();
+
+	public int getManuallySetDoseNumberToRecommend();
+
 	public int getNumberOfDosesInSeries();
 
 	public int getNumberOfShotsAdministeredInSeriesExcludingDuplicateShotsOnTheSameDay();
 
 	public int getNumberOfShotsAdministeredInSeries();
-
-	public TargetDose getTargetDoseByAdministeredShotNumber(int doseNumber);
-
-	public boolean isAllowableVaccineForDoseRule(Vaccine v, int doseNumber);
-
-	public boolean isPostForecastCheckCompleted();
-
-	public boolean isSeriesComplete();
 
 	public Date getSeasonStartDate();
 
@@ -90,4 +93,77 @@ public interface TargetSeriesInterface {
 
 	public Vaccine getRecommendationVaccine();
 
+	public Schedule getScheduleBackingSeries();
+
+	public String getSeriesName();
+
+	public List<String> getSeriesRulesProcessed();
+
+	public TargetDose getTargetDoseByAdministeredShotNumber(int doseNumber);
+
+	public String getTargetSeriesIdentifier();
+
+	public String getVaccineGroup();
+
+	public boolean isAllowableVaccineForDoseRule(Vaccine v, int doseNumber);
+
+	public boolean isHistoryEvaluationInitiated();
+
+	public boolean isImmunityToAllDiseasesRecorded();
+
+	public boolean isForecastDateDisplayedForConditionalRecommendations();
+
+	public boolean isPostForecastCheckCompleted();
+
+	public boolean isSeriesComplete();
+
+	public boolean isSelectedSeries();
+
+	/////////////////////
+
+	public void addAdjuvantDateAccountedForInRecommendedFinalEarliestDate(Date pAdjuvantDate);
+
+	public void addAdjuvantDateAccountedForInRecommendedFinalDate(Date pAdjuvantDate);
+
+	public void addLiveVirusDateAccountedForInRecommendedFinalEarliestDate(Date pLiveVirusDate);
+
+	public void addLiveVirusDateAccountedForInRecommendedFinalDate(Date pLiveVirusDate);
+
+	public void addSkipDoseEntryForSpecifiedDisease(int doseNumberToSkipFrom, int doseNumberToSkipTo);
+
+	public void addSkipDoseEntryForSpecifiedDisease(int doseNumberToSkipFrom, int doseNumberToSkipTo, String disease);
+
+	public void addSeriesRuleProcessed(String ruleName);
+
+	public boolean adjustRecommendationStatusAndReasonByEvalTime(Date evalTime);
+
+	public void convertToSpecifiedSeries(String seriesToConvertTo, int doseNumberFromWhichToBeginSwitch, boolean useDoseIntervalOfPriorDoseFromSwitchToSeries);
+
+	public void clearRecommendations();
+
+	public void removeTargetDoseFromSeries(TargetDose td);
+
+	public void setFinalEarliestDate(Date finalEarliestDate);
+
+	public void setFinalRecommendationDate(Date pFinalRecommendationDate);
+
+	public void setFinalOverdueDate(Date finalLatestRecommendationDate);
+
+	public void setForecastDateToBeDisplayedForConditionalRecommendations(boolean yesno);
+
+	public void setHistoryEvaluationInitiated(boolean truefalse);
+
+	public void setImmunityToAllDiseasesRecorded(boolean immunityToAllDiseasesRecorded);
+
+	public void setManuallySetAccountForLiveVirusIntervalsInRecommendation(boolean yesno);
+
+	public void setManuallySetDoseNumberToRecommend(int doseNumberToRecommend);
+
+	public void setPostForecastCheckCompleted(boolean postForecastCheckCompleted);
+
+	public void setRecommendationStatus(RecommendationStatus recommendationStatus);
+
+	public void setRecommendationVaccine(Vaccine recommendationVaccine);
+
+	public void setSeriesComplete(boolean pSeriesComplete);
 }

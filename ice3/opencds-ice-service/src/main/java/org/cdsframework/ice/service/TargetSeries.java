@@ -3710,7 +3710,6 @@ public class TargetSeries {
 	 * @return
 	 */
 	public Map<String, Integer> getAllEvaluationValidityCountsByDisease() {
-
 		Map<String, Integer> evaluationValidityCountsByDisease = new HashMap<>();
 		evaluationValidityCountsByDisease.putAll(this.interimEvaluationValidityCountByDisease);
 		return evaluationValidityCountsByDisease;
