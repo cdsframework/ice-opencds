@@ -53,6 +53,7 @@ import org.cdsframework.ice.util.TimePeriod.DurationType;
 import org.cdsframework.ice.util.TimePeriodException;
 import org.kie.api.definition.type.ClassReactive;
 import org.opencds.common.exceptions.ImproperUsageException;
+import org.opencds.vmr.v1_0.internal.EvaluatedPerson;
 
 
 @ClassReactive
@@ -82,6 +83,8 @@ public class TargetSeries {
 	private List<Recommendation> interimRecommendationsCustomEarliest;
 	private List<Recommendation> interimRecommendationsCustomLatest;
 
+	private Date seriesStartAgeDate;
+	private Date seriesEndAgeDate;
 	private Map<String, Integer> interimEvaluationValidityCountByDisease;					// Disease -> evaluation validity count for disease
 	private Map<String, Map<Integer, Integer>> interimDosesToSkipByDisease;					// Disease -> skip dose instructions for disease
 	private Map<String, Date> diseaseImmunityDate;											// Disease -> disease immunity date
@@ -109,13 +112,18 @@ public class TargetSeries {
 	 * @param pScheduleBackingSeries Schedule parameter, must be provided
 	 * @throws IllegalArgumentException If SeriesRules or Schedule parameter not populated or improperly populated
 	 */
-	public TargetSeries(SeriesRules pSeriesRules, Schedule pScheduleBackingSeries) {
+	public TargetSeries(SeriesRules pSeriesRules, Schedule pScheduleBackingSeries, EvaluatedPerson pP) {
 
 		String _METHODNAME = "TargetSeries(SeriesRules, Schedule): ";
 
 		/////// if (pSeriesRules == null || pScheduleBackingSeries == null || pEvalTime == null) {
 		if (pSeriesRules == null || pScheduleBackingSeries == null) {
 			String errStr = "SeriesRules, EvalTime and/or Schedule parameter was not supplied";
+			logger.warn(_METHODNAME + errStr);
+			throw new IllegalArgumentException(errStr);
+		}
+		if (pP == null || pP.getDemographics() == null || pP.getDemographics().getBirthTime() == null) {
+			String errStr = "EvaluatedPerson parameter does not contain the birthdate of the patient being evaluated";
 			logger.warn(_METHODNAME + errStr);
 			throw new IllegalArgumentException(errStr);
 		}
@@ -159,6 +167,19 @@ public class TargetSeries {
 		displayForecastDateForConditionalRecommendations = false;
 		/////// evalTime = pEvalTime;
 
+		if (seriesRules.getSeriesStartAge() != null) {
+			seriesStartAgeDate = TimePeriod.addTimePeriod(pP.getDemographics().getBirthTime(), seriesRules.getSeriesStartAge());
+		}
+		else {
+			seriesStartAgeDate = null;
+		}
+		if (seriesRules.getSeriesEndAge() != null) {
+			seriesEndAgeDate = TimePeriod.addTimePeriod(pP.getDemographics().getBirthTime(), seriesRules.getSeriesEndAge());
+		}
+		else {
+			seriesEndAgeDate = null;
+		}
+
 		interimEvaluationValidityCountByDisease = new HashMap<String, Integer>();
 		interimDosesToSkipByDisease = new HashMap<String, Map<Integer, Integer>>();
 		Collection<String> targetedDiseases = pScheduleBackingSeries.getDiseasesTargetedByVaccineGroup(pSeriesRules.getVaccineGroup());
@@ -181,10 +202,10 @@ public class TargetSeries {
 	 * @param pTargetSeason
 	 */
 	/////// public TargetSeries(SeriesRules pSeriesRules, Schedule pScheduleBackingSeries, Season pTargetSeason, Date pEvalTime) {
-	public TargetSeries(SeriesRules pSeriesRules, Schedule pScheduleBackingSeries, Season pTargetSeason) {
+	public TargetSeries(SeriesRules pSeriesRules, Schedule pScheduleBackingSeries, Season pTargetSeason, EvaluatedPerson pP) {
 
 		/////// this(pSeriesRules, pScheduleBackingSeries, pEvalTime);
-		this(pSeriesRules, pScheduleBackingSeries);
+		this(pSeriesRules, pScheduleBackingSeries, pP);
 
 		String _METHODNAME = "TargetSeries(SeriesRules, Schedule, Season): ";
 		if (pTargetSeason == null || pTargetSeason.isDefaultSeason()) {
@@ -244,6 +265,14 @@ public class TargetSeries {
 
 	public void setRecommendationVaccine(Vaccine recommendationVaccine) {
 		this.recommendationVaccine = recommendationVaccine;
+	}
+
+	public Date getSeriesStartAgeDate() {
+		return seriesStartAgeDate;
+	}
+
+	public Date getSeriesEndAgeDate() {
+		return seriesEndAgeDate;
 	}
 
 

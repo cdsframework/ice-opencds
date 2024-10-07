@@ -69,6 +69,7 @@ rule "CandidateSeriesIdentification (Influenza): Initialize TargetSeries for *CU
 		not (TargetSeries(seriesName == $s.seriesName, vaccineGroup == $s.vaccineGroup, targetSeason != null, targetSeason == 
 			Season.constructFullySpecifiedSeasonFromDefaultSeasonAndDate(new Season($priorSeason.seasonName, $s.vaccineGroup, false, $priorSeason.seasonStartMonth, $priorSeason.seasonStartDay, $priorSeason.seasonEndMonth, $priorSeason.seasonEndDay), evalTime)))
 		$tseasons : TargetSeasons()
+		$evalutedPerson : EvaluatedPerson()
 	then
 		String _RULENAME = kcontext.rule.name;
 		int startMonth = $priorSeason.getSeasonStartMonth();
@@ -77,7 +78,7 @@ rule "CandidateSeriesIdentification (Influenza): Initialize TargetSeries for *CU
 		int endDay = $priorSeason.getSeasonEndDay();
 		Season fullySpecified = Season.constructFullySpecifiedSeasonFromDefaultSeasonAndDate(new Season($priorSeason.seasonName, $s.vaccineGroup, false, startMonth, startDay, endMonth, endDay), evalTime);
 		$tseasons.addTargetSeason(fullySpecified);
-		TargetSeries ts = new TargetSeries($s, schedule, fullySpecified);
+		TargetSeries ts = new TargetSeries($s, schedule, fullySpecified, $evalutedPerson);
 		$s.addFullySpecifiedSeason(fullySpecified);
 		insert(ts);
 		insert(fullySpecified);
@@ -100,7 +101,8 @@ rule "CandidateSeriesIdentification (Influenza): Initialize TargetSeries for *Cu
 		not (TargetSeries(seriesName == $s.seriesName, vaccineGroup == $s.vaccineGroup, targetSeason != null, targetSeason == 
 				Season.constructFullySpecifiedSeasonFromDefaultSeasonAndDate(new Season($priorSeason.seasonName, $s.vaccineGroup, false, $priorSeason.seasonStartMonth, $priorSeason.seasonStartDay, $priorSeason.seasonEndMonth, $priorSeason.seasonEndDay), $shotDate)))
 		$tseasons : TargetSeasons()
-		eval(schedule.vaccineTargetsOneOrMoreOfSpecifiedDiseases(schedule.getVaccineByCdsConceptValue($occ), schedule.getDiseasesTargetedByVaccineGroup($s.vaccineGroup)) == true)		
+		eval(schedule.vaccineTargetsOneOrMoreOfSpecifiedDiseases(schedule.getVaccineByCdsConceptValue($occ), schedule.getDiseasesTargetedByVaccineGroup($s.vaccineGroup)) == true)
+		$evaluatedPerson : EvaluatedPerson()
 	then
 		String _RULENAME = kcontext.rule.name;
 		int startMonth = $priorSeason.getSeasonStartMonth();
@@ -109,7 +111,7 @@ rule "CandidateSeriesIdentification (Influenza): Initialize TargetSeries for *Cu
 		int endDay = $priorSeason.getSeasonEndDay();
 		Season fullySpecified = Season.constructFullySpecifiedSeasonFromDefaultSeasonAndDate(new Season($priorSeason.seasonName, $s.vaccineGroup, false, startMonth, startDay, endMonth, endDay), $shotDate);
 		$tseasons.addTargetSeason(fullySpecified);
-		TargetSeries ts = new TargetSeries($s, schedule, fullySpecified);
+		TargetSeries ts = new TargetSeries($s, schedule, fullySpecified, $evaluatedPerson);
 		$s.addFullySpecifiedSeason(fullySpecified);
 		insert(ts);
 		insert(fullySpecified);
@@ -196,9 +198,10 @@ rule "CandidateSeriesIdentification(RSV): Initialize an Adult RSV TargetSeries i
 		not TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == $s.seriesName)
 		EvaluatedPerson($birthDate : demographics.birthTime)
 		eval(TimePeriod.calculateElapsedTimePeriod($birthDate, evalTime, DurationType.DAYS).isGreaterThanEqualTo($s.seriesStartAge))
+		$evaluatedPerson : EvaluatedPerson()
 	then
 		String _RULENAME = kcontext.rule.name;
-		TargetSeries ts = new TargetSeries($s, schedule);
+		TargetSeries ts = new TargetSeries($s, schedule, $evaluatedPerson);
 		insert(ts);
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeries initialized: " + ts.toString());
 end
@@ -215,9 +218,10 @@ rule "CandidateSeriesIdentification(RSV): Initialize an Adult RSV TargetSeries i
 		eval(schedule.vaccineTargetsOneOrMoreOfSpecifiedDiseases(schedule.getVaccineByCdsConceptValue($occ), schedule.getDiseasesTargetedByVaccineGroup($s.vaccineGroup)) == true)	
 		EvaluatedPerson($birthDate : demographics.birthTime)
 		eval(TimePeriod.calculateElapsedTimePeriod($birthDate, evalTime, DurationType.DAYS).isGreaterThanEqualTo($s.seriesStartAge))
+		$evaluatedPerson : EvaluatedPerson()
 	then
 		String _RULENAME = kcontext.rule.name;
-		TargetSeries ts = new TargetSeries($s, schedule);
+		TargetSeries ts = new TargetSeries($s, schedule, $evaluatedPerson);
 		insert(ts);
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeries initialized: " + ts.toString());
 end
@@ -241,7 +245,7 @@ rule "CandidateSeriesIdentification(RSV): If the patient age is <= the RSV Infan
 		not (TargetSeries(seriesName == $rsvInfantSeries.seriesName, vaccineGroup == $rsvInfantSeries.vaccineGroup, targetSeason != null, 
 			targetSeason == Season.constructFullySpecifiedSeasonFromDefaultSeasonAndDate(new Season($mostRecentSeason.seasonName, $rsvInfantSeries.vaccineGroup, false, $mostRecentSeason.seasonStartMonth, $mostRecentSeason.seasonStartDay, 
 				$mostRecentSeason.seasonEndMonth, $mostRecentSeason.seasonEndDay), evalTime)))
-		EvaluatedPerson($birthDate : demographics.birthTime)
+		$evaluatedPerson : EvaluatedPerson($birthDate : demographics.birthTime)
 		eval(TimePeriod.calculateElapsedTimePeriod($birthDate, evalTime, DurationType.DAYS).isLessThanEqualTo($rsvInfantSeries.seriesEndAge))
 		$tseasons : TargetSeasons()
 	then
@@ -252,7 +256,7 @@ rule "CandidateSeriesIdentification(RSV): If the patient age is <= the RSV Infan
 		int endDay = $mostRecentSeason.getSeasonEndDay();
 		Season fullySpecified = Season.constructFullySpecifiedSeasonFromDefaultSeasonAndDate(new Season($mostRecentSeason.seasonName, $rsvInfantSeries.vaccineGroup, false, startMonth, startDay, endMonth, endDay), evalTime);
 		$tseasons.addTargetSeason(fullySpecified);
-		TargetSeries ts = new TargetSeries($rsvInfantSeries, schedule, fullySpecified);
+		TargetSeries ts = new TargetSeries($rsvInfantSeries, schedule, fullySpecified, $evaluatedPerson);
 		$rsvInfantSeries.addFullySpecifiedSeason(fullySpecified);
 		insert(ts);
 		insert(fullySpecified);
@@ -277,7 +281,7 @@ rule "CandidateSeriesIdentification(RSV): If a shot was administered <= the RSV 
 			targetSeason ==	Season.constructFullySpecifiedSeasonFromDefaultSeasonAndDate(new Season($mostRecentSeason.seasonName, $rsvInfantSeries.vaccineGroup, false, $mostRecentSeason.seasonStartMonth, $mostRecentSeason.seasonStartDay, 
 				$mostRecentSeason.seasonEndMonth, $mostRecentSeason.seasonEndDay), $shotDate)))
 		eval(schedule.vaccineTargetsOneOrMoreOfSpecifiedDiseases(schedule.getVaccineByCdsConceptValue($occ), schedule.getDiseasesTargetedByVaccineGroup($rsvInfantSeries.vaccineGroup)) == true)
-		EvaluatedPerson($birthDate : demographics.birthTime)
+		$evaluatedPerson : EvaluatedPerson($birthDate : demographics.birthTime)
 		eval(TimePeriod.calculateElapsedTimePeriod($birthDate, $shotDate, DurationType.DAYS).isLessThanEqualTo($rsvInfantSeries.seriesEndAge))
 		$tseasons : TargetSeasons()
 	then
@@ -288,7 +292,7 @@ rule "CandidateSeriesIdentification(RSV): If a shot was administered <= the RSV 
 		int endDay = $mostRecentSeason.getSeasonEndDay();
 		Season fullySpecified = Season.constructFullySpecifiedSeasonFromDefaultSeasonAndDate(new Season($mostRecentSeason.seasonName, $rsvInfantSeries.vaccineGroup, false, startMonth, startDay, endMonth, endDay), $shotDate);
 		$tseasons.addTargetSeason(fullySpecified);
-		TargetSeries ts = new TargetSeries($rsvInfantSeries, schedule, fullySpecified);
+		TargetSeries ts = new TargetSeries($rsvInfantSeries, schedule, fullySpecified, $evaluatedPerson);
 		$rsvInfantSeries.addFullySpecifiedSeason(fullySpecified);
 		insert(ts);
 		insert(fullySpecified);

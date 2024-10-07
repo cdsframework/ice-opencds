@@ -387,9 +387,10 @@ rule "CandidateSeriesIdentification: Initialize TargetSeries for non-seasonal va
 	when
 		$s : SeriesRules(seasons == null || seasons.isEmpty())
 		not ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, this == $s)
+		$evaluatedPerson : EvaluatedPerson()
 	then
 		String _RULENAME = kcontext.rule.name;
-		TargetSeries ts = new TargetSeries($s, schedule);
+		TargetSeries ts = new TargetSeries($s, schedule, $evaluatedPerson);
 		insert(ts);
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeries initialized: " + ts.toString());
 end
@@ -406,12 +407,13 @@ rule "CandidateSeriesIdentification: Initialize TargetSeries for *Current* Seaso
 		not ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, this == $s)  
 		$season : Season(isDefaultSeason() == false, isDefinedBySeriesTableRules() == true, dateIsApplicableToSeason(evalTime)) from $s.seasons
 		not (TargetSeries(seriesName == $s.seriesName, targetSeason != null, targetSeason.isDefaultSeason() == false, targetSeason == $season))
-		EvaluatedPerson($birthDate : demographics.birthTime)
+		$evaluatedPerson : EvaluatedPerson($birthDate : demographics.birthTime)
 		eval(($s.seriesEndAge == null || $s.seriesEndAge != null && TimePeriod.calculateElapsedTimePeriod($birthDate, evalTime, DurationType.DAYS).isLessThanEqualTo($s.seriesEndAge)) &&
 			($s.seriesStartAge == null || $s.seriesStartAge != null && TimePeriod.calculateElapsedTimePeriod($birthDate, evalTime, DurationType.DAYS).isGreaterThanEqualTo($s.seriesStartAge)))
+		$evalutedPerson : EvaluatedPerson()
 	then
 		String _RULENAME = kcontext.rule.name;
-		TargetSeries ts = new TargetSeries($s, schedule, $season);
+		TargetSeries ts = new TargetSeries($s, schedule, $season, $evaluatedPerson);
 		insert(ts);
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "*Seasonal* TargetSeries initialized: " + ts.toString());		
 end
@@ -429,15 +431,16 @@ rule "CandidateSeriesIdentification: Initialize *Current* Season TargetSeries wi
 		not (Season(isDefaultSeason() == false, vaccineGroup == $vg, dateIsApplicableToSeason(evalTime)))
 		not ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, this == $s)  
 		not (TargetSeries(seriesName == $s.seriesName, targetSeason != null, targetSeason == $season))
-		EvaluatedPerson($birthDate : demographics.birthTime)
+		$evaluatedPerson : EvaluatedPerson($birthDate : demographics.birthTime)
 		eval(($s.seriesEndAge == null || $s.seriesEndAge != null && TimePeriod.calculateElapsedTimePeriod($birthDate, evalTime, DurationType.DAYS).isLessThanEqualTo($s.seriesEndAge)) &&
 			($s.seriesStartAge == null || $s.seriesStartAge != null	&& TimePeriod.calculateElapsedTimePeriod($birthDate, evalTime, DurationType.DAYS).isGreaterThanEqualTo($s.seriesStartAge)))
 		$tseasons : TargetSeasons()
+		$evaluatedPerson : EvaluatedPerson()
 	then
 		String _RULENAME = kcontext.rule.name;
 		Season fullySpecified = Season.constructFullySpecifiedSeasonFromDefaultSeasonAndDate($season, evalTime);
 		$tseasons.addTargetSeason(fullySpecified);
-		TargetSeries ts = new TargetSeries($s, schedule, fullySpecified);
+		TargetSeries ts = new TargetSeries($s, schedule, fullySpecified, $evaluatedPerson);
 		$s.addFullySpecifiedSeason(fullySpecified);		
 		insert(ts);
 		insert(fullySpecified);
@@ -461,12 +464,13 @@ rule "CandidateSeriesIdentification: Initialize *Past* Season TargetSeries when 
 		$season : Season(isDefaultSeason() == false, isDefinedBySeriesTableRules() == true, $season.dateIsApplicableToSeason($shotDate)) from $s.seasons
 		not (TargetSeries(seriesName == $s.seriesName, targetSeason != null, targetSeason == $season))
 		eval(schedule.vaccineTargetsOneOrMoreOfSpecifiedDiseases(schedule.getVaccineByCdsConceptValue($occ), schedule.getDiseasesTargetedByVaccineGroup($vg)) == true)
-		EvaluatedPerson($birthDate : demographics.birthTime)
+		$evalutedPerson : EvaluatedPerson($birthDate : demographics.birthTime)
 		eval(($s.seriesEndAge == null || $s.seriesEndAge != null && TimePeriod.calculateElapsedTimePeriod($birthDate, $shotDate, DurationType.DAYS).isLessThanEqualTo($s.seriesEndAge)) &&
 			($s.seriesStartAge == null || $s.seriesStartAge != null	&& TimePeriod.calculateElapsedTimePeriod($birthDate, $shotDate, DurationType.DAYS).isGreaterThanEqualTo($s.seriesStartAge)))
+		$evaluatedPerson : EvaluatedPerson()
 	then
 		String _RULENAME = kcontext.rule.name;
-		TargetSeries ts = new TargetSeries($s, schedule, $season);
+		TargetSeries ts = new TargetSeries($s, schedule, $season, $evaluatedPerson);
 		insert(ts);
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "*Seasonal* TargetSeries initialized: " + ts.toString());		
 end
@@ -490,7 +494,7 @@ rule "CandidateSeriesIdentification: Initialize *Past* Season TargetSeries when 
 		not (TargetSeries(targetSeason != null, targetSeason == Season.constructFullySpecifiedSeasonFromDefaultSeasonAndDate($season, $shotDate))) 
 		$tseasons : TargetSeasons()
 		eval(schedule.vaccineTargetsOneOrMoreOfSpecifiedDiseases(schedule.getVaccineByCdsConceptValue($occ), schedule.getDiseasesTargetedByVaccineGroup($vg)) == true)
-		EvaluatedPerson($birthDate : demographics.birthTime)
+		$evaluatedPerson : EvaluatedPerson($birthDate : demographics.birthTime)
 		eval(($s.seriesEndAge == null || $s.seriesEndAge != null && TimePeriod.calculateElapsedTimePeriod($birthDate, $shotDate, DurationType.DAYS).isLessThanEqualTo($s.seriesEndAge)) &&
 			($s.seriesStartAge == null || $s.seriesStartAge != null	&& TimePeriod.calculateElapsedTimePeriod($birthDate, $shotDate, DurationType.DAYS).isGreaterThanEqualTo($s.seriesStartAge)))
 	then
@@ -498,7 +502,7 @@ rule "CandidateSeriesIdentification: Initialize *Past* Season TargetSeries when 
 		// Create a fully-specified season for this specific year using the default month and day
 		Season fullySpecified = Season.constructFullySpecifiedSeasonFromDefaultSeasonAndDate($season, $shotDate);
 		$tseasons.addTargetSeason(fullySpecified);
-		TargetSeries ts = new TargetSeries($s, schedule, fullySpecified);
+		TargetSeries ts = new TargetSeries($s, schedule, fullySpecified, $evaluatedPerson);
 		$s.addFullySpecifiedSeason(fullySpecified);
 		insert(ts);
 		insert(fullySpecified);
@@ -525,12 +529,12 @@ rule "CandidateSeriesIdentification: Initialize TargetSeries when Shots Administ
 		$season : Season(isDefaultSeason() == false, vaccineGroup == $vg, dateIsApplicableToSeason($shotDate) == false)
 		not (TargetSeries(seriesName == $s.seriesName, targetSeason != null, targetSeason == $season))
 		eval(schedule.vaccineTargetsOneOrMoreOfSpecifiedDiseases(schedule.getVaccineByCdsConceptValue($occ), schedule.getDiseasesTargetedByVaccineGroup($vg)) == true)
-		EvaluatedPerson($birthDate : demographics.birthTime)
+		$evaluatedPerson : EvaluatedPerson($birthDate : demographics.birthTime)
 		eval(($s.seriesEndAge == null || $s.seriesEndAge != null && TimePeriod.calculateElapsedTimePeriod($birthDate, $shotDate, DurationType.DAYS).isLessThanEqualTo($s.seriesEndAge)) &&
 			($s.seriesStartAge == null || $s.seriesStartAge != null	&& TimePeriod.calculateElapsedTimePeriod($birthDate, $shotDate, DurationType.DAYS).isGreaterThanEqualTo($s.seriesStartAge)))
 	then
 		String _RULENAME = kcontext.rule.name;
-		TargetSeries ts = new TargetSeries($s, schedule, $season);
+		TargetSeries ts = new TargetSeries($s, schedule, $season, $evaluatedPerson);
 		insert(ts);
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "*Seasonal* TargetSeries initialized: " + ts.toString());		
 end
