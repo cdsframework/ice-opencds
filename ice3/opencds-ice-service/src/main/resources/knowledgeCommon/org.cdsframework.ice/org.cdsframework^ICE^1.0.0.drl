@@ -1777,9 +1777,21 @@ rule "RecommendationForecast.setNextSeasonalTargetSeriesForRecommendation" rulef
 	when
 		// To avoid activation-group clashes, only forecast one series at a time
 		not TargetSeries(recommendationStatus == RecommendationStatus.FORECASTING_IN_PROGRESS || recommendationStatus == RecommendationStatus.FORECASTING_COMPLETE)
-		$ts: TargetSeries(recommendationStatus == RecommendationStatus.NOT_FORECASTED, $vg : vaccineGroup, isSelectedSeries() == true, targetSeason != null, 
-			$tseasonStartDate : targetSeason.fullySpecifiedSeasonStartDate)
-		not TargetSeries(vaccineGroup == $vg, targetSeason != null,	targetSeason.fullySpecifiedSeasonStartDate.isAfter($tseasonStartDate)) 
+		$ts: TargetSeries(recommendationStatus == RecommendationStatus.NOT_FORECASTED, $vg : vaccineGroup, isSelectedSeries() == true, targetSeason != null)
+		not TargetSeries(vaccineGroup == $vg, targetSeason != null,	targetSeason.fullySpecifiedSeasonStartDate.isAfter($ts.targetSeason.fullySpecifiedSeasonStartDate))
+		(		
+			TargetSeries(this == $ts, seriesRules.seriesEndAge == null) 
+			or
+			(
+				not TargetSeries(this != $ts, $vaccineGroup == $vg, seriesRules.seriesStartAge != null)
+				or
+				$person : EvaluatedPerson($birthdate : demographics.birthTime)
+				forall ($tssa : TargetSeries(this != $ts, vaccineGroup == $vg, seriesRules.seriesStartAge != null, targetSeason == null, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup)
+					// targetSeason == null because we don't want to compare defined ages with other seasonal series
+					eval($tssa.seriesStartAge == null || TimePeriod.addTimePeriod($birthdate, $ts.seriesRules.seriesEndAge).compareTo(TimePeriod.addTimePeriod($birthdate, $tssa.seriesRules.seriesStartAge)) < 0)
+				)
+        	)
+        )
 	then
 		String _RULENAME = kcontext.rule.name;		
 		modify($ts) {
@@ -1799,6 +1811,19 @@ rule "RecommendationForecast.setNextNonSeasonalTargetSeriesForRecommendation" ru
 		// To avoid activation-group clashes, only forecast one series at a time
 		not TargetSeries(recommendationStatus == RecommendationStatus.FORECASTING_IN_PROGRESS || recommendationStatus == RecommendationStatus.FORECASTING_COMPLETE)
 		$ts: TargetSeries(recommendationStatus == RecommendationStatus.NOT_FORECASTED, isSelectedSeries() == true, targetSeason == null)
+		(		
+			TargetSeries(this == $ts, seriesRules.seriesEndAge == null) 
+			or
+			(
+				not TargetSeries(this != $ts, $vaccineGroup == $vg, seriesRules.seriesGroup == $ts,seriesRules.seriesGroup, seriesRules.seriesStartAge != null)
+				or
+				$person : EvaluatedPerson($birthdate : demographics.birthTime)
+				forall ($tssa : TargetSeries(this != $ts, vaccineGroup == $vg, seriesRules.seriesStartAge != null, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup)
+					// targetSeason not checked because potentially a seasonal series could follow a non-seasonal series
+					eval($tssa.seriesRules.seriesStartAge == null || TimePeriod.addTimePeriod($birthdate, $ts.seriesRules.seriesEndAge).compareTo(TimePeriod.addTimePeriod($birthdate, $tssa.seriesRules.seriesStartAge)) < 0)
+				)
+        	)
+        )
 	then
 		String _RULENAME = kcontext.rule.name;		
 		RecommendationStatus newRecommendationStatus = RecommendationStatus.FORECASTING_IN_PROGRESS;
