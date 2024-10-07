@@ -3381,9 +3381,7 @@ public class TargetSeries {
 	 * @param targetDose
 	 */
 	public void removeTargetDoseFromSeries(TargetDose targetDose) {
-
 		// String _METHODNAME = "removeTargetDoseFromSeries(): ";
-
 		if (targetDose == null) {
 			return;
 		}

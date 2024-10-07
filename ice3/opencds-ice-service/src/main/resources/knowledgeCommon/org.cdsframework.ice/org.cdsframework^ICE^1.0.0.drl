@@ -663,10 +663,10 @@ end
 ///////// ***
 rule "SeriesAggregation: Initialize Series Aggregation Custom Rules Invocation" ruleflow-group "SeriesAggregation"
 	dialect "mvel"
-	salience 110
+	/////// salience 110
 	when
-		$iftf : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue)
-		$s : SeriesRules(this == $iftf.associatedSeriesRules)
+		exists ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue)
+		/////// $s : SeriesRules(this == $iftf.associatedSeriesRules)
 	then
 		String _RULENAME = kcontext.rule.name;
 		setFocus("SeriesAggregation^customAggregateSeriesRule");

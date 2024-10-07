@@ -109,16 +109,16 @@ rule "SeriesAggregation(RSV): If there are shots adminstered both <= the maxAge 
 	dialect "mvel"
 	agenda-group "SeriesAggregation^customAggregateSeriesRule"
 	when
-		$iftfinfant : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875",
-			associatedSeriesRules!.seriesName == "RSVInfantSeries")
-		$iftfadult : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875",
-			associatedSeriesRules!.seriesName == "RSVAdultSeries")
-		$tsinfant : TargetSeries(seriesRules == $iftfinfant.associatedSeriesRules, numberOfShotsAdministeredInSeries > 0, seasonStartDate != null, seasonStartDate <= evalTime, seasonEndDate != null, seasonEndDate >= evalTime)
-		$tsadult : TargetSeries(seriesRules == $iftfadult.associatedSeriesRules, numberOfShotsAdministeredInSeries > 0, seasonStartDate != null, seasonStartDate <= evalTime, seasonEndDate != null, seasonEndDate >= evalTime)
+		$iftfinfant : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875", associatedSeriesRules!.seriesName == "RSVInfantSeries")
+		$iftfadult : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875", associatedSeriesRules!.seriesName == "RSVAdultSeries")
+		/////// $tsinfant : TargetSeries(seriesRules == $iftfinfant.associatedSeriesRules, numberOfShotsAdministeredInSeries > 0, seasonStartDate != null, seasonStartDate <= evalTime, seasonEndDate != null, seasonEndDate >= evalTime)
+		/////// $tsadult : TargetSeries(seriesRules == $iftfadult.associatedSeriesRules, numberOfShotsAdministeredInSeries > 0, seasonStartDate != null, seasonStartDate <= evalTime, seasonEndDate != null, seasonEndDate >= evalTime)
+		$tsinfant : TargetSeries(seriesRules == $iftfinfant.associatedSeriesRules, numberOfShotsAdministeredInSeries > 0, seriesRules.seriesEndAge != null)
+		$tsadult : TargetSeries(seriesRules == $iftfadult.associatedSeriesRules, numberOfShotsAdministeredInSeries > 0, seriesRules.seriesStartAge != null)
 		EvaluatedPerson($birthDate : demographics.birthTime)
-		
+		// $overlappingTd : 
 	then
-	
+		
 end
 
 

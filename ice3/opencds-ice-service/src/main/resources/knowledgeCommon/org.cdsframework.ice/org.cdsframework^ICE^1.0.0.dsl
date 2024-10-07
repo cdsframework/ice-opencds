@@ -334,7 +334,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 [consequence][][Cc]lear [Ff]orecasted [Rr]ecommendations from [Cc]onsideration in [Ss]eries {refer_oTargetSeries}={refer_oTargetSeries}.clearRecommendations();
-[consequence][][Rr]emove the [Ss]hot {refer_oTargetDose} from [Ee]valuation as a part of the [Ss]eries {refer_oTargetSeries}=modify({refer_oTargetSeries}) \{ removeTargetDoseFromSeries({refer_oTargetDose}); \};
+[consequence][][Rr]emove the [Ss]hot {refer_oTargetDose} from [Ee]valuation as a part of the [Ss]eries {refer_oTargetSeries}=modify({refer_oTargetSeries}) \{ removeTargetDoseFromSeries({refer_oTargetDose}); retract({refer_oTargetDose}); \};
 [consequence][][Ss]kip [Ss]eries [Dd]ose [Nn]umber to {nToDoseNumber} from {nFromDoseNumber} for [Dd]isease {dd_oSupportedDiseaseConcept} in [Ss]eries {refer_oTargetSeries:[\\$A-Za-z0-9\\_]+} but [Dd]o [Nn]ot [Rr]efresh [Ss]eries [Ff]acts={refer_oTargetSeries}.addSkipDoseEntryForSpecifiedDisease({nFromDoseNumber}, {nToDoseNumber}, {dd_oSupportedDiseaseConcept});
 [consequence][][Ss]kip [Ss]eries [Dd]ose [Nn]umber to {nToDoseNumber} from {nFromDoseNumber} for all [Dd]iseases in the [Ss]eries {refer_oTargetSeries:[\\$A-Za-z0-9\\_]+} but [Dd]o [Nn]ot [Rr]efresh [Ss]eries [Ff]acts={refer_oTargetSeries}.addSkipDoseEntryForDose({nFromDoseNumber}, {nToDoseNumber});
 [consequence][][Ss]kip [Ss]eries [Dd]ose [Nn]umber to {nToDoseNumber} from {nFromDoseNumber} for [Dd]isease {dd_oSupportedDiseaseConcept} in [Ss]eries {refer_oTargetSeries}=modify({refer_oTargetSeries}) \{ addSkipDoseEntryForSpecifiedDisease({nFromDoseNumber}, {nToDoseNumber}, {dd_oSupportedDiseaseConcept}); \}
