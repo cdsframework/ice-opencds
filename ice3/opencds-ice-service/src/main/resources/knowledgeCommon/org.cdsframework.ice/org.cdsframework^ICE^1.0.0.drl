@@ -1785,15 +1785,16 @@ rule "RecommendationForecast.setNextSeasonalTargetSeriesForRecommendation" rulef
 		(		
 			TargetSeries(this == $ts, seriesRules.seriesEndAge == null) 
 			or
-			(
-				not TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, seriesRules.seriesStartAge != null)
-				or
+			/////// (
+				/////// not TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, seriesStartAgeDate != null)
+				/////// or
 				// targetSeason == null because we don't want to compare defined ages with other seasonal series; we already selected the most recent/current series in the predicates above
 				// However, all non-seasonal series, iof any, should come after this seasonal series
-				forall ($tssa : TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, seriesStartAgeDate != null, targetSeason == null, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup)
-					TargetSeries(this == $ts, seriesEndAgeDate == null || seriesEndAgeDate < $tssa.seriesStartAgeDate)
-				)
-        	)
+				//forall ($tssa : TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, seriesStartAgeDate != null, targetSeason == null, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup)
+				//	TargetSeries(this == $ts, seriesEndAgeDate == null || seriesEndAgeDate < $tssa.seriesStartAgeDate)
+				//)
+        	/////// )
+        	not TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, targetSeason == null, $ts.seriesEndAgeDate != null, seriesStartAgeDate != null && seriesStartAgeDate > $ts.seriesEndAgeDate, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup)
         )
 	then
 		String _RULENAME = kcontext.rule.name;		
@@ -1817,14 +1818,14 @@ rule "RecommendationForecast.setNextNonSeasonalTargetSeriesForRecommendation" ru
 		(		
 			TargetSeries(this == $ts, seriesRules.seriesEndAge == null) 
 			or
-			(
-				not TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup, seriesRules.seriesStartAge != null)
-				or
-				// TargetSeason is _not_ narrowed down here because, potentially, because both a seasonal series or non-seasonal series could have preceded this selected (non-seasonal) TargetSeries
-				forall ($tssa : TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, seriesStartAgeDate != null, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup)
-					TargetSeries(this == $ts, seriesEndAgeDate == null || seriesEndAgeDate < $tssa.seriesStartAgeDate)
-				)
-        	)
+			/////// (
+			///////	not TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup, seriesRules.seriesStartAge != null)
+			///////	or
+			///////	forall ($tssa : TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup)
+			///////		TargetSeries(this == $ts, seriesStartAgeDate == null || seriesEndAgeDate == null || seriesStartAgeDate > $tssa.seriesEndAgeDate)
+			///////	)
+        	/////// )
+        	not TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, $ts.seriesEndAgeDate != null, seriesStartAgeDate != null && seriesStartAgeDate > $ts.seriesEndAgeDate, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup)
         )
 	then
 		String _RULENAME = kcontext.rule.name;		
