@@ -665,7 +665,7 @@ end
 ///////// ***
 // General Design rule... Do not Edit
 ///////// ***
-rule "SeriesAggregation: Initialize Series Aggregation Custom Rules Invocation" ruleflow-group "SeriesAggregation"
+rule "SeriesAggregation: Initialize Series Aggregation Custom Rules Invocation" ruleflow-group "CandidateDosesIdentificationRevisions"
 	dialect "mvel"
 	/////// salience 110
 	when
@@ -673,7 +673,7 @@ rule "SeriesAggregation: Initialize Series Aggregation Custom Rules Invocation" 
 		/////// $s : SeriesRules(this == $iftf.associatedSeriesRules)
 	then
 		String _RULENAME = kcontext.rule.name;
-		setFocus("SeriesAggregation^customAggregateSeriesRule");
+		setFocus("CandidateDosesIdentificationRevisions^customCandidateDosesRule");
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Invoke Custom Aggregate Series for Series: " + $s);
 end
 
