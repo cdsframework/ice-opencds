@@ -905,7 +905,7 @@ end
 // If the patient is >= 20 months of age, then the RSV Adult Series; otherwise the RSV Infant Series applies.
 ///////
 
-rule "SeriesSelection(RSV): Select the RSV Infant Series if the Infant Series was not selected"
+rule "SeriesSelection(RSV): Select the RSV Infant Series if the Adult Series was not selected"
 	dialect "mvel"
 	agenda-group "SeriesSelection^customSeriesSelectionRules"
 	when
