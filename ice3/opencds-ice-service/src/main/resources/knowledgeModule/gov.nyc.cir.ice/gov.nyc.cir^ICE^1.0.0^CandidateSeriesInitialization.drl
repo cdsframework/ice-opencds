@@ -169,21 +169,6 @@ rule "CandidateSeriesIdentification(RSV): Prevent the default CandidateSeriesIde
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesRules \"" + $s.seriesName + "\" will not be examined by default CandidateSeriesIdentification rules");
 end
 
-/*		
-rule "CandidateSeriesIdentification(RSV): Prevent Default CandidateSeriesIdentification rules from running on the *Current* Season of the RSV Infant Series"
-	dialect "mvel"
-	agenda-group "CandidateSeriesIdentification^customCandidateSeriesIdentificationRule"
-	when
-		$s : SeriesRules(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesName == "RSVInfantSeries", seasons.size() > 0)
-		not ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules == $s)
-		Season(dateIsApplicableToSeason(evalTime)) from $s.seasons
-	then
-		String _RULENAME = kcontext.rule.name;
-		ICEFactTypeFinding iftf = new ICEFactTypeFinding(SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, $s);
-		insert(iftf);
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "SeriesRules \"" + $s.seriesName + "\" will not be examined by default CandidateSeriesIdentification rules");
-end
-*/
 
 ///////
 // RSV Adult TargetSeries Initializations

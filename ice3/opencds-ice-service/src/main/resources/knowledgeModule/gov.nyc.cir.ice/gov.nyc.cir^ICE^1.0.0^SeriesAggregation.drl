@@ -96,7 +96,7 @@ rule "SeriesAggregation(RSV): If there are no shots administered in the RSV Adul
 end
 */
 
-rule "SeriesAggregation(RSV): If there are shots adminstered > the Series End Date of the RSVInfantSeries and that are also in the RSVAdultSeries, remove the TargetDose from the RSVInfant TargetSeries"
+rule "CandidateDosesIdentificationRevisions(RSV): If there are shots adminstered > the Series End Date of the RSVInfantSeries and that are also in the RSVAdultSeries, remove the TargetDose from the RSVInfant TargetSeries"
 	dialect "mvel"
 	agenda-group "CandidateDosesIdentificationRevisions^customCandidateDosesRule"
 	when
@@ -105,8 +105,8 @@ rule "SeriesAggregation(RSV): If there are shots adminstered > the Series End Da
 		$tsinfant : TargetSeries(seriesRules == $iftfinfant.associatedSeriesRules, numberOfShotsAdministeredInSeries > 0, seriesEndAgeDate != null)
 		$tsadult : TargetSeries(seriesRules == $iftfadult.associatedSeriesRules, numberOfShotsAdministeredInSeries > 0, seriesStartAgeDate != null)
 		$overlappingTd : TargetDose(associatedTargetSeries == $tsinfant, administrationDate > $tsinfant.seriesEndAgeDate)
-		exists TargetDose(associatedTargetSeries == $tsadult, doseId == $overlappingTd.doseId)
-		not TargetDose(associatedTargetSeries == $tsinfant, administrationDate > $tsinfant.seriesEndAgeDate, administrationDate < $overlappingTd.administrationDate)
+		exists TargetDose(associatedTargetSeries == $tsadult, doseId == $overlappingTd.doseId, administrationDate >= $tsadult.seriesStartAgeDate)
+		/////// not TargetDose(associatedTargetSeries == $tsinfant, administrationDate > $tsinfant.seriesEndAgeDate, administrationDate < $overlappingTd.administrationDate)
 	then
 		String _RULENAME = kcontext.rule.name;
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Removing TargetDose " + $overlappingTd + " from RSV Infant Series. ' TargetSeries: " + $tsinfant);
@@ -117,7 +117,7 @@ rule "SeriesAggregation(RSV): If there are shots adminstered > the Series End Da
 end
 
 
-rule "SeriesAggregation(RSV): If there are shots adminstered < the Series Start Date of the RSVAdultSeries and that are also in the RSVInfantSeries, remove the TargetDose from the RSVAdult TargetSeries"
+rule "CandidateDosesIdentificationRevisions(RSV): If there are shots adminstered < the Series Start Date of the RSVAdultSeries and that are also in the RSVInfantSeries, remove the TargetDose from the RSVAdult TargetSeries"
 	dialect "mvel"
 	agenda-group "CandidateDosesIdentificationRevisions^customCandidateDosesRule"
 	when
@@ -126,8 +126,8 @@ rule "SeriesAggregation(RSV): If there are shots adminstered < the Series Start 
 		$tsinfant : TargetSeries(seriesRules == $iftfinfant.associatedSeriesRules, numberOfShotsAdministeredInSeries > 0, seriesEndAgeDate != null)
 		$tsadult : TargetSeries(seriesRules == $iftfadult.associatedSeriesRules, numberOfShotsAdministeredInSeries > 0, seriesStartAgeDate != null)
 		$overlappingTd : TargetDose(associatedTargetSeries == $tsadult, administrationDate < $tsadult.seriesStartAgeDate)
-		exists TargetDose(associatedTargetSeries == $tsinfant, doseId == $overlappingTd.doseId)
-		not TargetDose(associatedTargetSeries == $tsadult, administrationDate < $tsadult.seriesStartAgeDate, administrationDate < $overlappingTd.administrationDate)
+		exists TargetDose(associatedTargetSeries == $tsinfant, doseId == $overlappingTd.doseId, administrationDate <= $tsinfant.seriesEndAgeDate)
+		/////// not TargetDose(associatedTargetSeries == $tsadult, administrationDate < $tsadult.seriesStartAgeDate, administrationDate < $overlappingTd.administrationDate)
 	then
 		String _RULENAME = kcontext.rule.name;
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Removing TargetDose " + $overlappingTd + " from RSV Adult Series. ' TargetSeries: " + $tsadult);	

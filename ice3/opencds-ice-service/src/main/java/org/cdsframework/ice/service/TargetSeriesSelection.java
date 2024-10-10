@@ -87,7 +87,7 @@ public class TargetSeriesSelection {
 		}
 		this.seriesSelectionStatus = SeriesSelectionStatus.SERIES_SELECTION_NOT_STARTED;
 		this.selectedSeriesName = null;
-		this.seriesGroup = 0;	// TODO:
+		this.seriesGroup = pTS.getSeriesRules().getSeriesGroup();
 	}
 
 
@@ -101,6 +101,10 @@ public class TargetSeriesSelection {
 
 	public int getSeriesSelectionPriority() {
 		return seriesSelectionPriority;
+	}
+
+	public int getSeriesGroup() {
+		return this.seriesGroup;
 	}
 
 	public Season getSeriesSelectionSeason() {

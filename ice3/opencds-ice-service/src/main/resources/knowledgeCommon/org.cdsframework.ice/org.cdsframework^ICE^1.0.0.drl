@@ -1455,7 +1455,7 @@ rule "SeriesSelection: Initialize Next Non-Seasonal TargetSeriesSelection" rulef
 	when
 		$tss : TargetSeriesSelection(seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_NOT_STARTED, seriesSelectionSeason == null)
 		// Perform selection on series; higher priority vaccine groups first and those with seasons in start date ascending order
-		not TargetSeriesSelection(seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_NOT_STARTED, seriesSelectionVaccineGroup != $tss.seriesSelectionVaccineGroup, seriesSelectionPriority > $tss.seriesSelectionPriority)
+		not TargetSeriesSelection(seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_NOT_STARTED, seriesSelectionVaccineGroup != $tss.seriesSelectionVaccineGroup, seriesSelectionPriority > $tss.seriesSelectionPriority, seriesGroup < $tss.seriesGroup)
 	then
 		String _RULENAME = kcontext.rule.name;
 		modify ($tss) {
@@ -1473,7 +1473,7 @@ rule "SeriesSelection: Initialize Next Seasonal TargetSeriesSelection" ruleflow-
 	when
 		$tss : TargetSeriesSelection(seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_NOT_STARTED, seriesSelectionSeason != null)
 		// Perform selection on series; higher priority vaccine groups first and those with seasons in start date ascending order
-		not TargetSeriesSelection(seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_NOT_STARTED, seriesSelectionVaccineGroup != $tss.seriesSelectionVaccineGroup, seriesSelectionPriority > $tss.seriesSelectionPriority) 		
+		not TargetSeriesSelection(seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_NOT_STARTED, seriesSelectionVaccineGroup != $tss.seriesSelectionVaccineGroup, seriesSelectionPriority > $tss.seriesSelectionPriority, seriesGroup < $tss.seriesGroup) 
 		not TargetSeriesSelection(seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_NOT_STARTED, seriesSelectionVaccineGroup == $tss.seriesSelectionVaccineGroup, 
 			seriesSelectionSeason != null && seriesSelectionSeason.fullySpecifiedSeasonStartDate.isBefore($tss.seriesSelectionSeason.fullySpecifiedSeasonStartDate))
 	then
@@ -1592,14 +1592,14 @@ end
 // Retracts all TargetSeries and corresponding TargetDoses in a vaccine group that remain (i.e. - were not chosen). 
 // For Seasonal Series, since recommendations are only made on the current season
 ///////// ***
-rule "SeriesSelection: Retract All Series Not Selected in Vaccine Group" ruleflow-group "SeriesSelection"
+rule "SeriesSelection: Retract All Series Not Selected in the same Series Group and Vaccine Group" ruleflow-group "SeriesSelection"
 	dialect "mvel"
 	salience 50
 	when
 		$tss : TargetSeriesSelection($ssvg : seriesSelectionVaccineGroup, $sss : seriesSelectionSeason, 
 			seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS || seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_POSTPROCESS ||	seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_COMPLETE)
 		$selected : TargetSeries(seriesRules.vaccineGroup == $ssvg, selectedSeries == true, targetSeason == $sss)
-		$ts : TargetSeries(seriesRules.vaccineGroup == $ssvg, selectedSeries == false, targetSeason == $sss)
+		$ts : TargetSeries(seriesRules.vaccineGroup == $ssvg, selectedSeries == false, targetSeason == $sss, seriesRules.seriesGroup == $tss.seriesGroup)
 	then
 		String _RULENAME = kcontext.rule.name;
 		for (TargetDose d : $ts.targetDoses) {
@@ -1611,6 +1611,7 @@ rule "SeriesSelection: Retract All Series Not Selected in Vaccine Group" ruleflo
 end
 
 
+// AI: Move this to RecommendationForecast
 ///////// ***
 // Supplemental Series Selection rule... Output Series Selection Information, if _OUTPUT_NUMBER_OF_DOSES_REMAINING option enabled
 ///////// ***
@@ -1631,6 +1632,7 @@ rule "SeriesSelection: Make a Record of all Non-Seasonal TargetSeries of the Vac
 end
 
 
+// AI: Move this to RecommendationForecast
 ///////// ***
 // Supplemental Series Selection rule... Output Series Selection Information, if _OUTPUT_NUMBER_OF_DOSES_REMAINING option enabled
 ///////// ***
@@ -1666,7 +1668,7 @@ rule "SeriesSelection: Select already completed series that has the fewest doses
 		$tss : TargetSeriesSelection(seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS || seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_POSTPROCESS)
 		not (TargetSeries(selectedSeries == true, seriesRules.vaccineGroup == $tss.seriesSelectionVaccineGroup, targetSeason == $tss.seriesSelectionSeason))
 		$ts1 : TargetSeries(seriesRules.vaccineGroup == $tss.seriesSelectionVaccineGroup, isSeriesComplete() == true, $numberOfDosesInSeries1 : seriesRules.numberOfDosesInSeries, targetSeason == $tss.seriesSelectionSeason)
-		not (TargetSeries(seriesRules.vaccineGroup == $tss.seriesSelectionVaccineGroup, isSeriesComplete() == true, $numberOfDosesInSeries1 > seriesRules.numberOfDosesInSeries, targetSeason == $tss.seriesSelectionSeason))
+		not (TargetSeries(seriesRules.vaccineGroup == $tss.seriesSelectionVaccineGroup, isSeriesComplete() == true, $numberOfDosesInSeries1 > seriesRules.numberOfDosesInSeries, targetSeason == $tss.seriesSelectionSeason, seriesRules.seriesGroup == $tss.seriesGroup))
 	then
 		String _RULENAME = kcontext.rule.name;
 		$ts1.setSelectedSeries(true);
@@ -1690,10 +1692,10 @@ rule "SeriesSelection: Select already _completed_ series with earliest completio
 	when
 		$tss : TargetSeriesSelection(seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS || seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_POSTPROCESS)
 		$ts1 : TargetSeries(seriesRules.vaccineGroup == $tss.seriesSelectionVaccineGroup, $id1 : targetSeriesIdentifier, selectedSeries == true, targetSeason == $tss.seriesSelectionSeason, $seriesComplete1 : isSeriesComplete(), 
-			$lastNecessaryShotAdministered1 : getValidShotByDoseNumber(seriesRules.numberOfDosesInSeries))
+			$seriesGroup1 : seriesRules.SeriesGroup, $lastNecessaryShotAdministered1 : getValidShotByDoseNumber(seriesRules.numberOfDosesInSeries))
 		$ts2 : TargetSeries(seriesRules.vaccineGroup == $tss.seriesSelectionVaccineGroup, targetSeriesIdentifier != $ts1.targetSeriesIdentifier, selectedSeries == false, targetSeason == $tss.seriesSelectionSeason, $seriesComplete2 : isSeriesComplete(), 
-			$lastAdministeredShot2InSeries: lastShotAdministeredInSeries, $lastNecessaryShotAdministered2 : getValidShotByDoseNumber(seriesRules.numberOfDosesInSeries))
-		eval($seriesComplete1 == true && $seriesComplete2 == true && ($lastAdministeredShot2InSeries == null || 
+			$seriesGroup2 : seriesRules.seriesGroup, $lastAdministeredShot2InSeries: lastShotAdministeredInSeries, $lastNecessaryShotAdministered2 : getValidShotByDoseNumber(seriesRules.numberOfDosesInSeries))
+		eval($seriesComplete1 == true && $seriesComplete2 == true && $seriesGroup1 == $seriesGroup2 && ($lastAdministeredShot2InSeries == null || 
 			($lastNecessaryShotAdministered1 != null && $lastNecessaryShotAdministered2 != null && $lastNecessaryShotAdministered2.getAdministrationDate() != null && 
 				$lastNecessaryShotAdministered2.getAdministrationDate().before($lastNecessaryShotAdministered1.getAdministrationDate()))))
 	then
@@ -1793,8 +1795,45 @@ rule "RecommendationForecast.setNextSeasonalTargetSeriesForRecommendation" rulef
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Forecasting TargetSeries " + $ts);
 		setFocus("RecommendationForecast^preRecommendationValidation");
 end
+*/
 
 
+///////// ***
+// General Design rule... Do not Edit
+///////// ***
+rule "RecommendationForecast.setNextSeasonalTargetSeriesForRecommendation" ruleflow-group "RecommendationForecast"
+	dialect "mvel"
+	when
+		// To avoid activation-group clashes, only forecast one series at a time
+		not TargetSeries(recommendationStatus == RecommendationStatus.FORECASTING_IN_PROGRESS || recommendationStatus == RecommendationStatus.FORECASTING_COMPLETE)
+		$ts: TargetSeries(recommendationStatus == RecommendationStatus.NOT_FORECASTED, isSelectedSeries() == true, targetSeason != null)
+		not TargetSeries(vaccineGroup == $ts.vaccineGroup, targetSeason != null, targetSeason.fullySpecifiedSeasonStartDate.isAfter($ts.targetSeason.fullySpecifiedSeasonStartDate))
+		(		
+			TargetSeries(this == $ts, seriesRules.seriesGroup <= 0 || seriesRules.seriesGroup > 0 && seriesRules.seriesEndAge == null) 
+			or
+			/////// (
+				/////// not TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, seriesStartAgeDate != null)
+				/////// or
+				// targetSeason == null because we don't want to compare defined ages with other seasonal series; we already selected the most recent/current series in the predicates above
+				// However, all non-seasonal series, iof any, should come after this seasonal series
+				//forall ($tssa : TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, seriesStartAgeDate != null, targetSeason == null, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup)
+				//	TargetSeries(this == $ts, seriesEndAgeDate == null || seriesEndAgeDate < $tssa.seriesStartAgeDate)
+				//)
+        	/////// )
+        	not TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, targetSeason == null, $ts.seriesEndAgeDate != null, seriesStartAgeDate != null && seriesStartAgeDate > $ts.seriesEndAgeDate, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup, 
+        		numberOfShotsAdministeredInSeries > 0)
+        )
+	then
+		String _RULENAME = kcontext.rule.name;	
+		modify($ts) {
+			setRecommendationStatus(RecommendationStatus.FORECASTING_IN_PROGRESS);
+		}
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Forecasting TargetSeries " + $ts);
+		setFocus("RecommendationForecast^preRecommendationValidation");
+end
+
+
+/*
 ///////// ***
 // General Design rule... Do not Edit
 ///////// ***
@@ -1818,40 +1857,6 @@ end
 ///////// ***
 // General Design rule... Do not Edit
 ///////// ***
-rule "RecommendationForecast.setNextSeasonalTargetSeriesForRecommendation" ruleflow-group "RecommendationForecast"
-	dialect "mvel"
-	when
-		// To avoid activation-group clashes, only forecast one series at a time
-		not TargetSeries(recommendationStatus == RecommendationStatus.FORECASTING_IN_PROGRESS || recommendationStatus == RecommendationStatus.FORECASTING_COMPLETE)
-		$ts: TargetSeries(recommendationStatus == RecommendationStatus.NOT_FORECASTED, isSelectedSeries() == true, targetSeason != null)
-		not TargetSeries(vaccineGroup == $ts.vaccineGroup, targetSeason != null, targetSeason.fullySpecifiedSeasonStartDate.isAfter($ts.targetSeason.fullySpecifiedSeasonStartDate))
-		(		
-			TargetSeries(this == $ts, seriesRules.seriesEndAge == null) 
-			or
-			/////// (
-				/////// not TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, seriesStartAgeDate != null)
-				/////// or
-				// targetSeason == null because we don't want to compare defined ages with other seasonal series; we already selected the most recent/current series in the predicates above
-				// However, all non-seasonal series, iof any, should come after this seasonal series
-				//forall ($tssa : TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, seriesStartAgeDate != null, targetSeason == null, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup)
-				//	TargetSeries(this == $ts, seriesEndAgeDate == null || seriesEndAgeDate < $tssa.seriesStartAgeDate)
-				//)
-        	/////// )
-        	not TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, targetSeason == null, $ts.seriesEndAgeDate != null, seriesStartAgeDate != null && seriesStartAgeDate > $ts.seriesEndAgeDate, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup)
-        )
-	then
-		String _RULENAME = kcontext.rule.name;		
-		modify($ts) {
-			setRecommendationStatus(RecommendationStatus.FORECASTING_IN_PROGRESS);
-		}
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Forecasting TargetSeries " + $ts);
-		setFocus("RecommendationForecast^preRecommendationValidation");
-end
-
-
-///////// ***
-// General Design rule... Do not Edit
-///////// ***
 rule "RecommendationForecast.setNextNonSeasonalTargetSeriesForRecommendation" ruleflow-group "RecommendationForecast"
 	dialect "mvel"
 	when
@@ -1859,7 +1864,7 @@ rule "RecommendationForecast.setNextNonSeasonalTargetSeriesForRecommendation" ru
 		not TargetSeries(recommendationStatus == RecommendationStatus.FORECASTING_IN_PROGRESS || recommendationStatus == RecommendationStatus.FORECASTING_COMPLETE)
 		$ts: TargetSeries(recommendationStatus == RecommendationStatus.NOT_FORECASTED, isSelectedSeries() == true, targetSeason == null)
 		(		
-			TargetSeries(this == $ts, seriesRules.seriesEndAge == null) 
+			TargetSeries(this == $ts, seriesRules.seriesGroup <= 0 || seriesRules.seriesGroup > 0 && seriesRules.seriesEndAge == null) 
 			or
 			/////// (
 			///////	not TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup, seriesRules.seriesStartAge != null)
@@ -1868,7 +1873,8 @@ rule "RecommendationForecast.setNextNonSeasonalTargetSeriesForRecommendation" ru
 			///////		TargetSeries(this == $ts, seriesStartAgeDate == null || seriesEndAgeDate == null || seriesStartAgeDate > $tssa.seriesEndAgeDate)
 			///////	)
         	/////// )
-        	not TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, $ts.seriesEndAgeDate != null, seriesStartAgeDate != null && seriesStartAgeDate > $ts.seriesEndAgeDate, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup)
+        	not TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, $ts.seriesEndAgeDate != null, seriesStartAgeDate != null && seriesStartAgeDate > $ts.seriesEndAgeDate, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup, 
+        		numberOfShotsAdministeredInSeries > 0)
         )
 	then
 		String _RULENAME = kcontext.rule.name;		
