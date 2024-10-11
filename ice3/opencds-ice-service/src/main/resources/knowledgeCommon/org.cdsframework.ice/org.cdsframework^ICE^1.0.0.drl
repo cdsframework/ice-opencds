@@ -658,22 +658,21 @@ end
 
 
 /*****************************************************************************************************************************************************************************/
-// 															Series Aggregation Ruleflow Group
+// 															Candidate Doses Revisions Ruleflow Group
 /*****************************************************************************************************************************************************************************/
 
 ///////// ***
 // General Design rule... Do not Edit
 ///////// ***
-rule "SeriesAggregation: Initialize Series Aggregation Custom Rules Invocation" ruleflow-group "CandidateDosesIdentificationRevisions"
+rule "CandidateDosesRevisions: Initialize Series Aggregation Custom Rules Invocation" ruleflow-group "CandidateDosesRevisions"
 	dialect "mvel"
-	/////// salience 110
 	when
 		exists ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue)
 		/////// $s : SeriesRules(this == $iftf.associatedSeriesRules)
 	then
 		String _RULENAME = kcontext.rule.name;
-		setFocus("CandidateDosesIdentificationRevisions^customCandidateDosesRule");
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Invoke Custom Aggregate Series for Series");
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Invoke Custom Candidate Dose Revisions for All Series");
+		setFocus("CandidateDosesRevisions^customCandidateDoseRevisionRule");
 end
 
 

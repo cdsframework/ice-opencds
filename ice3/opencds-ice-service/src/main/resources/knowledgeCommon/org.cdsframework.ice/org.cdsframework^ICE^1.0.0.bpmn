@@ -105,7 +105,7 @@
         </outputSet>
       </ioSpecification>
     </businessRuleTask>
-    <businessRuleTask id="_20" name="Revise Candidate Doses for Evaluation" g:ruleFlowGroup="CandidateDosesIdentificationRevisions" 
+    <businessRuleTask id="_20" name="Revise Candidate Doses for Evaluation" g:ruleFlowGroup="CandidateDosesRevisions" 
  implementation="http://www.jboss.org/drools/rule" >
       <ioSpecification>
         <inputSet>

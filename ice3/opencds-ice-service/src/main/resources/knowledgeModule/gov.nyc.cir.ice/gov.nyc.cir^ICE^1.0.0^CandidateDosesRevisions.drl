@@ -58,7 +58,7 @@ global org.cdsframework.ice.service.Schedule schedule
 
 
 /*************************************************************************************************************************************************************************************
- RSV Series Aggregation Initialization Rules
+ RSV Candidate Dose Revisions Rules
 *************************************************************************************************************************************************************************************/
 
 /////////////////////
@@ -96,9 +96,9 @@ rule "SeriesAggregation(RSV): If there are no shots administered in the RSV Adul
 end
 */
 
-rule "CandidateDosesIdentificationRevisions(RSV): If there are shots adminstered > the Series End Date of the RSVInfantSeries and that are also in the RSVAdultSeries, remove the TargetDose from the RSVInfant TargetSeries"
+rule "CandidateDosesRevisions(RSV): If there are shots adminstered > the Series End Date of the RSVInfantSeries and >= the Series Start Date of the RSVAdultSeries, remove the TargetDose from the RSVInfant TargetSeries"
 	dialect "mvel"
-	agenda-group "CandidateDosesIdentificationRevisions^customCandidateDosesRule"
+	agenda-group "CandidateDosesRevisions^customCandidateDoseRevisionRule"
 	when
 		$iftfinfant : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875", associatedSeriesRules!.seriesName == "RSVInfantSeries")
 		$iftfadult : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875", associatedSeriesRules!.seriesName == "RSVAdultSeries")
@@ -117,9 +117,9 @@ rule "CandidateDosesIdentificationRevisions(RSV): If there are shots adminstered
 end
 
 
-rule "CandidateDosesIdentificationRevisions(RSV): If there are shots adminstered < the Series Start Date of the RSVAdultSeries and that are also in the RSVInfantSeries, remove the TargetDose from the RSVAdult TargetSeries"
+rule "CandidateDosesRevisions(RSV): If there are shots adminstered < the Series Start Date of the RSVAdultSeries and <= the Series End Date of the RSVInfantSeries, remove the TargetDose from the RSVAdult TargetSeries"
 	dialect "mvel"
-	agenda-group "CandidateDosesIdentificationRevisions^customCandidateDosesRule"
+	agenda-group "CandidateDosesRevisions^customCandidateDoseRevisionRule"
 	when
 		$iftfinfant : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875", associatedSeriesRules!.seriesName == "RSVInfantSeries")
 		$iftfadult : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875", associatedSeriesRules!.seriesName == "RSVAdultSeries")
