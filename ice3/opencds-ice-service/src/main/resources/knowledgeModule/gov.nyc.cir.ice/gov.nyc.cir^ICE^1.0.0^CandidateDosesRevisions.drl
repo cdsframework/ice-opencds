@@ -67,10 +67,11 @@ global org.cdsframework.ice.service.Schedule schedule
 // implemented in this agenda group, is as follows:
 //   + If there are shots administered both <= the maxAge of the infant series and >= the minAge of the adult series, remove/retract the target doses that overlap in the 2 target series, as applicable by series start/end ages. 
 /////////////////////
-/*
-rule "SeriesAggregation(RSV): If there are no shots administered in the RSV Infant Series, remove the TargetSeries from consideration"
+
+
+rule "CandidateDosesRevisions(RSV): If there are no shots administered in the RSV Infant Series, remove the TargetSeries from consideration"
 	dialect "mvel"
-	agenda-group "CandidateDosesIdentificationRevisions^customCandidateDosesRule"
+	agenda-group "CandidateDosesRevisions^customCandidateDoseRevisionRule"
 	when
 		$iftf : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875",
 			associatedSeriesRules!.seriesName == "RSVInfantSeries")
@@ -82,9 +83,9 @@ rule "SeriesAggregation(RSV): If there are no shots administered in the RSV Infa
 end
 
 
-rule "SeriesAggregation(RSV): If there are no shots administered in the RSV Adult Series, remove the TargetSeries from consideration"
+rule "CandidateDosesRevisions(RSV): If there are no shots administered in the RSV Adult Series, remove the TargetSeries from consideration"
 	dialect "mvel"
-	agenda-group "CandidateDosesIdentificationRevisions^customCandidateDosesRule"
+	agenda-group "CandidateDosesRevisions^customCandidateDoseRevisionRule"
 	when
 		$iftf : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875",
 			associatedSeriesRules!.seriesName == "RSVAdultSeries")
@@ -94,9 +95,9 @@ rule "SeriesAggregation(RSV): If there are no shots administered in the RSV Adul
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "RSV Infant Series' TargetSeries removed: " + $ts);
 		retract($ts);
 end
-*/
 
-rule "CandidateDosesRevisions(RSV): If there are shots adminstered > the Series End Date of the RSVInfantSeries and >= the Series Start Date of the RSVAdultSeries, remove the TargetDose from the RSVInfant TargetSeries"
+
+rule "CandidateDosesRevisions(RSV): If there are shots adminstered > the Series End Date of the RSV Infant Series and >= the Series Start Date of the RSV Adult Series, remove the TargetDose from the RSV Infant TargeSeries"
 	dialect "mvel"
 	agenda-group "CandidateDosesRevisions^customCandidateDoseRevisionRule"
 	when
@@ -117,7 +118,7 @@ rule "CandidateDosesRevisions(RSV): If there are shots adminstered > the Series 
 end
 
 
-rule "CandidateDosesRevisions(RSV): If there are shots adminstered < the Series Start Date of the RSVAdultSeries and <= the Series End Date of the RSVInfantSeries, remove the TargetDose from the RSVAdult TargetSeries"
+rule "CandidateDosesRevisions(RSV): If there are shots adminstered < the Series Start Date of the RSV Adult Series and <= the Series End Date of the RSV Infant Series, remove the TargetDose from the RSV Adult TargetSeries"
 	dialect "mvel"
 	agenda-group "CandidateDosesRevisions^customCandidateDoseRevisionRule"
 	when
