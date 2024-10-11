@@ -72,3 +72,16 @@ rule "RSV: If a patient is >= 8 months and < 20 months, the recommendation is Co
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
 end
+
+
+// If a patient is < 8 months is not complete for the RSV Infant Series, and is not in the RSV season as of the evaluation date, the recommendation is Future Recommended with reason code SUPPLEMENTAL_TEXT.
+
+
+// If a patient is < 8 months is not complete for the RSV Infant Series, and is in the RSV season as of the evaluation date, the recommendation is Recommended with reason code SUPPLEMENTAL_TEXT.
+
+
+// If a patient is < 8 months and is complete for the RSV Infant Series, the recommendation is Not Recommended and the reason code is COMPLETE_HIGH_RISK.
+
+
+// 
+ 
