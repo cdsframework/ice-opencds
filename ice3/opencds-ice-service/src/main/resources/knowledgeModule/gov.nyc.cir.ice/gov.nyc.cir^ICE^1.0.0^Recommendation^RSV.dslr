@@ -55,7 +55,7 @@ global org.cdsframework.ice.service.Schedule schedule
 
 
 // If a patient is >= 8 months and < 20 months, the recommendation is Conditional and the reason code is HIGH_RISK.
-rule "RSV: If a patient is >= 8 months and < 20 months, the recommendation is Conditional and the reason code is HIGH_RISK" 
+rule "RSV: If a patient is >= 8 months and < 20 months of age, the recommendation is Conditional and the reason code is HIGH_RISK" 
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule"
 	when
@@ -73,9 +73,30 @@ rule "RSV: If a patient is >= 8 months and < 20 months, the recommendation is Co
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
+// If a patient is < 8 months and is complete for the RSV Infant Series, the recommendation is Not Recommended and the reason code is COMPLETE_HIGH_RISK.
+rule "RSV: If a patient is < 8 months of age and is complete for the RSV Infant Series, the recommendation is Not Recommended and the reason code is COMPLETE_HIGH_RISK"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule"
+	when
+		There is a Series $targetSeries that needs forecasting
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.875"
+			- the name of the Series is "RSVInfantSeries"
+			- the Series is complete
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the Patient's birthdate as $birthDate
+		Confirm elapsed time between $birthDate and evalTime < "8m" 
+	then
+		Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Mark Forecasting of the Series $targetSeries Complete
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+       	Log that this Series Rule fired for the Series $targetSeries
+end
+
 
 // If a patient is < 8 months is not complete for the RSV Infant Series, and is in the RSV season as of the evaluation date, the recommendation is Future Recommended with reason code SUPPLEMENTAL_TEXT.
-rule "RSV: If the next recommended date at < 8 months for the RSV Infant Series, return SUPPLEMENTAL_TEXT"
+rule "RSV: If is < 8 months of age and is recommended a dose in the RSV Infant Series, add SUPPLEMENTAL_TEXT to the recommendation"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
 	when
@@ -86,9 +107,9 @@ rule "RSV: If the next recommended date at < 8 months for the RSV Infant Series,
 			- the Series is not complete
 			- a forecast for the Series has been made and a shot is recommended
 			- make note of the recommendation date as $recommendationDate 
-			- the date $recommendationDate falls within the season start and stop dates of the Series
 		The Patient information $patientInfo must be known to complete writing this rule
 			- make note of the Patient's birthdate as $birthDate
+		Confirm elapsed time between $birthDate and evalTime < "8m"
 		Confirm elapsed time between $birthDate and $recommendationDate < "8m" 
 	then
 		Create a Recommendation as $recommendation for the Series $targetSeries
@@ -99,13 +120,25 @@ rule "RSV: If the next recommended date at < 8 months for the RSV Infant Series,
 end
 
 
-// If a patient is < 8 months and is complete for the RSV Infant Series, the recommendation is Not Recommended and the reason code is COMPLETE_HIGH_RISK.
-rule "RSV: If a patient is < 8 months and is complete for the RSV Infant Series, the recommendation is Not Recommended and the reason code is COMPLETE_HIGH_RISK"
+// If a patient is >= 20 months and < 60 years old and a shot is recommended for the RSV Adult Series, add SUPPLEMENTAL_TEXT to the recommendation
+rule "RSV: If a patient is >= 20 months and < 60 years old and a shot is recommended for the RSV Adult Series, add SUPPLEMENTAL_TEXT to the recommendation"
 	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
 	when
-	
+		There is a Series $targetSeries
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.875"
+			- the name of the Series is "RSVAdultSeries"
+			- post processing on the Series forecast has not already been run
+			- the Series is not complete
+			- a forecast for the Series has been made and a shot is recommended
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the Patient's birthdate as $birthDate
+		Confirm elapsed time between $birthDate and evalTime >= "20m" && elapsed time between $birthDate and evalTime < "60m"
 	then
-	
+		Create a Recommendation as $recommendation for the Series $targetSeries
+		Set the Recommendation Supplemental text for $recommendation to "The RSV evaluations and recommendations in ICE primarily target the routine series. RSV is recommended for adults 75 years of age and older and adults 60–74 years of age and older who are at increased risk of severe RSV disease. Note: RSV vaccine is also recommended for pregnant persons at 32-36 weeks' gestation, using seasonal administration." 
+		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+       	Log that this Series Rule fired for the Series $targetSeries
 end
-
+	
