@@ -285,6 +285,80 @@ public class SupportedSeasons implements SupportingData {
 
 
 	/**
+	 * Return a *copy* of the list of Season associated with the specified vaccine group. If the vaccine group is not supported, null is returned.
+	 * If the vaccine group is supported but not Season have been specified for the vaccine group, an empty list is returned.
+	 */
+	public List<Season> getCopyOfSeasonForVaccineGroup(LocallyCodedVaccineGroupItem plcvg) {
+
+		return getSeasonsForVaccineGroup(plcvg, true);
+	}
+
+
+	/**
+	 * Return a reference to the list of Season associated with the specified vaccine group. If the vaccine group is not supported, null is returned.
+	 * If the vaccine group is supported but not Season have been specified for the vaccine group, an empty list is returned.
+	 */
+	protected List<Season> getSeasonsForVaccineGroup(LocallyCodedVaccineGroupItem plcvg) {
+
+		return getSeasonsForVaccineGroup(plcvg, false);
+	}
+
+
+	private List<Season> getSeasonsForVaccineGroup(LocallyCodedVaccineGroupItem plcvg, boolean copyOf) {
+
+		List<Season> lSs = this.vaccineGroupItemToSeasons.get(plcvg);
+		if (lSs == null) {
+			return null;
+		}
+
+		List<Season> lSsResult = new ArrayList<Season>();
+		for (Season lS : lSs) {
+			Season lSRcopy = (copyOf == true) ? Season.constructDeepCopyOfSeasonObject(lS) : lS;
+			lSsResult.add(lSRcopy);
+		}
+
+		return lSsResult;
+	}
+
+
+	/**
+	 * Return a copy of all Season supported by this installation. If none, an empty list is returned.
+	 */
+	public List<Season> getCopyOfAllSeasons() {
+
+		return getAllSeasons(true);
+	}
+
+
+	/**
+	 * Return a copy of all Season supported by this installation. If none, an empty list is returned.
+	 */
+	protected List<Season> getAllSeasons() {
+
+		return getAllSeasons(false);
+	}
+
+
+	private List<Season> getAllSeasons(boolean copyOf) {
+
+		Collection<List<Season>> lCollectionOfSRs = this.vaccineGroupItemToSeasons.values();
+		if (lCollectionOfSRs == null) {
+			return new ArrayList<Season>();
+		}
+
+		List<Season> lSRsCopy = new ArrayList<Season>();
+		for (List<Season> lSRs : lCollectionOfSRs) {
+			for (Season lSR : lSRs) {
+				Season lSRcopy = (copyOf == true) ? Season.constructDeepCopyOfSeasonObject(lSR) : lSR;
+				lSRsCopy.add(lSRcopy);
+			}
+		}
+
+		return lSRsCopy;
+	}
+
+
+	/**
 	 * Get MonthDay object for month and day string represented by MM-DD
 	 * @param pMonthAndDay
 	 * @return
