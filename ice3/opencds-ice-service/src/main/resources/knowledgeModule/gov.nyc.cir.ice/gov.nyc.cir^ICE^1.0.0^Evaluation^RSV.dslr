@@ -52,7 +52,7 @@ global java.util.Date evalTime
 // RSV shots administered to a patient age < 8 months outside the RSV season (e.g., during September, if the season has been defined as October 1 to March 31) will be evaluated as Valid with reason code OUTSIDE_SEASON. 
 // (Note: Patient is complete for the RSV Infant Series.)
 
-rule "RSV: If an RSV shot is administered in the Infant Series to a patient < 8 months of age outside the RSV season, the shot is Valid"
+rule "RSV: If an RSV shot is administered in the Infant Series to a patient < 8 months of age outside the RSV season, the shot is Valid with reason code OUTSIDE_SERIES"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
 	activation-group "doseInSeasonCheck"
@@ -67,6 +67,7 @@ rule "RSV: If an RSV shot is administered in the Infant Series to a patient < 8 
 		Confirm elapsed time between $birthdate and $currentShotDate < "8m"
 	then
 		// The shot is vald; nothing to do
+		Include the reason for shot $currentShot Valid due to "Outside Season"
 		Record that this dose rule was processed for the TargetDose $currentShot
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
@@ -74,8 +75,6 @@ end
 
 // If any RSV shot is administered at age >= 8 months and < 50 years, evaluate the shot as Accepted / OUTSIDE_ROUTINE_SERIES.
 // Note that this overrides the ICE General Rule "Evaluation Selection Priority" in all cases, except where the ICE General Rule "Evaluation of Shots Above the Vaccine Code Absolute Maximum Age" applies. 
-
-// PCV shot administered between 5 years and 19 years is ACCEPTED / OUTSIDE_ROUTINE_SERIES 
 rule "RSV(Abstract): Evaluate shot >= 8 months and < 50 years of age as Accepted / Outside of any Routine Series"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck"
