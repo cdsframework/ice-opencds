@@ -243,8 +243,7 @@ rule "CandidateSeriesIdentification(RSV): If the patient age is <= the RSV Infan
 		insert(ts);
 		insert(fullySpecified);
 		update($s);
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "*Seasonal* TargetSeries initialized: " + ts.toString());
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "*Updated* TargetSeasons: " + $tseasons.toString());
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "*Seasonal* TargetSeries initialized: " + ts.toString() + "; *Updated* TargetSeasons: " + $tseasons.toString());
 end
 
 
@@ -279,6 +278,5 @@ rule "CandidateSeriesIdentification(RSV): If a shot was administered <= the RSV 
 		insert(ts);
 		insert(fullySpecified);
 		update($s);
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "*Seasonal* TargetSeries initialized: " + ts.toString());
-		ICELogicHelper.logDRLDebugMessage(_RULENAME, "*Updated* TargetSeasons: " + $tseasons.toString());	
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "*Seasonal* TargetSeries initialized: " + ts.toString() + "; *Updated* TargetSeasons: " + $tseasons.toString());
 end

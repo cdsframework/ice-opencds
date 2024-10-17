@@ -72,7 +72,7 @@ end
 
 // RSV shots administered to a patient age < 8 months outside the RSV season (e.g., during September, if the season has been defined as October 1 to March 31) will be evaluated as Valid with reason code OUTSIDE_SEASON. 
 // (Note: Patient is complete for the RSV Infant Series.)
-rule "RSV: If an RSV shot is administered in the Infant Series to a patient < 8 months of age outside the RSV season, the shot is Valid with reason code OUTSIDE_SERIES"
+rule "RSV: If an RSV shot is administered in the Infant Series to a patient < 8 months of age outside the RSV season, the shot is Valid with reason code OUTSIDE_SEASON"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
 	activation-group "doseInSeasonCheck"
