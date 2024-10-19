@@ -101,10 +101,10 @@ rule "CandidateDosesRevisions(RSV): If there are shots adminstered > the Series 
 	dialect "mvel"
 	agenda-group "CandidateDosesRevisions^customCandidateDoseRevisionRule"
 	when
-		$iftfinfant : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875", associatedSeriesRules!.seriesName == "RSVInfantSeries")
-		$iftfadult : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875", associatedSeriesRules!.seriesName == "RSVAdultSeries")
-		$tsinfant : TargetSeries(seriesRules == $iftfinfant.associatedSeriesRules, numberOfShotsAdministeredInSeries > 0, seriesEndAgeDate != null)
-		$tsadult : TargetSeries(seriesRules == $iftfadult.associatedSeriesRules, numberOfShotsAdministeredInSeries > 0, seriesStartAgeDate != null)
+		/////// $iftfinfant : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875", associatedSeriesRules!.seriesName == "RSVInfantSeries")
+		/////// $iftfadult : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875", associatedSeriesRules!.seriesName == "RSVAdultSeries")
+		$tsinfant : TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesRules.seriesName == "RSVInfantSeries", numberOfShotsAdministeredInSeries > 0, seriesEndAgeDate != null)
+		$tsadult : TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesRules.seriesName == "RSVAdultSeries", numberOfShotsAdministeredInSeries > 0, seriesStartAgeDate != null)
 		$overlappingTd : TargetDose(associatedTargetSeries == $tsinfant, administrationDate > $tsinfant.seriesEndAgeDate)
 		exists TargetDose(associatedTargetSeries == $tsadult, doseId == $overlappingTd.doseId, administrationDate >= $tsadult.seriesStartAgeDate)
 		/////// not TargetDose(associatedTargetSeries == $tsinfant, administrationDate > $tsinfant.seriesEndAgeDate, administrationDate < $overlappingTd.administrationDate)
@@ -112,9 +112,10 @@ rule "CandidateDosesRevisions(RSV): If there are shots adminstered > the Series 
 		String _RULENAME = kcontext.rule.name;
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Removing TargetDose " + $overlappingTd + " from RSV Infant Series. ' TargetSeries: " + $tsinfant);
 		// Remove the target dose from the target series and retract	
-		$tsinfant.removeTargetDoseFromSeries($overlappingTd);
+		modify($tsinfant) {
+			removeTargetDoseFromSeries($overlappingTd);
+		}
 		retract($overlappingTd);
-		update($tsinfant);
 end
 
 
@@ -122,10 +123,10 @@ rule "CandidateDosesRevisions(RSV): If there are shots adminstered < the Series 
 	dialect "mvel"
 	agenda-group "CandidateDosesRevisions^customCandidateDoseRevisionRule"
 	when
-		$iftfinfant : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875", associatedSeriesRules!.seriesName == "RSVInfantSeries")
-		$iftfadult : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875", associatedSeriesRules!.seriesName == "RSVAdultSeries")
-		$tsinfant : TargetSeries(seriesRules == $iftfinfant.associatedSeriesRules, numberOfShotsAdministeredInSeries > 0, seriesEndAgeDate != null)
-		$tsadult : TargetSeries(seriesRules == $iftfadult.associatedSeriesRules, numberOfShotsAdministeredInSeries > 0, seriesStartAgeDate != null)
+		/////// $iftfinfant : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875", associatedSeriesRules!.seriesName == "RSVInfantSeries")
+		/////// $iftfadult : ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._CANDIDATE_SERIES_IDENTIFICATION_DEFAULT_RULE_OVERRIDE.conceptCodeValue, associatedSeriesRules!.vaccineGroup == "VACCINE_GROUP_CONCEPT.875", associatedSeriesRules!.seriesName == "RSVAdultSeries")
+		$tsinfant : TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesRules.seriesName == "RSVInfantSeries", numberOfShotsAdministeredInSeries > 0, seriesEndAgeDate != null)
+		$tsadult : TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesRules.seriesName == "RSVAdultSeries", numberOfShotsAdministeredInSeries > 0, seriesStartAgeDate != null)
 		$overlappingTd : TargetDose(associatedTargetSeries == $tsadult, administrationDate < $tsadult.seriesStartAgeDate)
 		exists TargetDose(associatedTargetSeries == $tsinfant, doseId == $overlappingTd.doseId, administrationDate <= $tsinfant.seriesEndAgeDate)
 		/////// not TargetDose(associatedTargetSeries == $tsadult, administrationDate < $tsadult.seriesStartAgeDate, administrationDate < $overlappingTd.administrationDate)
@@ -133,7 +134,8 @@ rule "CandidateDosesRevisions(RSV): If there are shots adminstered < the Series 
 		String _RULENAME = kcontext.rule.name;
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Removing TargetDose " + $overlappingTd + " from RSV Adult Series. ' TargetSeries: " + $tsadult);	
 		// Remove the target dose from the target series and retract
-		$tsadult.removeTargetDoseFromSeries($overlappingTd);
+		modify($tsadult) {
+			removeTargetDoseFromSeries($overlappingTd);
+		}
 		retract($overlappingTd);
-		update($tsadult);
 end

@@ -131,7 +131,7 @@ public class TargetSeries {
 		targetSeriesIdentifier = ICELogicHelper.generateUniqueString();
 		scheduleBackingSeries = pScheduleBackingSeries;
 		seriesRules = pSeriesRules;
-		targetDoses = new TreeSet<TargetDose>(new TargetSeriesComparator()); // Ordered by administration date
+		targetDoses = Collections.synchronizedNavigableSet(new TreeSet<TargetDose>(new TargetSeriesComparator())); // Ordered by administration date
 		targetSeason = null;
 		seriesComplete = false;
 		selectedSeries = false;
@@ -3419,24 +3419,26 @@ public class TargetSeries {
 		int i = 1;
 		boolean foundShotToRemove = false;
 		int prevDoseNumber = 1;
-		Iterator<TargetDose> iter = this.targetDoses.iterator();
-		while (iter.hasNext()) {
-			TargetDose td = iter.next();
-			if (foundShotToRemove == false && td.equals(targetDose)) {
-				foundShotToRemove = true;
-				prevDoseNumber = td.getDoseNumberInSeries();
-				this.targetDoses.remove(td);
-			}
-			else if (foundShotToRemove == false) {
-				i++;
-				continue;
-			}
-			else {		// found shot to remove is true
-				int nextDoseNumber = td.getDoseNumberInSeries();
-				td.setAdministeredShotNumberInSeries(i);
-				td.setDoseNumberInSeries(prevDoseNumber);
-				prevDoseNumber = nextDoseNumber;
-				i++;
+		synchronized(this.targetDoses) {
+			Iterator<TargetDose> iter = this.targetDoses.iterator();
+			while (iter.hasNext()) {
+				TargetDose td = iter.next();
+				if (foundShotToRemove == false && td.equals(targetDose)) {
+					foundShotToRemove = true;
+					prevDoseNumber = td.getDoseNumberInSeries();
+					this.targetDoses.remove(td);
+				}
+				else if (foundShotToRemove == false) {
+					i++;
+					continue;
+				}
+				else {		// found shot to remove is true
+					int nextDoseNumber = td.getDoseNumberInSeries();
+					td.setAdministeredShotNumberInSeries(i);
+					td.setDoseNumberInSeries(prevDoseNumber);
+					prevDoseNumber = nextDoseNumber;
+					i++;
+				}
 			}
 		}
 	}
