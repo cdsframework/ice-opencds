@@ -131,7 +131,6 @@ public class TargetSeries {
 		targetSeriesIdentifier = ICELogicHelper.generateUniqueString();
 		scheduleBackingSeries = pScheduleBackingSeries;
 		seriesRules = pSeriesRules;
-		/////// targetDoses = Collections.synchronizedNavigableSet(new TreeSet<TargetDose>(new TargetSeriesComparator())); // Ordered by administration date
 		targetDoses = new TreeSet<TargetDose>(new TargetSeriesComparator()); // Ordered by administration date
 		targetSeason = null;
 		seriesComplete = false;
@@ -3410,7 +3409,7 @@ public class TargetSeries {
 	 * of this series. (e.g. CVX 109 may be evaluated as a part of PCV or PPSV depending circumstances).
 	 * @param targetDose
 	 */
-	public synchronized void removeTargetDoseFromSeries(TargetDose targetDose) {
+	public void removeTargetDoseFromSeries(TargetDose targetDose) {
 		// String _METHODNAME = "removeTargetDoseFromSeries(): ";
 		if (targetDose == null) {
 			return;
