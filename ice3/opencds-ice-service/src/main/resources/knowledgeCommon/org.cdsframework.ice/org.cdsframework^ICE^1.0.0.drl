@@ -1827,8 +1827,7 @@ rule "RecommendationForecast.setNextSeasonalTargetSeriesForRecommendation" rulef
 				//	TargetSeries(this == $ts, seriesEndAgeDate == null || seriesEndAgeDate < $tssa.seriesStartAgeDate)
 				//)
         	/////// )
-        	not TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, targetSeason == null, $ts.seriesEndAgeDate != null, seriesStartAgeDate != null && seriesStartAgeDate > $ts.seriesEndAgeDate, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup, 
-        		numberOfShotsAdministeredInSeries > 0)
+        	not TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, targetSeason == null, $ts.seriesEndAgeDate != null, seriesStartAgeDate != null && seriesStartAgeDate > $ts.seriesEndAgeDate)
         )
 	then
 		String _RULENAME = kcontext.rule.name;	
@@ -1880,8 +1879,7 @@ rule "RecommendationForecast.setNextNonSeasonalTargetSeriesForRecommendation" ru
 			///////		TargetSeries(this == $ts, seriesStartAgeDate == null || seriesEndAgeDate == null || seriesStartAgeDate > $tssa.seriesEndAgeDate)
 			///////	)
         	/////// )
-        	not TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, $ts.seriesEndAgeDate != null, seriesStartAgeDate != null && seriesStartAgeDate > $ts.seriesEndAgeDate, seriesRules.seriesGroup == $ts.seriesRules.seriesGroup, 
-        		numberOfShotsAdministeredInSeries > 0)
+        	not TargetSeries(this != $ts, vaccineGroup == $ts.vaccineGroup, $ts.seriesEndAgeDate != null, seriesStartAgeDate != null && seriesStartAgeDate > $ts.seriesEndAgeDate) 
         )
 	then
 		String _RULENAME = kcontext.rule.name;		
