@@ -78,7 +78,7 @@ end
 
 
 // If a patient is >= 8 months and < 20 months, the recommendation is Conditional and the reason code is HIGH_RISK.
-rule "RSV: If a patient is >= 8 months and < 20 months of age, the recommendation is Conditional with reason code HIGH_RISK" 
+rule "RSV: If a patient is >= 8 months and < 20 months of age, the recommendation is Conditional with reason code HIGH_RISK. Mark forecasting of the series as completed." 
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule"
 	when
