@@ -157,6 +157,28 @@ rule "RSV: If shot administered >= 8 months and < 50 years was evaluated as Inva
 end
 
 
+// CVX Code Absolute Maximum Age: If one of the CVX codes in the table above is administered above the absolute maximum age for that CVX code, then the Evaluation is Invalid and the reason code is ABOVE_MAXIMUM_AGE_VACCINE, 
+// per the ICE General Rule "Evaluation of Shots Above the Vaccine Code Absolute Maximum Age".
+rule "RSV: If shot administered was evaluated in the Adult Series as Invalid with an evaluation reason ABOVE_MAXIMUM_AGE_VACCINE and BELOW_MINIMUM_AGE_SERIES, remove the BELOW_MINIMUM_AGE_SERIES evaluation reason"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^postEvaluationCheck"
+	when
+		There is an administered shot $administeredShot 
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.875"
+			- the shot belongs to the Series with name "RSVAdultSeries"
+			- that has already been evaluated and whose shot validity is INVALID
+			- make note of Invalid evaluation reasons for this shot as $oEvaluationReasons
+			- the size of the collection $oEvaluationReasons is > 1
+			- the collection $oEvaluationReasons contains "EVALUATION_REASON_CONCEPT.ABOVE_MAXIMUM_AGE_VACCINE"
+			- the collection $oEvaluationReasons contains "EVALUATION_REASON_CONCEPT.BELOW_MINIMUM_AGE_SERIES"
+			- make note of the associated series as $associatedTargetSeries
+	then
+		Remove Evaluation Reason "EVALUATION_REASON_CONCEPT.BELOW_MINIMUM_AGE_SERIES" from shot $administeredShot
+		Record that this dose rule was processed for the TargetDose $administeredShot
+		Log that this dose rule fired for the dose $administeredShot in the Series $associatedTargetSeries	
+end
+
+
 rule "RSV: Remove evaluation reason VACCINE_NOT_ALLOWED_FOR_THIS_DOSE if there are other evaluation reason codes"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck"
@@ -164,8 +186,8 @@ rule "RSV: Remove evaluation reason VACCINE_NOT_ALLOWED_FOR_THIS_DOSE if there a
 	when
 		There is an administered shot $notAllowedShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.875"
-			- that has already been evaluated
-			- make note of all evaluation reasons for this shot as $oEvaluationReasons
+			- that has already been evaluated and whose shot validity is INVALID
+			- make note of Invalid evaluation reasons for this shot as $oEvaluationReasons
 			- the size of the collection $oEvaluationReasons is > 1
 			- the collection $oEvaluationReasons contains "EVALUATION_REASON_CONCEPT.VACCINE_NOT_ALLOWED_FOR_THIS_DOSE"
 			- make note of the associated series as $associatedTargetSeries
