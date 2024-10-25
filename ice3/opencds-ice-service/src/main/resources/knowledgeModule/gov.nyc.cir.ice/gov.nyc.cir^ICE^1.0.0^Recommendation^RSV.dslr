@@ -139,7 +139,25 @@ rule "RSV: If a dose is recommended at >= 8 months and < 20 months, change recom
 end
 
 
-// If a patient is < 8 months is not complete for the RSV Infant Series, and is in the RSV season as of the evaluation date, the recommendation is Future Recommended with reason code SUPPLEMENTAL_TEXT.
+rule "RSV: If a patient is >= 8 months and < 20 months of age, the recommendation is CONDITIONAL with reason code HIGH_RISK. Mark forecasting of the series as completed."
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule"
+	when
+		There is a Series $targetSeries that needs forecasting
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.875"
+		The Patient information $patientInfo must be known to complete writing this rule
+			- make note of the Patient's birthdate as $birthDate
+		Confirm elapsed time between $birthDate and evalTime >= "8m" && elapsed time between $birthDate and evalTime < "20m"
+	then
+		Create a Recommendation as $recommendation with Status RecommendationStatus.CONDITIONALLY_RECOMMENDED for the Series $targetSeries
+		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.HIGH_RISK"
+		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Mark Forecasting of the Series $targetSeries Complete
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+       	Log that this Series Rule fired for the Series $targetSeries
+end
+
+
 rule "RSV: If the patient is both < 8 months of age and a dose is recommended in the RSV Infant Series at < 8 months of age, add SUPPLEMENTAL_TEXT to the recommendation"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
