@@ -117,6 +117,7 @@
 [condition][]- [Tt]he [Nn]umeric  {oNumericOne:[\\$]?[a-zA-Z0-9\\.\\_]+}  is {aOp}  {nNumericTwo:[\\$]?[a-zA-Z0-9\\.\\_]+}={oNumericOne} {aOp} {nNumericTwo}
 [condition][]- [Tt]he [Dd]ate {dtDateOne} {aOp:[\=\\<\\>]+}  {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}={dtDateOne} {aOp} {strDate}
 [condition][]- [Tt]he [Dd]ate {dtObjectOne} {aOp}  {dtObjectTwo}={dtObjectOne} != null && {dtObjectTwo} != null && {dtObjectOne} {aOp} {dtObjectTwo}
+[condition][]- [Tt]he [Oo]bject {oObjectOne:[\\$]?[a-zA-Z0-9\\.\\_]+} is {aOp}  {oObjectTwo:[\\$]?[a-zA-Z0-9\\.\\_]+}={oObjectOne} {aOp} {oObjectTwo}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,8 +144,13 @@
 [condition][]- [Tt]he [Ss]eries is a [Nn]ot a [Ss]easonal [Ss]eries=targetSeasonExists() == false
 [condition][]- [Tt]he [Ss]eries belongs to the [Ss]eason with [Nn]ame {sNameOfSeason}=targetSeasonExists() == true && targetSeason.seasonName == {sNameOfSeason}
 [condition][]- [Tt]he [Ss]eries does not belong to the [Ss]eason with [Nn]ame {sNameOfSeason}=targetSeasonExists == false || targetSeasonExists() == true && targetSeason.seasonName != {sNameOfSeason}
-[condition][]- [Tt]he [Dd]ate {dtDate:[\\$]?[a-zA-Z0-9\\.\\_\\]+} [Ff]alls within the [Ss]eason [Ss]tart and [Ss]top [Dd]ates of the [Ss]eries=targetSeason == null || targetSeason.dateIsApplicableToSeason({dtDate}, false) == true)
+[condition][]- [Tt]he [Cc]urrent [Dd]ate falls between the [Ss]eason [Ss]tart and [Oo]ffseason [Ss]top [Dd]ates of the [Ss]eries=targetSeason == null || targetSeason.dateIsApplicableToSeason(evalTime, true) == true
+[condition][]- [Tt]he [Cc]urrent [Dd]ate falls between the [Ss]eason [Ss]tart and [Ss]top [Dd]ates=targetSeason == null || targetSeason.dateIsApplicableToSeason(evalTime, false) == true
+/////// [condition][]- [Tt]he [Dd]ate {dtDate:[a-zA-Z]+} [Ff]alls within the [Ss]eason [Ss]tart and [Ss]top [Dd]ates of the [Ss]eries=targetSeason == null || targetSeason.dateIsApplicableToSeason({dtDate}, false) == true
+/////// [condition][]- [Tt]he [Dd]ate {dtDate:[\\$]?[a-zA-Z0-9\\.\\_\\]+} [Ff]alls within the [Ss]eason [Ss]tart and [Ss]top [Dd]ates of the [Ss]eries=targetSeason == null || targetSeason.dateIsApplicableToSeason({dtDate}, false) == true
+[condition][]- [Tt]he [Ss]hot {refer_oTargetDose} [Ff]alls within the [Ss]eason [Ss]tart and [Oo]ffseason [Ss]top [Dd]ates of the [Ss]eries=targetSeason == null || targetSeason.dateIsApplicableToSeason({refer_oTargetDose}.getAdministrationDate(), true) == true
 [condition][]- [Tt]he [Ss]hot {refer_oTargetDose} [Ff]alls within the [Ss]eason [Ss]tart and [Ss]top [Dd]ates of the [Ss]eries=targetSeason == null || targetSeason.dateIsApplicableToSeason({refer_oTargetDose}.getAdministrationDate(), false) == true
+[condition][]- [Tt]he [Ss]hot {refer_oTargetDose} does not [Ff]all within the [Ss]eason [Ss]tart and [Oo]ffseason [Ss]top [Dd]ates of the [Ss]eries=targetSeason != null && targetSeason.dateIsApplicableToSeason({refer_oTargetDose}.getAdministrationDate(), true) == false
 [condition][]- [Tt]he [Ss]hot {refer_oTargetDose} does not [Ff]all within the [Ss]eason [Ss]tart and [Ss]top [Dd]ates of the [Ss]eries=targetSeason != null && targetSeason.dateIsApplicableToSeason({refer_oTargetDose}.getAdministrationDate(), false) == false
 [condition][]- [Tt]he [Dd]ose [Nn]umber to [Rr]ecommend is {aOp}  {nDoseNumber}=doseNumberToRecommend {aOp}  {nDoseNumber}
 [condition][]- [Tt]he [Nn]umber of [Dd]oses [Rr]equired to [Cc]omplete this [Ss]eries is {aOp}  {nDoseNumber}=seriesRules.numberOfDosesInSeries {aOp}  {nDoseNumber}
@@ -216,6 +222,7 @@
 [condition][]- [Tt]he [Ss]tring {strObject} {aOp}  {strValue}={strObject} != null && {strObject} {aOp} {strValue} || {strObject} == null && {strValue} == null
 [condition][]- [Tt]he [Dd]ate {dtDateOne} {aOp:[\=\\<\\>]+}  {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}={dtDateOne} {aOp} {strDate}
 [condition][]- [Tt]he [Dd]ate {dtObjectOne} {aOp:[\=\\<\\>]+}  {dtObjectTwo}={dtObjectOne} != null && {dtObjectTwo} != null && {dtObjectOne} {aOp} {dtObjectTwo}
+[condition][]- [Tt]he [Oo]bject {oObjectOne:[\\$]?[a-zA-Z0-9\\.\\_]+} is {aOp}  {oObjectTwo:[\\$]?[a-zA-Z0-9\\.\\_]+}={oObjectOne} {aOp} {oObjectTwo}
 
 //
 // TargetDose accumulates
