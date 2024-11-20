@@ -79,4 +79,5 @@
         </ns2:doseVaccine>
     </ns2:iceSeriesDose>
 	<ns2:seasonCode>COVID19Sep2023Season</ns2:seasonCode>
+	<ns2:seasonCode>COVID19Aug2024Season</ns2:seasonCode>
 </ns2:iceSeriesSpecificationFile>
