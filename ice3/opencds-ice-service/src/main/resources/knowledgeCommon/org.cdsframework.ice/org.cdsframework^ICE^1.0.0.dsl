@@ -108,7 +108,8 @@
 [condition][]- [Mm]ake [Nn]ote of [Aa]ccepted [Ee]valuation [Rr]easons for this [Ss]hot as {assign_oCollectionOfReasons}={assign_oCollectionOfReasons} : acceptedReasons
 [condition][]- [Mm]ake [Nn]ote of [Ii]nvalid [Ee]valuation [Rr]easons for this [Ss]hot as {assign_oCollectionOfReasons}={assign_oCollectionOfReasons} : invalidReasons
 [condition][]- [Mm]ake [Nn]ote of the [Aa]dministered [Vv]accine as {assign_oVaccineAdministered}={assign_oVaccineAdministered} : administeredVaccine
-[condition][]- [Mm]ake [Nn]ote of the [Uu]nique [Ii][Dd] of the [Ss]hot as {assign_strUniqueId}={assign_strUniqueId} : uniqueId 
+[condition][]- [Mm]ake [Nn]ote of the [Uu]nique [Ii][Dd] of the [Ss]hot as {assign_strUniqueId}={assign_strUniqueId} : uniqueId
+[condition][]- [Mm]ake [Nn]ote of the [Ss]eason [Ss]tart [Dd]ate of the [Aa]ssociated [Ss]eries as {assign_oSeasonStartDate}={assign_oSeasonStartDate} : associatedTargetSeries.seasonStartDate, {assign_oSeasonStartDate} != null
 [condition][]- [Tt]he [Cc]ollection {oCollection} contains {oCollectionElement}={oCollection} contains {oCollectionElement}
 [condition][]- [Tt]he [Cc]ollection {oCollection} does not contain {oCollectionElement}={oCollection} not contains {oCollectionElement}
 [condition][]- [Tt]he [Ss]ize of the [Cc]ollection {oCollection} is {aOp}  {nNumeric:([0-9]+)([\\.][0-9]+)?}={oCollection}.size() {aOp} {nNumeric}
@@ -204,10 +205,10 @@
 [condition][]- [Mm]ake [Nn]ote of the [Ee]ffective [Dd]ose [Nn]umber in the [Ss]eries as {assign_nEffectiveDoseNumber}={assign_nEffectiveDoseNumber} : determineDoseNumberInSeries()
 [condition][]- [Mm]ake [Nn]ote of the [Dd]ose [Nn]umber after which the [Ss]eries was [Mm]arked [Cc]omplete as {assign_nEffectiveDoseNumber}={assign_nEffectiveDoseNumber} : getDoseAfterWhichSeriesWasMarkedComplete()
 [condition][]- [Mm]ake [Nn]ote of the [Ss]eason [Nn]ame as {assign_strSeasonName}={assign_strSeasonName} : targetSeason!.seasonName
-[condition][]- [Mm]ake [Nn]ote of the [Ss]eason [Ss]tart [Dd]ate as {assign_dtSeasonStartDate}={assign_dtSeasonStartDate} : getSeasonStartDate()
-[condition][]- [Mm]ake [Nn]ote of the [Ss]eason [Ee]nd [Dd]ate as {assign_dtSeasonEndDate}={assign_dtSeasonEndDate} : getSeasonEndDate()
-[condition][]- [Mm]ake [Nn]ote of the [Oo]ff [Ss]eason [Ss]tart [Dd]ate as {assign_dtOffSeasonStartDate}={assign_dtOffSeasonStartDate} : getOffSeasonStartDate()
-[condition][]- [Mm]ake [Nn]ote of the [Oo]ff [Ss]eason [Ee]nd [Dd]ate as {assign_dtOffSeasonEndDate}={assign_dtOffSeasonEndDate} : getOffSeasonEndDate()
+[condition][]- [Mm]ake [Nn]ote of the [Ss]eason [Ss]tart [Dd]ate as {assign_dtSeasonStartDate}={assign_dtSeasonStartDate} : getSeasonStartDate(), {assign_dtSeasonStartDate} != null
+[condition][]- [Mm]ake [Nn]ote of the [Ss]eason [Ee]nd [Dd]ate as {assign_dtSeasonEndDate}={assign_dtSeasonEndDate} : getSeasonEndDate(), {assign_dtSeasonEndDate} != null
+[condition][]- [Mm]ake [Nn]ote of the [Oo]ff [Ss]eason [Ss]tart [Dd]ate as {assign_dtOffSeasonStartDate}={assign_dtOffSeasonStartDate} : getOffSeasonStartDate(), {assign_dtOffSeasonStartDate} != null
+[condition][]- [Mm]ake [Nn]ote of the [Oo]ff [Ss]eason [Ee]nd [Dd]ate as {assign_dtOffSeasonEndDate}={assign_dtOffSeasonEndDate} : getOffSeasonEndDate(), {assign_dtOffSeasonEndDate} != null
 [condition][]- [Mm]ake [Nn]ote of the [Ll]ast [Ss]hot [Aa]dministered in the [Ss]eries as {assign_oLastShotInSeries}={assign_oLastShotInSeries} : getLastShotAdministeredInSeries()
 [condition][]- [Mm]ake [Nn]ote of [Ss]hot [Aa]dministered by [Ss]hot [Nn]umber {nShotNumber} in the [Ss]eries as {assign_oShotInSeries}={assign_oShotInSeries} : getTargetDoseByAdministeredShotNumber({nShotNumber})
 [condition][]- [Mm]ake [Nn]ote of [Aa]ll [Vv]accines [Pp]ermitted for [Dd]ose {nDoseNumber} in the [Ss]eries as {assign_oListVaccines}={assign_oListVaccines} : getAllPermittedVaccinesForTargetDose({nDoseNumber})
