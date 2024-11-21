@@ -962,7 +962,7 @@ end
 // Pfizer/Mixed Product Skip Dose rules
 ///////
 
-rule "COVID-19(Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): If the patient has *0* shots in the current season has *1* dose of a prior formulation administered prior to 9/12/2023 at < 5yrs of age, skip to target dose 2"
+rule "COVID-19(Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): If the patient has *0* shots in the current season has *1* dose of a prior formulation administered prior to the current season at < 5yrs of age, skip to target dose 2"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
 	salience 999
@@ -993,7 +993,7 @@ rule "COVID-19(Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): If the patient h
 end
 
 
-rule "COVID-19 (Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): If the patient has *0* shots in the current season but has *2 or more* doses of a prior formulation administered prior to 9/12/2023 at < 5yrs of age, skip to target dose 3"
+rule "COVID-19 (Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): If the patient has *0* shots in the current season but has *2 or more* doses of a prior formulation administered prior to the current season at < 5yrs of age, skip to target dose 3"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
 	salience 999
@@ -1006,16 +1006,16 @@ rule "COVID-19 (Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): If the patient 
 			- the number of administered shots is == 0
 			- make note of the effective dose number in the Series as $effectiveDoseNumber
 			- the numeric $effectiveDoseNumber is < 3
-			/////// - make note of the season start date as $seasonStartDate
+			- make note of the season start date as $seasonStartDate
 		There is an administered shot $previousShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- that has already been evaluated and whose shot validity is VALID
 			- make note of the date this shot was administered as $administrationDate
 		There exists an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- that is not the same shot as $previousShot
-			- the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- the administration date of the shot is != $administrationDate
 			- that has already been evaluated and whose shot validity is VALID
 	then
@@ -1024,7 +1024,7 @@ rule "COVID-19 (Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): If the patient 
 end
 
 
-rule "COVID-19(Sep2023 __Pfizer / Mixed Product__ < 5yrs Series): If the patient has shots in the current season and *1* dose of a prior formulation administered prior to 9/12/2023 at < 5yrs of age, dose 1 is not needed; skip to target dose 2."
+rule "COVID-19(Sep2023 __Pfizer / Mixed Product__ < 5yrs Series): If the patient has shots in the current season and *1* dose of a prior formulation administered prior to the current season start date at < 5yrs of age, dose 1 is not needed; skip to target dose 2."
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	salience 999
@@ -1037,16 +1037,16 @@ rule "COVID-19(Sep2023 __Pfizer / Mixed Product__ < 5yrs Series): If the patient
 			- make note of the dose number as $effectiveDoseNumber
 			- the numeric $effectiveDoseNumber is < 2
 			- make note of the associated series as $associatedTargetSeries
-			/////// - make note of the season start date of the associated series as $seasonStartDate
+			- make note of the season start date of the associated series as $seasonStartDate
 		There is an administered shot $previousShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- that has already been evaluated and whose shot validity is VALID
 			- make note of the date this shot was administered as $administrationDate
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- that is not the same shot as $previousShot
-			- the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- the administration date of the shot is != $administrationDate
 			- that has already been evaluated and whose shot validity is VALID
 	then
@@ -1056,7 +1056,7 @@ rule "COVID-19(Sep2023 __Pfizer / Mixed Product__ < 5yrs Series): If the patient
 end
 
 
-rule "COVID-19(Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): If the patient has shots in the current season and *2 or more* doses of a prior formulation administered prior to 9/12/2023 at < 5yrs of age, skip to target dose 3."
+rule "COVID-19(Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): If the patient has shots in the current season and *2 or more* doses of a prior formulation administered prior to the current season start date at < 5yrs of age, skip to target dose 3."
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	salience 999
@@ -1092,7 +1092,7 @@ end
 // Moderna Skip Dose rules
 ///////
 
-rule "COVID-19 (Sep2023 __Moderna__ < 5yrs Series): If the patient has *0* shots in the current season but *1 or more* doses of a prior formulation administered prior to 9/12/2023 at < 5yrs of age, skip to target dose 2"
+rule "COVID-19 (Sep2023 __Moderna__ < 5yrs Series): If the patient has *0* shots in the current season but *1 or more* doses of a prior formulation administered prior to the current season start date at < 5yrs of age, skip to target dose 2"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
 	salience 999
@@ -1117,7 +1117,7 @@ rule "COVID-19 (Sep2023 __Moderna__ < 5yrs Series): If the patient has *0* shots
 end
 
 
-rule "COVID-19(Sep2023 __Moderna__ < 5yrs Series): if the patient has shots in the current season and *1 or more* doses of a prior formulation administered prior to 9/12/2023 at < 5yrs of age, skip to target dose 2."
+rule "COVID-19(Sep2023 __Moderna__ < 5yrs Series): if the patient has shots in the current season and *1 or more* doses of a prior formulation administered prior to current season start date at < 5yrs of age, skip to target dose 2."
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	salience 999
