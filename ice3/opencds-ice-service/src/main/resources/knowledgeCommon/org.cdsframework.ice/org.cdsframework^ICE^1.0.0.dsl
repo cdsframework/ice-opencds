@@ -145,8 +145,8 @@
 [condition][]- [Tt]he [Ss]eries is a [Nn]ot a [Ss]easonal [Ss]eries=targetSeasonExists() == false
 [condition][]- [Tt]he [Ss]eries belongs to the [Ss]eason with [Nn]ame {sNameOfSeason}=targetSeasonExists() == true && targetSeason.seasonName == {sNameOfSeason}
 [condition][]- [Tt]he [Ss]eries does not belong to the [Ss]eason with [Nn]ame {sNameOfSeason}=targetSeasonExists == false || targetSeasonExists() == true && targetSeason.seasonName != {sNameOfSeason}
-[condition][]- [Tt]he [Ss]eason [Ss]tart [Dd]ate for the [Ss]eries is {aOp:[\=\\<\\>]+}  {dtDate}=seasonStartDate {aOp} {dtDate}
-[condition][]- [Tt]he [Ss]eason [Ee]nd [Dd]ate for the [Ss]eries is {aOp:[\=\\<\\>]+}  {dtDate}={assign_dtSeasonEndDate} : getSeasonEndDate(), {assign_dtSeasonEndDate} != null && {dtDate} != null, {assign_dtSeasonEndDate} {aOp} {dtDate}
+[condition][]- [Tt]he [Ss]eason [Ss]tart [Dd]ate for the [Ss]eries is {aOp:[\=\\<\\>]+}  {dtDate}=seasonStartDate != null, {dtDate} != null, seasonStartDate {aOp} {dtDate}
+[condition][]- [Tt]he [Ss]eason [Ee]nd [Dd]ate for the [Ss]eries is {aOp:[\=\\<\\>]+}  {dtDate}=seasonEndDate != null, {dtDate} != null, seasonEndDate {aOp} {dtDate}
 [condition][]- [Tt]he [Cc]urrent [Dd]ate falls between the [Ss]eason [Ss]tart and [Oo]ffseason [Ss]top [Dd]ates of the [Ss]eries=targetSeason == null || targetSeason.dateIsApplicableToSeason(evalTime, true) == true
 [condition][]- [Tt]he [Cc]urrent [Dd]ate falls between the [Ss]eason [Ss]tart and [Ss]top [Dd]ates=targetSeason == null || targetSeason.dateIsApplicableToSeason(evalTime, false) == true
 /////// [condition][]- [Tt]he [Dd]ate {dtDate:[a-zA-Z]+} [Ff]alls within the [Ss]eason [Ss]tart and [Ss]top [Dd]ates of the [Ss]eries=targetSeason == null || targetSeason.dateIsApplicableToSeason({dtDate}, false) == true
@@ -238,9 +238,9 @@
 [condition][]There is {entity:a |}[Ss]eason {assign_oSeason}={assign_oSeason} : Season()
 [condition][]- [Tt]he [Nn]ame of the [Ss]eason is {sNameOfSeason}=seasonName == {sNameOfSeason}
 [condition][]- [Tt]he [Ss]eason belongs to the [Vv]accine [Gg]roup {dd_oVaccineGroupCdsListItem}=vaccineGroup == {dd_oVaccineGroupCdsListItem}
-[condition][]- [Tt]he [Ff]ully [Ss]pecied [Ss]eason [Ss]tart [Dd]ate is {aOp:[\=\\<\\>]+}  {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}=fullySpecifiedSeasonStartDate != null && {strDate} != null && fullySpecifiedSeasonStartDate {aOp} {strDate}
-[condition][]- [Tt]he [Ff]ully [Ss]pecied [Ss]eason [Ss]tart [Dd]ate is {aOp:[\=\\<\\>]+}  {dtObject}=fullySpecifiedSeasonStartDate != null && {dtObject} != null && fullySpecifiedSeasonStartDate {aOp} {dtObject}
-[condition][]- [Mm]ake [Nn]ote of the [Ff]ully [Ss]pecified [Ss]eason [Ss]tart [Dd]ate as {assign_dtSeasonStartDate}={assign_dtSeasonStartDate} : fullySpecifiedSeasonStartDate, {assign_dtSeasonStartDate} != null
+[condition][]- [Tt]he [Ff]ully [Ss]pecied [Ss]eason [Ss]tart [Dd]ate is {aOp:[\=\\<\\>]+}  {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}=fullySpecifiedSeasonStartDate != null && {strDate} != null && fullySpecifiedSeasonStartDate.toDate() {aOp} {strDate}
+[condition][]- [Tt]he [Ff]ully [Ss]pecied [Ss]eason [Ss]tart [Dd]ate is {aOp:[\=\\<\\>]+}  {dtObject}=fullySpecifiedSeasonStartDate != null && {dtObject} != null && fullySpecifiedSeasonStartDate.toDate() {aOp} {dtObject}
+[condition][]- [Mm]ake [Nn]ote of the [Ff]ully [Ss]pecified [Ss]eason [Ss]tart [Dd]ate as {assign_dtSeasonStartDate}={assign_dtSeasonStartDate} : fullySpecifiedSeasonStartDate.toDate(), {assign_dtSeasonStartDate} != null
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
