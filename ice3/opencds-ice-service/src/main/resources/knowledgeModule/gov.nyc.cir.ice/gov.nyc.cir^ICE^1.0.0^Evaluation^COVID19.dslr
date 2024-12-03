@@ -163,9 +163,9 @@ rule "COVID-19: Invoke separate agenda group for evaluation of shots in the COVI
 		Set the Agenda Group Focus to "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 end
 
-
+/*
 // If any new seasons are defined after the COVID Sept 2023, for now, use the agenda group rules defined in the HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season, since they still apply.
-rule "COVID-19: Invoke separate agenda group for evaluation of shots in any season after the COVID19Sep2023 Season using the COVID19Sep2023 rule set (as of 2024-205 season, default behavior for seasons after Sep2023)"
+rule "COVID-19: Invoke separate agenda group for evaluation of shots for any season after the COVID19Sep2023 Season using the COVID19Sep2023 Rule Set (as of 2024-205 season, default behavior for seasons is the same as for the Sep2023 season)"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule"
 	salience 999
@@ -191,7 +191,7 @@ rule "COVID-19: Invoke separate agenda group for evaluation of shots in any seas
 		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
 		Set the Agenda Group Focus to "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 end
-
+*/
 
 rule "COVID-19: Invoke separate agenda group for postEvaluationCheck of shots in the COVID19Dec2020 Season"
 	dialect "mvel"
@@ -238,7 +238,8 @@ rule "COVID-19: Invoke separate agenda group for postEvaluationCheck of shots in
 		Set the Agenda Group Focus to "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
 end
 
-rule "COVID-19: Invoke separate agenda group for postEvaluationCheck of shots for any season after the COVID19Sep2023 Season, using the COVID19Sep2023 rule set (as of 2024-205 season, default behavior for seasons after Sep2023)"
+/*
+rule "COVID-19: Invoke separate agenda group for postEvaluationCheck of shots for any season after the COVID19Sep2023 Season, using the COVID19Sep2023 rule set (as of 2024-205 season, default behavior is the same as for the Sep2023 season)"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck"
 	salience 999
@@ -264,6 +265,7 @@ rule "COVID-19: Invoke separate agenda group for postEvaluationCheck of shots fo
 		Log that this dose rule fired for the dose $currentShot in the Series $targetSeries
 		Set the Agenda Group Focus to "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
 end
+*/
 
 /*************************************************************************************************************************************************************************************
  END Invoke Seasonal Agenda Group Logic
