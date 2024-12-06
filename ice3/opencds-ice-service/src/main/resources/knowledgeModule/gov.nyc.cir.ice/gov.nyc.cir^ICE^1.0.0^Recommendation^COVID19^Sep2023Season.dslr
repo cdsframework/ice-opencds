@@ -55,7 +55,7 @@ global org.cdsframework.ice.service.Schedule schedule
 
 
 /*****************************************************************************************************************************************************************************************************************
-===> PRIOR FORMULATION of COVID-19 Vaccine Administered on or after 9/12/2023   
+===> PRIOR FORMULATION of COVID-19 Vaccine Administered on or after the 9/12/2023
  If the patient has a prior formulation COVID-19 shot that does not count towards U.S. vaccination (CVX 500, CVX 501, CVX 503, CVX 504, CVX 505, CVX 506, CVX 507, CVX 508, CVX 509, CVX 513, CVX 514, CVX 515, CVX 516, CVX 517, CVX 518, CVX 521) administered on or after 9/12/2023, the intervals to the next target dose are: 
      + Absolute Minimum Interval = 8 weeks - 4 days
      + Minimum Interval = 8 weeks
@@ -187,10 +187,12 @@ rule "COVID-19(Sep2023 >= 5yrs): If the interval from the most recent shot admin
 			- the name of the Series is "COVID19Sep2023gte5Series"
 			- the effective dose number in the series is == 1
 			- the Series is not complete
+			- make note of the season start date as $seasonStartDate
 		There is an administered shot $mostRecentShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- make note of the date this shot was administered as $mostRecentShotDate
-        	- the date $mostRecentShotDate >= "12-Sep-2023"
+        	/////// - the date $mostRecentShotDate >= "12-Sep-2023"
+        	- the date $mostRecentShotDate >= $seasonStartDate
 			- the shot is not ignored
 			- make note of the recommended interval from this dose to the next dose as $recommendedInterval
 		There does not exist an administered shot
@@ -199,7 +201,8 @@ rule "COVID-19(Sep2023 >= 5yrs): If the interval from the most recent shot admin
 			- the shot is not ignored
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
         	- make note of the date as $dtDateAtAge5y when the patient is "5y" of age
-        	- the date $dtDateAtAge5y >= "12-Sep-2023"
+        	/////// - the date $dtDateAtAge5y >= "12-Sep-2023"
+        	- the date $dtDateAtAge5y >= $seasonStartDate
         There exists an administered shot
         	- that is the same shot as $mostRecentShot
         	- the administration date of the shot is < $dtDateAtAge5y
@@ -208,16 +211,18 @@ rule "COVID-19(Sep2023 >= 5yrs): If the interval from the most recent shot admin
 	then
 		Create a Recommendation as $r for the Series $targetSeries
 		// Set the earliest date here to avoid redundant calculation in child earliestAgeCheck rule (below)
-		Set the recommendation Earliest Forecast Date for $r to "12-Sep-2023"
-		Set the recommendation Recommended Forecast Date for $r to "12-Sep-2023"
-		Include the Recommendation $r for Consideration in the final forecast of the Series
+		/////// Set the recommendation Earliest Forecast Date for $r to "12-Sep-2023"
+		Set the recommendation Earliest Forecast Date for $r to $seasonStartDate
+		/////// Set the recommendation Recommended Forecast Date for $r to "12-Sep-2023"
+ 		Set the recommendation Recommended Forecast Date for $r to $seasonStartDate
+ 		Include the Recommendation $r for Consideration in the final forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
 
-rule "COVID-19(Sep2023 >= 5yrs): If 8 weeks from the last administered shot elapsed prior to the patient turning 5 years of age, set earliest and recommended age for target dose 1 to 9/12/2023 (*earliestAgeCheck*)"
-		extends "COVID-19(Sep2023 >= 5yrs): If the interval from the most recent shot administered >= 9/12/2023 has elapsed and the patient turns 5 years of age >= 9/12/2023, set the recommended age for target dose 1 to 9/12/2023 (*recommendationAgeCheck*)"
+rule "COVID-19(Sep2023 >= 5yrs): If 8 weeks from the last administered shot elapsed prior to the patient turning 5 years of age, set earliest and recommended age for target dose 1 to the season start date (*earliestAgeCheck*)"
+		extends "COVID-19(Sep2023 >= 5yrs): If the interval from the most recent shot administered >= the season start date has elapsed and the patient also turns 5 years of age >= season start date, set the recommended age for target dose 1 to the season start date (*recommendationAgeCheck*)"
 	// previously, rule was: "...set earliest and recommended age for target dose 1 to 8w from the last administered shot (*earliestAgeCheck*)", not to 9/12/2023
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
@@ -236,7 +241,7 @@ end
 
 
 // rule "COVID-19(Sep2023 >= 5yrs): If there are no shots in the current season and only ignored shots in the prior season, set the earlest and recommended age date to 9/12/2023 (*recommendationAgeCheck*)"
-rule "COVID-19(Sep2023 >= 5yrs)->TargetDose 1: If there are no shots in the current season but there are shots in the prior season, set the earlest and recommended date for target dose 1 to the latter of age 6 months or 9/12/2023 (*recommendationAgeCheck*)"
+rule "COVID-19(Sep2023 >= 5yrs)->TargetDose 1: If there are no shots in the current season but there are shots in the prior season, set the earlest and recommended date for target dose 1 to the latter of age 6 months or the season start date (*recommendationAgeCheck*)"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "recommendationAgeCheck"
@@ -246,28 +251,33 @@ rule "COVID-19(Sep2023 >= 5yrs)->TargetDose 1: If there are no shots in the curr
 			- the name of the Series is "COVID19Sep2023gte5Series"
 			- the effective dose number in the series is == 1
 			- the Series is not complete
+			- make note of the season start date as $seasonStartDate
 		There is an administered shot $mostRecentShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- make note of the date this shot was administered as $mostRecentShotDate
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- the administration date of the shot is > $mostRecentShotDate
 		The patient information $oEvaluatedPerson must be known to complete writing this rule
         	- make note of the date as $dtDateAtAge6m when the patient is "6m" of age
 	then
 		Create a Recommendation as $r for the Series $targetSeries
-		Set the recommendation Earliest Forecast Date for $r to the latter of $dtDateAtAge6m and "12-Sep-2023"
-		Set the recommendation Recommended Forecast Date for $r to the latter of $dtDateAtAge6m and "12-Sep-2023"
+		/////// Set the recommendation Earliest Forecast Date for $r to the latter of $dtDateAtAge6m and "12-Sep-2023"
+		/////// Set the recommendation Recommended Forecast Date for $r to the latter of $dtDateAtAge6m and "12-Sep-2023"
+		Set the recommendation Earliest Forecast Date for $r to the latter of $dtDateAtAge6m and $seasonStartDate
+		Set the recommendation Recommended Forecast Date for $r to the latter of $dtDateAtAge6m and $seasonStartDate
 		Include the Recommendation $r for Consideration in the final forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
 
-rule "COVID-19(Sep2023 >= 5yrs): If there are no shots in the current season but there are shots in the prior season, set the earlest and recommended age date to the latter of age 6 months or 9/12/2023 (*earliestAgeCheck*)"
-		extends "COVID-19(Sep2023 >= 5yrs)->TargetDose 1: If there are no shots in the current season but there are shots in the prior season, set the earlest and recommended date for target dose 1 to the latter of age 6 months or 9/12/2023 (*recommendationAgeCheck*)"
+rule "COVID-19(Sep2023 >= 5yrs): If there are no shots in the current season but there are shots in the prior season, set the earlest and recommended age date to the latter of age 6 months or the season start date (*earliestAgeCheck*)"
+		extends "COVID-19(Sep2023 >= 5yrs)->TargetDose 1: If there are no shots in the current season but there are shots in the prior season, set the earlest and recommended date for target dose 1 to the latter of age 6 months or the season start date (*recommendationAgeCheck*)"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "earliestAgeCheck"
@@ -969,19 +979,23 @@ rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs): For target dose 1 o
 			- the name of the Series a member of ("COVID19Sep2023PfizerLT5ySeries", "COVID19Sep2023ModernaLT5ySeries", "COVID19Sep2023MixedProductLT5ySeries")
 			- the Series is not complete
 			- the effective dose number in the Series is == 1
+			- make note of the season start date as $seasonStartDate
 		There does not exist an administered shot
 			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
-			- the administration date of the shot is < "12-Sep-2023"
+			///////- the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate 
 			- that has already been evaluated and whose shot validity is VALID
 		There is an administered shot $previousShot
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the shot is not ignored
 			- make note of the date this shot was administered as $previousShotDate
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the administration date of the shot is > $previousShotDate
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 	then
 		Create a Recommendation as $r for the Series $targetSeries
 		Add "8w" to $previousShotDate and make note of the newly calculated date as $dtCalculated
@@ -1005,13 +1019,16 @@ rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series): For target d
 			- the number of administered shots is == 0
 			- make note of the effective dose number in the Series as $effectiveDoseNumber
 			- the numeric $effectiveDoseNumber is == 1
+			- make note of the season start date as $seasonStartDate
 		There is an administered shot $mostRecentShotPreviousSeason
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- make note of the date this shot was administered as $mostRecentShotDate
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- the administration date of the shot is > $mostRecentShotDate
 	then
 		Obtain the existing DoseRule for Dose Number 1 in the Series $targetSeries as $oDoseRule
@@ -1042,13 +1059,16 @@ rule "COVID-19(Sep2023 Pfizer/Moderna/Mixed Product < 5yrs Series): For target d
 			- make note of the effective dose number in the Series as $effectiveDoseNumber
 			- the numeric $effectiveDoseNumber is > 1
 			- the numeric $effectiveDoseNumber is <= $numberOfDosesInSeries
+			- make note of the season start date as $seasonStartDate
 		There is an administered shot $mostRecentShotPreviousSeason
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- make note of the date this shot was administered as $mostRecentShotDate
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- the administration date of the shot is > $mostRecentShotDate
 	then
 		Obtain the existing DoseRule for Dose Number $effectiveDoseNumber-1 in the Series $targetSeries as $oDoseRule
@@ -1090,10 +1110,12 @@ rule "COVID-19(Sep2023 __Moderna__ < 5yrs Series): For target dose > 1: If 2 or 
 			// - at least one shot has been administered
 			- the number of doses administered is == 0
 			- the effective dose number in the Series is > 1
+			- make note of the season start date as $seasonStartDate
 		// Obtain the most recent dose in the prior season
 		There is an administered shot $previousShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- that has already been evaluated and whose shot validity is VALID
 			- make note of the date this shot was administered as $mostRecentShotDatePriorSeason
 			- make note of the associated series as $priorSeasonSeries
@@ -1101,7 +1123,8 @@ rule "COVID-19(Sep2023 __Moderna__ < 5yrs Series): For target dose > 1: If 2 or 
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the shot belongs to the series $priorSeasonSeries
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- the administration date of the shot is > $mostRecentShotDatePriorSeason
 			- that has already been evaluated and whose shot validity is VALID
 		// Now check to make sure there is a different dose in the prior season in the same series
@@ -1109,7 +1132,8 @@ rule "COVID-19(Sep2023 __Moderna__ < 5yrs Series): For target dose > 1: If 2 or 
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- that is not the same shot as $previousShot
 			- the shot belongs to the series $priorSeasonSeries
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- the administration date of the shot is != $mostRecentShotDatePriorSeason
 			- that has already been evaluated and whose shot validity is VALID
 	then
@@ -1153,7 +1177,7 @@ end
      + If CVX 313 was administered for dose 1 or dose 2, dose 3 is not needed. Skip to target dose 4. 
 /************************************************************************************************************************************************************************************/
 
-rule "COVID-19(Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): if the patient has 1 dose of a prior formulation administered prior to 9/12/2023 at < 5yrs of age, set the recommendation dose number to 2"
+rule "COVID-19(Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): if the patient has 1 dose of a prior formulation administered prior to the season start date at < 5yrs of age, set the recommendation dose number to 2"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	salience 999
@@ -1166,24 +1190,28 @@ rule "COVID-19(Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): if the patient h
 			- make note of the effective dose number in the Series as $effectiveDoseNumber
 			- the numeric $effectiveDoseNumber is <= 2
 			- the dose number to recommend is < 2
+			- make note of the season start date as $seasonStartDate
 		// Obtain the most recent dose in the prior season
 		There is an administered shot $previousShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- that has already been evaluated and whose shot validity is VALID
 			- make note of the date this shot was administered as $administrationDate
 			- make note of the associated series as $associatedPriorSeasonSeries
 		// We want to run this rule for one and only one dose from the prior season; therefore, make sure we're looking at the most recent dose in that season
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- the administration date of the shot is > $administrationDate
 			- that has already been evaluated and whose shot validity is VALID
 		// Now check to make sure there is not a different dose in the prior season
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- that is not the same shot as $previousShot
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- the administration date of the shot is != $administrationDate
 			- that has already been evaluated and whose shot validity is VALID
 	then
@@ -1195,7 +1223,7 @@ rule "COVID-19(Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): if the patient h
 end
 
 
-rule "COVID-19(Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): if the patient has >= 2 doses of a prior formulation administered prior to 9/12/2023 at < 5yrs of age, set the recommendation dose number to 3"
+rule "COVID-19(Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): if the patient has >= 2 doses of a prior formulation administered prior to the season start date at < 5yrs of age, set the recommendation dose number to 3"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	salience 999
@@ -1208,10 +1236,12 @@ rule "COVID-19(Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): if the patient h
 			- make note of the effective dose number in the Series as $effectiveDoseNumber
 			- the numeric $effectiveDoseNumber is <= 3
 			- the dose number to recommend is < 3
+			- make note of the season start date as $seasonStartDate
 		// Obtain the most recent dose in the prior season
 		There is an administered shot $previousShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- that has already been evaluated and whose shot validity is VALID
 			- make note of the date this shot was administered as $administrationDate
 			- make note of the associated series as $priorSeasonSeries
@@ -1219,7 +1249,8 @@ rule "COVID-19(Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): if the patient h
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the shot belongs to the series $priorSeasonSeries
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- the administration date of the shot is > $administrationDate
 			- that has already been evaluated and whose shot validity is VALID
 		// Now check to make sure there is a different dose in the prior season in the same series
@@ -1227,7 +1258,8 @@ rule "COVID-19(Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): if the patient h
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- that is not the same shot as $previousShot
 			- the shot belongs to the series $priorSeasonSeries
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- that has already been evaluated and whose shot validity is VALID
 	then
 		Skip Series Dose Number to 3 from $effectiveDoseNumber for Disease "SUPPORTED_DISEASE_CONCEPT.079.89" in Series $targetSeries but do not refresh series facts
@@ -1238,7 +1270,7 @@ rule "COVID-19(Sep2023 __Pfizer/Mixed Product__ < 5yrs Series): if the patient h
 end
 
 
-rule "COVID-19(Sep2023 __Moderna__ < 5yrs Series): if the patient has >= 1 doses of a prior formulation administered prior to 9/12/2023 at < 5yrs of age, set the recommendation dose number to 2"
+rule "COVID-19(Sep2023 __Moderna__ < 5yrs Series): if the patient has >= 1 doses of a prior formulation administered prior to the season start date at < 5yrs of age, set the recommendation dose number to 2"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	salience 999
@@ -1251,10 +1283,12 @@ rule "COVID-19(Sep2023 __Moderna__ < 5yrs Series): if the patient has >= 1 doses
 			- make note of the effective dose number in the Series as $effectiveDoseNumber
 			- the numeric $effectiveDoseNumber is <= 2
 			- the dose number to recommend is < 2
+			- make note of the season start date as $seasonStartDate
 		// Obtain the most recent dose in the prior season
 		There is an administered shot $previousShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- that has already been evaluated and whose shot validity is VALID
 			- make note of the date this shot was administered as $administrationDate
 			- make note of the associated series as $priorSeasonSeries
@@ -1262,7 +1296,8 @@ rule "COVID-19(Sep2023 __Moderna__ < 5yrs Series): if the patient has >= 1 doses
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the shot belongs to the series $priorSeasonSeries
-			- the administration date of the shot is < "12-Sep-2023"
+			/////// - the administration date of the shot is < "12-Sep-2023"
+			- the administration date of the shot is < $seasonStartDate
 			- the administration date of the shot is > $administrationDate
 			- that has already been evaluated and whose shot validity is VALID
 	then
