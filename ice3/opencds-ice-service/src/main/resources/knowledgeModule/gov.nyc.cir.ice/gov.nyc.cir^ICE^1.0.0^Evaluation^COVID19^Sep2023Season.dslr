@@ -482,7 +482,7 @@ rule "COVID-19(Sep2023 Sep2023 Pfizer < 5yrs Series): If the patient has 1 dose 
 		There is an Administered Shot $validShotSame
 			- that is the same shot as $validShot
 			- the administration date of the shot is >= $dtAtAge5y
-			- the administration date of the shot is >= $seasonStartDate
+			/////// - the administration date of the shot is >= $seasonStartDate
 	then
 		Mark the Series $targetSeries complete
 		Refresh all facts in the Series $targetSeries
