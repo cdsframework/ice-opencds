@@ -359,6 +359,7 @@ rule "COVID-19(Sep2023 >= 5yrs): activation-group extension => if a shot was adm
 	when
 		// No condition required for this extension
 	then
+		// Nothing to do - earliest interval was specified in the parent rule
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
 end
