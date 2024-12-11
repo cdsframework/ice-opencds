@@ -549,7 +549,7 @@ end
 // TargetDose 2: the recommended date is the latter of the calculated forecast date or February 28, 2024.
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-rule "COVID-19(Sep2023): The recommended age of dose 2 is the latter of age 65 years or 2/28/2024 (*recommendationAgeCheck*)"
+rule "COVID-19(Sep2023 >= 5yrs): The recommended age of dose 2 is the latter of age 65 years or 2/28/2024 (*recommendationAgeCheck*)"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "recommendationAgeCheck"
@@ -571,8 +571,8 @@ rule "COVID-19(Sep2023): The recommended age of dose 2 is the latter of age 65 y
 end
 
 
-rule "COVID-19(Sep2023): If there are no shots administered, set the earliest age to the latter of age 65 years or 2/28/2023 (*earliestAgeCheck*)"
-		extends "COVID-19(Sep2023): The recommended age of dose 2 is the latter of age 65 years or 2/28/2024 (*recommendationAgeCheck*)"
+rule "COVID-19(Sep2023 >= 5yrs): If there are no shots administered, set the earliest age to the latter of age 65 years or 2/28/2024 (*earliestAgeCheck*)"
+		extends "COVID-19(Sep2023 >= 5yrs): The recommended age of dose 2 is the latter of age 65 years or 2/28/2024 (*recommendationAgeCheck*)"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "earliestAgeCheck"
@@ -903,6 +903,7 @@ rule "COVID-19(Sep2023 Novavax Series):activation-group extension => If a CVX 31
 	when
 		// No condition required for this extension
 	then
+		// Nothing to do; earliest forecast date set in parent rule
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
 end
@@ -1097,7 +1098,7 @@ end
 //     + Recommended interval = 8 weeks 
 /////////////////////
 
-rule "COVID-19(Sep2023 __Moderna__ < 5yrs Series): For target dose > 1: If 2 or more doses were administered in the prior season, earliest/recommended interval to the next dose is 8 weeks"
+rule "COVID-19(Sep2023 __Moderna__ < 5yrs Series): For target dose > 1: If 2 or more doses of the prior vaccine formulation were administered in the prior season, earliest/recommended interval to the next dose is 8 weeks"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season^CustomIntervals"
@@ -1118,6 +1119,7 @@ rule "COVID-19(Sep2023 __Moderna__ < 5yrs Series): For target dose > 1: If 2 or 
 			/////// - the administration date of the shot is < "12-Sep-2023"
 			- the administration date of the shot is < $seasonStartDate
 			- that has already been evaluated and whose shot validity is VALID
+			- the vaccine administered a member of ("ICE207", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE311", "ICE312", "ICE519")
 			- make note of the date this shot was administered as $mostRecentShotDatePriorSeason
 			- make note of the associated series as $priorSeasonSeries
 		// We want to run this rule for one and only one dose from the prior season; therefore, make sure we're looking at the most recent dose in that season
