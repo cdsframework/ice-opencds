@@ -322,7 +322,7 @@ end
 //     Minimum Interval = 8 weeks
 //     Recommended Interval = 8 weeks
 ///////
-rule "COVID-19(Sep2023 >= 5yrs)->TargetDose 1/Happy Path: If an unignored shot was administered (regardless of whether it is in the past season or present season) and the series is not complete, recommend earliest & recommended interval of 8w from target dose 1 to the next target dose"
+rule "COVID-19(Sep2023 >= 5yrs)->TargetDose 1/Happy Path: If an unignored shot was administered (regardless of whether it is in the past season or present season) and the series is not complete, recommend earliest & recommended interval of 8w from target dose 1 to the next target dose (*recommendationIntervalCheck*)"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "recommendationIntervalCheck"
@@ -351,8 +351,8 @@ rule "COVID-19(Sep2023 >= 5yrs)->TargetDose 1/Happy Path: If an unignored shot w
 end
 
 
-rule "COVID-19(Sep2023 >= 5yrs): activation-group extension => if a shot was administered (regardless of whether it is in the past season or present season) but the series is not complete, recommend erarliest interval of 8w to the next target dose"
-		extends "COVID-19(Sep2023 >= 5yrs)->TargetDose 1/Happy Path: If an unignored shot was administered (regardless of whether it is in the past season or present season) and the series is not complete, recommend earliest & recommended interval of 8w from target dose 1 to the next target dose"
+rule "COVID-19(Sep2023 >= 5yrs): activation-group extension => if a shot was administered (regardless of whether it is in the past season or present season) but the series is not complete, recommend earliest interval of 8w to the next target dose (*earliestIntervalCheck*)"
+		extends "COVID-19(Sep2023 >= 5yrs)->TargetDose 1/Happy Path: If an unignored shot was administered (regardless of whether it is in the past season or present season) and the series is not complete, recommend earliest & recommended interval of 8w from target dose 1 to the next target dose (*recommendationIntervalCheck*)"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "earliestIntervalCheck"
@@ -432,6 +432,7 @@ rule "COVID-19(Sep2023 >= 5yrs)->TargetDose 1/Exception 2: activation-group exte
 	when
 		// No condition required for this extension
 	then
+		// Nothing to do - earliest interval was specified in the parent rule
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
 end
