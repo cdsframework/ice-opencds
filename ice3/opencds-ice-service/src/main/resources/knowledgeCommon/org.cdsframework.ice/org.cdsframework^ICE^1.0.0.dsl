@@ -363,6 +363,7 @@
 [consequence][][Ii]nclude [Ss]upplemental [Tt]ext {sSupplementalText} for [Ii]nvalid [Ss]hot {refer_oTargetDose}={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.SUPPLEMENTAL_TEXT"); {refer_oTargetDose}.addSupplementalTextForInvalidShot({sSupplementalText});
 [consequence][][Rr]emove [Ss]upplemental [Tt]ext {sSupplementalText} from [Ii]nvalid [Ss]hot {refer_oTargetDose}={refer_oTargetDose}.removeSupplementalTextForInvalidShot({sSupplementalText});
 
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TargetSeries Actions
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
