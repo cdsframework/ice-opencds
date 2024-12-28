@@ -101,7 +101,52 @@ end
  for the series and the patient's age, based on the COVID-19 Vaccines table
 *****************************************************************************************************************************************************************************************************************/
 
+rule "COVID-19(Sep2023+ Moderna < 5yrs Series Abstract): Recommend at the vaccine level"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
+	when
+		There is a Series $targetSeries
+			- a Forecast for the Series has been made and a Recommendation Date has been determined
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the name of the Series is "COVID19Sep2023ModernaLT5ySeries"
+			- make note of the Recommendation Date as $recommendationDate
+			- post processing on the Series forecast has not already been run
+		The patient information $assign_oEvaluatedPerson must be known to complete writing this rule
+			- make note of the patient's birthdate as $dtBirthDate
+	then
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+       	Log that this Series Rule fired for the Series $targetSeries
+end
 
+
+rule "COVID-19(Sep2023+ Moderna < 5yrs Series): If the next recommended dose is at > 6m and < 12y of age, recommend Moderna 6m-11y (CVX 311) at the vaccine level" 
+		extends "COVID-19(Sep2023+ Moderna < 5yrs Series Abstract): Recommend at the vaccine level"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
+	when
+		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "6m" && elapsed time between $dtBirthDate and $recommendationDate < "12y"
+	then
+		Create a Recommendation as $oRecommendation for the Series $targetSeries
+		Set the Recommendation Vaccine for $oRecommendation to "ICE311"
+		Include the Recommendation $oRecommendation for Consideration in the final forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+       	Log that this Series Rule fired for the Series $targetSeries
+end
+
+
+rule "COVID-19(Sep2023+ Moderna < 5yrs Series): If the next recommended dose is at >= 12y of age, recommend Moderna 12y (CVX 312) at the vaccine level" 
+		extends "COVID-19(Sep2023+ Moderna < 5yrs Series Abstract): Recommend at the vaccine level"	
+	dialect "mvel"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
+	when
+		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "12y"
+	then
+		Create a Recommendation as $oRecommendation for the Series $targetSeries
+		Set the Recommendation Vaccine for $oRecommendation to "ICE312"
+		Include the Recommendation $oRecommendation for Consideration in the final forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+       	Log that this Series Rule fired for the Series $targetSeries
+end
 
 
 /*****************************************************************************************************************************************************************************************************************
