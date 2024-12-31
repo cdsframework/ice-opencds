@@ -2630,7 +2630,7 @@ public class TargetSeries {
 		DoseRule seriesDoseRule = obtainDoseRuleForSeriesByDoseNumber(targetDoseNumber);
 		if (seriesDoseRule == null) {
 			String str = "Corresponding series dose not found: " + getVaccineGroup() + "; " + getSeriesName() + "; target dose number: " + targetDoseNumber;
-			logger.info(_METHODNAME + str);
+			/////// logger.info(_METHODNAME + str);
 			return null;
 		}
 
