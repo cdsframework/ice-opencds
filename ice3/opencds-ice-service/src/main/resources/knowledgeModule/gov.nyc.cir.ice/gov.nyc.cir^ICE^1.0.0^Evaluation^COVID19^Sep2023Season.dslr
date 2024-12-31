@@ -1253,7 +1253,7 @@ rule "COVID-19 (Sep2023 __Moderna__ < 5yrs Series): If the patient has *0* shots
 			- make note of the season start date as $seasonStartDate
 		There is an administered shot $previousShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the vaccine administered a member of ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE308", "ICE309", "ICE310", "ICE520")
+			- the vaccine administered a member of ("ICE207", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE311", "ICE312", "ICE519")
 			- the administration date of the shot is < $seasonStartDate
 			- that has already been evaluated and whose shot validity is VALID
 			- make note of the date this shot was administered as $administrationDate
@@ -1279,7 +1279,7 @@ rule "COVID-19(Sep2023 __Moderna__ < 5yrs Series): if the patient has shots in t
 			- make note of the season start date of the associated series as $seasonStartDate
 		There is an administered shot $previousShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the vaccine administered a member of ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE308", "ICE309", "ICE310", "ICE520")
+			- the vaccine administered a member of ("ICE207", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE311", "ICE312", "ICE519")
 			- the administration date of the shot is < $seasonStartDate
 			- that has already been evaluated and whose shot validity is VALID
 	then
