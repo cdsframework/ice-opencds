@@ -124,7 +124,7 @@ rule "COVID-19(Sep2023+ Moderna < 5yrs Series): If the next recommended dose is 
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
 	when
-		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "6m" && elapsed time between $dtBirthDate and $recommendationDate < "12y"
+		Confirm the date $recommendationDate is on the same date or after "12-Sep-2023" && elapsed time between $dtBirthDate and $recommendationDate >= "6m" && elapsed time between $dtBirthDate and $recommendationDate < "12y"
 	then
 		Create a Recommendation as $oRecommendation for the Series $targetSeries
 		Set the Recommendation Vaccine for $oRecommendation to "ICE311"
@@ -139,7 +139,7 @@ rule "COVID-19(Sep2023+ Moderna < 5yrs Series): If the next recommended dose is 
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
 	when
-		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "12y"
+		Confirm the date $recommendationDate is on the same date or after "12-Sep-2023" && elapsed time between $dtBirthDate and $recommendationDate >= "12y"
 	then
 		Create a Recommendation as $oRecommendation for the Series $targetSeries
 		Set the Recommendation Vaccine for $oRecommendation to "ICE312"
@@ -172,7 +172,7 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If the next recommended dose is a
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
 	when
-		Confirm the date evalTime is on the same date or after "22-Aug-2024" && elapsed time between $dtBirthDate and $recommendationDate >= "6m" && elapsed time between $dtBirthDate and $recommendationDate < "5y"
+		Confirm the date $recommendationDate is on the same date or after "12-Sep-2023" && elapsed time between $dtBirthDate and $recommendationDate >= "6m" && elapsed time between $dtBirthDate and $recommendationDate < "5y"
 	then
 		Create a Recommendation as $oRecommendation for the Series $targetSeries
 		Set the Recommendation Vaccine for $oRecommendation to "ICE308"
@@ -187,7 +187,7 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If the next recommended dose is a
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
 	when
-		Confirm the date evalTime is on the same date or after "22-Aug-2024" && elapsed time between $dtBirthDate and $recommendationDate >= "5y" && elapsed time between $dtBirthDate and $recommendationDate < "12y"
+		Confirm the date $recommendationDate is on the same date or after "12-Sep-2023" && elapsed time between $dtBirthDate and $recommendationDate >= "5y" && elapsed time between $dtBirthDate and $recommendationDate < "12y"
 	then
 		Create a Recommendation as $oRecommendation for the Series $targetSeries
 		Set the Recommendation Vaccine for $oRecommendation to "ICE310"
@@ -202,7 +202,7 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If the next recommended dose is a
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
 	when
-		Confirm the date evalTime is on the same date or after "22-Aug-2024" && elapsed time between $dtBirthDate and $recommendationDate >= "12y"
+		Confirm the date $recommendationDate is on the same date or after "12-Sep-2023" && elapsed time between $dtBirthDate and $recommendationDate >= "12y"
 	then
 		Create a Recommendation as $oRecommendation for the Series $targetSeries
 		Set the Recommendation Vaccine for $oRecommendation to "ICE309"
