@@ -108,7 +108,8 @@
 [condition][]- [Mm]ake [Nn]ote of [Aa]ccepted [Ee]valuation [Rr]easons for this [Ss]hot as {assign_oCollectionOfReasons}={assign_oCollectionOfReasons} : acceptedReasons
 [condition][]- [Mm]ake [Nn]ote of [Ii]nvalid [Ee]valuation [Rr]easons for this [Ss]hot as {assign_oCollectionOfReasons}={assign_oCollectionOfReasons} : invalidReasons
 [condition][]- [Mm]ake [Nn]ote of the [Aa]dministered [Vv]accine as {assign_oVaccineAdministered}={assign_oVaccineAdministered} : administeredVaccine
-[condition][]- [Mm]ake [Nn]ote of the [Uu]nique [Ii][Dd] of the [Ss]hot as {assign_strUniqueId}={assign_strUniqueId} : uniqueId 
+[condition][]- [Mm]ake [Nn]ote of the [Uu]nique [Ii][Dd] of the [Ss]hot as {assign_strUniqueId}={assign_strUniqueId} : uniqueId
+[condition][]- [Mm]ake [Nn]ote of the [Ss]eason [Ss]tart [Dd]ate of the [Aa]ssociated [Ss]eries as {assign_oSeasonStartDate}={assign_oSeasonStartDate} : associatedTargetSeries.seasonStartDate, {assign_oSeasonStartDate} != null
 [condition][]- [Tt]he [Cc]ollection {oCollection} contains {oCollectionElement}={oCollection} contains {oCollectionElement}
 [condition][]- [Tt]he [Cc]ollection {oCollection} does not contain {oCollectionElement}={oCollection} not contains {oCollectionElement}
 [condition][]- [Tt]he [Ss]ize of the [Cc]ollection {oCollection} is {aOp}  {nNumeric:([0-9]+)([\\.][0-9]+)?}={oCollection}.size() {aOp} {nNumeric}
@@ -142,8 +143,12 @@
 [condition][]- [Tt]he [Ss]eries is [Nn]ot [Cc]omplete=isSeriesComplete() == false
 [condition][]- [Tt]he [Ss]eries is a [Ss]easonal [Ss]eries=targetSeasonExists() == true
 [condition][]- [Tt]he [Ss]eries is a [Nn]ot a [Ss]easonal [Ss]eries=targetSeasonExists() == false
+[condition][]- [Tt]he [Ss]eries belongs to the [Ss]eason with [Nn]ame a member of {list_sNameOfSeason:[\\(]+[a-zA-Z0-9\\.\\-_\\"\\,\\ \\(\\)]+[\\)]+}=targetSeasonExists() == true && targetSeason.seasonName in {list_sNameOfSeason}
 [condition][]- [Tt]he [Ss]eries belongs to the [Ss]eason with [Nn]ame {sNameOfSeason}=targetSeasonExists() == true && targetSeason.seasonName == {sNameOfSeason}
+[condition][]- [Tt]he [Ss]eries does not belong to the [Ss]eason with [Nn]ame a member of {list_sNameOfSeason:[\\(]+[a-zA-Z0-9\\.\\-_\\"\\,\\ \\(\\)]+[\\)]+}=targetSeasonExists == false || targetSeasonExists() == true && targetSeason.seasonName not in {list_sNameOfSeason}
 [condition][]- [Tt]he [Ss]eries does not belong to the [Ss]eason with [Nn]ame {sNameOfSeason}=targetSeasonExists == false || targetSeasonExists() == true && targetSeason.seasonName != {sNameOfSeason}
+[condition][]- [Tt]he [Ss]eason [Ss]tart [Dd]ate for the [Ss]eries is {aOp:[\=\\<\\>]+}  {dtDate}=seasonStartDate != null, {dtDate} != null, seasonStartDate {aOp} {dtDate}
+[condition][]- [Tt]he [Ss]eason [Ee]nd [Dd]ate for the [Ss]eries is {aOp:[\=\\<\\>]+}  {dtDate}=seasonEndDate != null, {dtDate} != null, seasonEndDate {aOp} {dtDate}
 [condition][]- [Tt]he [Cc]urrent [Dd]ate falls between the [Ss]eason [Ss]tart and [Oo]ffseason [Ss]top [Dd]ates of the [Ss]eries=targetSeason == null || targetSeason.dateIsApplicableToSeason(evalTime, true) == true
 [condition][]- [Tt]he [Cc]urrent [Dd]ate falls between the [Ss]eason [Ss]tart and [Ss]top [Dd]ates=targetSeason == null || targetSeason.dateIsApplicableToSeason(evalTime, false) == true
 /////// [condition][]- [Tt]he [Dd]ate {dtDate:[a-zA-Z]+} [Ff]alls within the [Ss]eason [Ss]tart and [Ss]top [Dd]ates of the [Ss]eries=targetSeason == null || targetSeason.dateIsApplicableToSeason({dtDate}, false) == true
@@ -204,10 +209,10 @@
 [condition][]- [Mm]ake [Nn]ote of the [Ee]ffective [Dd]ose [Nn]umber in the [Ss]eries as {assign_nEffectiveDoseNumber}={assign_nEffectiveDoseNumber} : determineDoseNumberInSeries()
 [condition][]- [Mm]ake [Nn]ote of the [Dd]ose [Nn]umber after which the [Ss]eries was [Mm]arked [Cc]omplete as {assign_nEffectiveDoseNumber}={assign_nEffectiveDoseNumber} : getDoseAfterWhichSeriesWasMarkedComplete()
 [condition][]- [Mm]ake [Nn]ote of the [Ss]eason [Nn]ame as {assign_strSeasonName}={assign_strSeasonName} : targetSeason!.seasonName
-[condition][]- [Mm]ake [Nn]ote of the [Ss]eason [Ss]tart [Dd]ate as {assign_dtSeasonStartDate}={assign_dtSeasonStartDate} : getSeasonStartDate()
-[condition][]- [Mm]ake [Nn]ote of the [Ss]eason [Ee]nd [Dd]ate as {assign_dtSeasonEndDate}={assign_dtSeasonEndDate} : getSeasonEndDate()
-[condition][]- [Mm]ake [Nn]ote of the [Oo]ff [Ss]eason [Ss]tart [Dd]ate as {assign_dtOffSeasonStartDate}={assign_dtOffSeasonStartDate} : getOffSeasonStartDate()
-[condition][]- [Mm]ake [Nn]ote of the [Oo]ff [Ss]eason [Ee]nd [Dd]ate as {assign_dtOffSeasonEndDate}={assign_dtOffSeasonEndDate} : getOffSeasonEndDate()
+[condition][]- [Mm]ake [Nn]ote of the [Ss]eason [Ss]tart [Dd]ate as {assign_dtSeasonStartDate}={assign_dtSeasonStartDate} : getSeasonStartDate(), {assign_dtSeasonStartDate} != null
+[condition][]- [Mm]ake [Nn]ote of the [Ss]eason [Ee]nd [Dd]ate as {assign_dtSeasonEndDate}={assign_dtSeasonEndDate} : getSeasonEndDate(), {assign_dtSeasonEndDate} != null
+[condition][]- [Mm]ake [Nn]ote of the [Oo]ff [Ss]eason [Ss]tart [Dd]ate as {assign_dtOffSeasonStartDate}={assign_dtOffSeasonStartDate} : getOffSeasonStartDate(), {assign_dtOffSeasonStartDate} != null
+[condition][]- [Mm]ake [Nn]ote of the [Oo]ff [Ss]eason [Ee]nd [Dd]ate as {assign_dtOffSeasonEndDate}={assign_dtOffSeasonEndDate} : getOffSeasonEndDate(), {assign_dtOffSeasonEndDate} != null
 [condition][]- [Mm]ake [Nn]ote of the [Ll]ast [Ss]hot [Aa]dministered in the [Ss]eries as {assign_oLastShotInSeries}={assign_oLastShotInSeries} : getLastShotAdministeredInSeries()
 [condition][]- [Mm]ake [Nn]ote of [Ss]hot [Aa]dministered by [Ss]hot [Nn]umber {nShotNumber} in the [Ss]eries as {assign_oShotInSeries}={assign_oShotInSeries} : getTargetDoseByAdministeredShotNumber({nShotNumber})
 [condition][]- [Mm]ake [Nn]ote of [Aa]ll [Vv]accines [Pp]ermitted for [Dd]ose {nDoseNumber} in the [Ss]eries as {assign_oListVaccines}={assign_oListVaccines} : getAllPermittedVaccinesForTargetDose({nDoseNumber})
@@ -224,9 +229,26 @@
 [condition][]- [Tt]he [Dd]ate {dtObjectOne} {aOp:[\=\\<\\>]+}  {dtObjectTwo}={dtObjectOne} != null && {dtObjectTwo} != null && {dtObjectOne} {aOp} {dtObjectTwo}
 [condition][]- [Tt]he [Oo]bject {oObjectOne:[\\$]?[a-zA-Z0-9\\.\\_]+} is {aOp}  {oObjectTwo:[\\$]?[a-zA-Z0-9\\.\\_]+}={oObjectOne} {aOp} {oObjectTwo}
 
-//
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Season
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+[condition][]There exists {entity:a |another |}[Ss]eason=exists Season()
+[condition][]There does not exist {entity:a |another |}[Ss]eason=not Season()
+[condition][]There is {entity:a |}[Ss]eason {assign_oSeason} distinct from {assign_oOtherSeason}={assign_oSeason} : Season(this != {assign_oOtherSeason})
+[condition][]There is {entity:a |}[Ss]eason {assign_oSeason}={assign_oSeason} : Season()
+[condition][]- [Tt]he [Nn]ame of the [Ss]eason is {sNameOfSeason}=seasonName == {sNameOfSeason}
+[condition][]- [Tt]he [Ss]eason belongs to the [Vv]accine [Gg]roup {dd_oVaccineGroupCdsListItem}=vaccineGroup == {dd_oVaccineGroupCdsListItem}
+[condition][]- [Tt]he [Ff]ully [Ss]pecied [Ss]eason [Ss]tart [Dd]ate is {aOp:[\=\\<\\>]+}  {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}=fullySpecifiedSeasonStartDate != null && {strDate} != null && fullySpecifiedSeasonStartDate.toDate() {aOp} {strDate}
+[condition][]- [Tt]he [Ff]ully [Ss]pecied [Ss]eason [Ss]tart [Dd]ate is {aOp:[\=\\<\\>]+}  {dtObject}=fullySpecifiedSeasonStartDate != null && {dtObject} != null && fullySpecifiedSeasonStartDate.toDate() {aOp} {dtObject}
+[condition][]- [Mm]ake [Nn]ote of the [Ff]ully [Ss]pecified [Ss]eason [Ss]tart [Dd]ate as {assign_dtSeasonStartDate}={assign_dtSeasonStartDate} : fullySpecifiedSeasonStartDate.toDate(), {assign_dtSeasonStartDate} != null
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TargetDose accumulates
-//
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 [condition][][Vv]erify that the [Cc]ount of [Dd]oses [Aa]dministered in [Ss]eries {refer_oTargetSeries} with [Vv]accine a member of {dd_oVaccineCdsList:[\\(]+[a-zA-Z0-9\\.\\-_\\"\\,\\ \\(\\)]+[\\)]+} is {aOp_num}  {nNumberOfDoses}=accumulate($td : TargetDose(status == DoseStatus.VALID, vaccineComponent.cdsConceptName in {dd_oVaccineCdsList} || $td.administeredVaccine.cdsConceptName in {dd_oVaccineCdsList}) from {refer_oTargetSeries}.targetDoses; $countNum: count($td); $countNum {aOp_num}  {nNumberOfDoses})
 [condition][][Vv]erify that the [Cc]ount of [Dd]oses [Aa]dministered in [Ss]eries {refer_oTargetSeries} with [Vv]accine {dd_oVaccineCdsListItem} is {aOp_num}  {nNumberOfDoses}=accumulate($td : TargetDose(status == DoseStatus.VALID, vaccineComponent.cdsConceptName == {dd_oVaccineCdsListItem} || $td.administeredVaccine.cdsConceptName == {dd_oVaccineCdsListItem}) from {refer_oTargetSeries}.targetDoses; $countNum: count($td); $countNum {aOp_num}  {nNumberOfDoses})
 [condition][][Vv]erify that the [Uu]nique [Cc]ount of [Ss]hots [Aa]dministered in [Ss]eries {refer_oTargetSeries} by [Dd]ate is {aOp_num}  {nNumberOfShots}=Set(size {aOp_num} {nNumberOfShots}) from accumulate(TargetDose($shotDate : administrationDate) from {refer_oTargetSeries}.targetDoses, collectSet($shotDate))
@@ -234,9 +256,11 @@
 [condition][][Mm]ake [Nn]ote of the [Nn]umber of [Dd]oses [Aa]dministered {accumulate_oTargetDoses} in [Ss]eries {refer_oTargetSeries} as {assign_nNumberOfDoses} [Ww]here [Aa]dministration [Dd]ate {aOp:[\=\\<\\>]+}  {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}=accumulate({accumulate_oTargetDoses} : TargetDose(status == DoseStatus.VALID, administrationDate {aOp} {strDate}) from {refer_oTargetSeries}.targetDoses; {assign_nNumberOfDoses}: count({accumulate_oTargetDoses}))
 // accumulate($td : TargetDose(status == DoseStatus.VALID, vaccineComponent.cdsConceptName in {dd_oVaccineCdsList} || $td.administeredVaccine.cdsConceptName in {dd_oVaccineCdsList}) from {refer_oTargetSeries}.targetDoses) ; {assign_nCountOfDoses}: count($td); {assign_nCountOfDoses} >= 0)
 
-//
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TargetSeries accumulates
-//
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 [condition][]Verify that the [Cc]ount of [Rr]ecommendations in Series {refer_oTargetSeries} with [Rr]ecommendation [Ss]tatus {oRecommendationStatus} and a populated [Rr]eason is {aOp_num}  {nNumberOfRecommendations}=accumulate($recommendations : Recommendation(recommendationStatus == {oRecommendationStatus}, recommendationReason != null) from {refer_oTargetSeries}.finalRecommendations; $countNum : count($recommendations); $countNum {aOp_num}  {nNumberOfRecommendations})
 
 
@@ -339,6 +363,7 @@
 [consequence][][Ii]nclude [Ss]upplemental [Tt]ext {sSupplementalText} for [Ii]nvalid [Ss]hot {refer_oTargetDose}={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.SUPPLEMENTAL_TEXT"); {refer_oTargetDose}.addSupplementalTextForInvalidShot({sSupplementalText});
 [consequence][][Rr]emove [Ss]upplemental [Tt]ext {sSupplementalText} from [Ii]nvalid [Ss]hot {refer_oTargetDose}={refer_oTargetDose}.removeSupplementalTextForInvalidShot({sSupplementalText});
 
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TargetSeries Actions
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -371,12 +396,15 @@
 [consequence][][Cc]reate a [Rr]ecommendation as {assign_oRecommendation} for the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries});
 [consequence][][Ss]et the [Rr]ecommendation [Ss]tatus for {refer_oRecommendation} to {enum_RecommendationStatus}={refer_oRecommendation}.setRecommendationStatus({enum_RecommendationStatus});
 [consequence][][Ss]et the [Rr]ecommendation [Ee]arliest [Ff]orecast [Dd]ate for {refer_oRecommendation} to the latter of {dtForecastDate} and {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}=if ({dtForecastDate} != null) \{ Date latterDate = {dtForecastDate}; Date strDate = TimePeriod.generateDateFromStringInDroolsDateFormat({strDate}); if (strDate != null && latterDate != null && strDate.after(latterDate)) \{ latterDate = strDate; \} {refer_oRecommendation}.setEarliestDate(latterDate); \}
+[consequence][][Ss]et the [Rr]ecommendation [Ee]arliest [Ff]orecast [Dd]ate for {refer_oRecommendation} to the latter of {dtForecastDate} and {dtDate}=if ({dtForecastDate} != null) \{ Date latterDate = {dtForecastDate}; if ({dtDate} != null && latterDate != null && {dtDate}.after(latterDate)) \{ latterDate = {dtDate}; \} {refer_oRecommendation}.setEarliestDate(latterDate); \}
 [consequence][][Ss]et the [Rr]ecommendation [Ee]arliest [Ff]orecast [Dd]ate for {refer_oRecommendation} to {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}={refer_oRecommendation}.setEarliestDate(TimePeriod.generateDateFromStringInDroolsDateFormat({strDate}));
 [consequence][][Ss]et the [Rr]ecommendation [Ee]arliest [Ff]orecast [Dd]ate for {refer_oRecommendation} to {dtForecastDate}=if ({dtForecastDate} != null) \{ {refer_oRecommendation}.setEarliestDate({dtForecastDate}); \}
 [consequence][][Ss]et the [Rr]ecommendation [Rr]ecommended [Ff]orecast [Dd]ate for {refer_oRecommendation} to the latter of {dtForecastDate} and {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}=if ({dtForecastDate} != null) \{ Date latterDate = {dtForecastDate}; Date strDate = TimePeriod.generateDateFromStringInDroolsDateFormat({strDate}); if (strDate != null && latterDate != null && strDate.after(latterDate)) \{ latterDate = strDate; \} {refer_oRecommendation}.setRecommendationDate(latterDate); \}
+[consequence][][Ss]et the [Rr]ecommendation [Rr]ecommended [Ff]orecast [Dd]ate for {refer_oRecommendation} to the latter of {dtForecastDate} and {dtDate}=if ({dtForecastDate} != null) \{ Date latterDate = {dtForecastDate}; if ({dtDate} != null && latterDate != null && {dtDate}.after(latterDate)) \{ latterDate = {dtDate}; \} {refer_oRecommendation}.setRecommendationDate(latterDate); \}
 [consequence][][Ss]et the [Rr]ecommendation [Rr]ecommended [Ff]orecast [Dd]ate for {refer_oRecommendation} to {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}={refer_oRecommendation}.setRecommendationDate(TimePeriod.generateDateFromStringInDroolsDateFormat({strDate}));
 [consequence][][Ss]et the [Rr]ecommendation [Rr]ecommended [Ff]orecast [Dd]ate for {refer_oRecommendation} to {dtForecastDate}=if ({dtForecastDate} != null) \{ {refer_oRecommendation}.setRecommendationDate({dtForecastDate}); \}
 [consequence][][Ss]et the [Rr]ecommendation [Oo]verdue [Ff]orecast [Dd]ate for {refer_oRecommendation} to the latter of {dtForecastDate} and {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}=if ({dtForecastDate} != null) \{ Date latterDate = {dtForecastDate}; Date strDate = TimePeriod.generateDateFromStringInDroolsDateFormat({strDate}); if (strDate != null && latterDate != null && strDate.after(latterDate)) \{ latterDate = strDate; \} {refer_oRecommendation}.setOverdueDate(latterDate); \}
+[consequence][][Ss]et the [Rr]ecommendation [Oo]verdue [Ff]orecast [Dd]ate for {refer_oRecommendation} to the latter of {dtForecastDate} and {dtDate}=if ({dtForecastDate} != null) \{ Date latterDate = {dtForecastDate}; if ({dtDate} != null && latterDate != null && {dtDate}.after(latterDate)) \{ latterDate = {dtDate}; \} {refer_oRecommendation}.setOverdueDate(latterDate); \}
 [consequence][][Ss]et the [Rr]ecommendation [Oo]verdue [Ff]orecast [Dd]ate for {refer_oRecommendation} to {dtForecastDate}=if ({dtForecastDate} != null) \{ {refer_oRecommendation}.setOverdueDate({dtForecastDate}); \}
 [consequence][][Ss]et the [Rr]ecommendation [Rr]eason for {refer_oRecommendation} to {oCD}={refer_oRecommendation}.setRecommendationReason({oCD});
 [consequence][][Ss]et the [Rr]ecommendation [Ss]upplemental [Tt]ext for {refer_oRecommendation} to {sSupplementalText}={refer_oRecommendation}.setRecommendationSupplementalText({sSupplementalText}); {refer_oRecommendation}.setRecommendationReason(BaseDataRecommendationReason._SUPPLEMENTAL_TEXT.getCdsListItemName());

@@ -2941,7 +2941,7 @@ rule "ProcessResults: Check Seasonal SeriesSelection Consistency" ruleflow-group
 	then
 		String _RULENAME = kcontext.rule.name;
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "No *seasonal* series properly selected for vaccine group " + $vg + "; count of series was: " + $countInVG);
-		ICELogicHelper.throwRuntimeException(new InconsistentConfigurationException("No *seasonal* series properly selected for vaccine group " + $vg ". Count of Series was: " + $countInVG));
+		ICELogicHelper.throwRuntimeException(new InconsistentConfigurationException("No *seasonal* series properly selected for vaccine group " + $vg + ". Count of Series was: " + $countInVG));
 end
 
 
