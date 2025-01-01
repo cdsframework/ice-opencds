@@ -978,12 +978,14 @@ rule "COVID-19(Sep2023 __Pfizer__ < 5yrs Series): If the patient has *0* shots i
 			- make note of the season start date as $seasonStartDate
 		There is an administered shot $previousShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the shot belongs to the Series with name a member of ("COVID19MixedProductSeries", "COVID19PfizerSeries", "COVID19Sep2023PfizerLT5ySeries")
 			- the vaccine administered a member of ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE308", "ICE309", "ICE310", "ICE520")
 			- the administration date of the shot is < $seasonStartDate
 			- that has already been evaluated and whose shot validity is VALID
 			- make note of the date this shot was administered as $administrationDate
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the shot belongs to the Series with name a member of ("COVID19MixedProductSeries", "COVID19PfizerSeries", "COVID19Sep2023PfizerLT5ySeries")
 			- the vaccine administered a member of ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE308", "ICE309", "ICE310", "ICE520")
 			- that is not the same shot as $previousShot
 			- the administration date of the shot is < $seasonStartDate
@@ -1011,12 +1013,14 @@ rule "COVID-19 (Sep2023 __Pfizer__ < 5yrs Series): If the patient has *0* shots 
 			- make note of the season start date as $seasonStartDate
 		There is an administered shot $previousShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the shot belongs to the Series with name a member of ("COVID19MixedProductSeries", "COVID19PfizerSeries", "COVID19Sep2023PfizerLT5ySeries")
 			- the vaccine administered a member of ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE308", "ICE309", "ICE310", "ICE520")
 			- the administration date of the shot is < $seasonStartDate
 			- that has already been evaluated and whose shot validity is VALID
 			- make note of the date this shot was administered as $administrationDate
 		There exists an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the shot belongs to the Series with name a member of ("COVID19MixedProductSeries", "COVID19PfizerSeries", "COVID19Sep2023PfizerLT5ySeries")
 			- the vaccine administered a member of ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE308", "ICE309", "ICE310", "ICE520")
 			- that is not the same shot as $previousShot
 			- the administration date of the shot is < $seasonStartDate
@@ -1028,7 +1032,7 @@ rule "COVID-19 (Sep2023 __Pfizer__ < 5yrs Series): If the patient has *0* shots 
 end
 
 
-rule "COVID-19(Sep2023 __Pfizer__ < 5yrs Series): If the patient has shots in the current season and *1* dose of a prior formulation administered prior to the current season start date at < 5yrs of age, dose 1 is not needed; skip to target dose 2."
+rule "COVID-19(Sep2023 __Pfizer__ < 5yrs Series): If the patient has shots in the current season and *1* dose of administered prior to the current season start date at < 5yrs of age, dose 1 is not needed; skip to target dose 2."
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	salience 999
@@ -1044,12 +1048,14 @@ rule "COVID-19(Sep2023 __Pfizer__ < 5yrs Series): If the patient has shots in th
 			- make note of the season start date of the associated series as $seasonStartDate
 		There is an administered shot $previousShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the shot belongs to the Series with name a member of ("COVID19MixedProductSeries", "COVID19PfizerSeries", "COVID19Sep2023PfizerLT5ySeries")
 			- the vaccine administered a member of ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE308", "ICE309", "ICE310", "ICE520")
 			- the administration date of the shot is < $seasonStartDate
 			- that has already been evaluated and whose shot validity is VALID
 			- make note of the date this shot was administered as $administrationDate
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the shot belongs to the Series with name a member of ("COVID19MixedProductSeries", "COVID19PfizerSeries", "COVID19Sep2023PfizerLT5ySeries")
 			- the vaccine administered a member of ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE308", "ICE309", "ICE310", "ICE520")
 			- that is not the same shot as $previousShot
 			- the administration date of the shot is < $seasonStartDate
@@ -1062,7 +1068,7 @@ rule "COVID-19(Sep2023 __Pfizer__ < 5yrs Series): If the patient has shots in th
 end
 
 
-rule "COVID-19(Sep2023 __Pfizer__ < 5yrs Series): If the patient has shots in the current season and *2 or more* doses of a prior formulation administered prior to the current season start date at < 5yrs of age, skip to target dose 3."
+rule "COVID-19(Sep2023 __Pfizer__ < 5yrs Series): If the patient has shots in the current season and *2 or more* doses of administered prior to the current season start date at < 5yrs of age, skip to target dose 3."
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	salience 999
@@ -1078,12 +1084,14 @@ rule "COVID-19(Sep2023 __Pfizer__ < 5yrs Series): If the patient has shots in th
 			- make note of the season start date of the associated series as $seasonStartDate
 		There is an administered shot $previousShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the shot belongs to the Series with name a member of ("COVID19MixedProductSeries", "COVID19PfizerSeries", "COVID19Sep2023PfizerLT5ySeries")
 			- the vaccine administered a member of ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE308", "ICE309", "ICE310", "ICE520")
 			- the administration date of the shot is < $seasonStartDate
 			- that has already been evaluated and whose shot validity is VALID
 			- make note of the date this shot was administered as $administrationDate
 		There exists another administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the shot belongs to the Series with name a member of ("COVID19MixedProductSeries", "COVID19PfizerSeries", "COVID19Sep2023PfizerLT5ySeries")
 			- the vaccine administered a member of ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE308", "ICE309", "ICE310", "ICE520")
 			- that is not the same shot as $previousShot
 			- the administration date of the shot is < $seasonStartDate
@@ -1253,6 +1261,7 @@ rule "COVID-19 (Sep2023 __Moderna__ < 5yrs Series): If the patient has *0* shots
 			- make note of the season start date as $seasonStartDate
 		There is an administered shot $previousShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the shot belongs to the Series with name a member of ("COVID19MixedProductSeries", "COVID19ModernaSeries", "COVID19Sep2023ModernaLT5ySeries")
 			- the vaccine administered a member of ("ICE207", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE311", "ICE312", "ICE519")
 			- the administration date of the shot is < $seasonStartDate
 			- that has already been evaluated and whose shot validity is VALID
@@ -1279,6 +1288,7 @@ rule "COVID-19(Sep2023 __Moderna__ < 5yrs Series): if the patient has shots in t
 			- make note of the season start date of the associated series as $seasonStartDate
 		There is an administered shot $previousShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the shot belongs to the Series with name a member of ("COVID19MixedProductSeries", "COVID19ModernaSeries", "COVID19Sep2023ModernaLT5ySeries")
 			- the vaccine administered a member of ("ICE207", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE311", "ICE312", "ICE519")
 			- the administration date of the shot is < $seasonStartDate
 			- that has already been evaluated and whose shot validity is VALID

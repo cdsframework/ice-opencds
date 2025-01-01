@@ -143,7 +143,7 @@
 [condition][]- [Tt]he [Ss]eries is [Nn]ot [Cc]omplete=isSeriesComplete() == false
 [condition][]- [Tt]he [Ss]eries is a [Ss]easonal [Ss]eries=targetSeasonExists() == true
 [condition][]- [Tt]he [Ss]eries is a [Nn]ot a [Ss]easonal [Ss]eries=targetSeasonExists() == false
-[condition][]- [Tt]he [Ss]eries belongs to the [Ss]eason with [Nn]ame {list_sNameOfSeason:[\\(]+[a-zA-Z0-9\\.\\-_\\"\\,\\ \\(\\)]+[\\)]+}=targetSeasonExists() == true && targetSeason.seasonName in {sNameOfSeason}
+[condition][]- [Tt]he [Ss]eries belongs to the [Ss]eason with [Nn]ame a member of {list_sNameOfSeason:[\\(]+[a-zA-Z0-9\\.\\-_\\"\\,\\ \\(\\)]+[\\)]+}=targetSeasonExists() == true && targetSeason.seasonName in {list_sNameOfSeason}
 [condition][]- [Tt]he [Ss]eries belongs to the [Ss]eason with [Nn]ame {sNameOfSeason}=targetSeasonExists() == true && targetSeason.seasonName == {sNameOfSeason}
 [condition][]- [Tt]he [Ss]eries does not belong to the [Ss]eason with [Nn]ame a member of {list_sNameOfSeason:[\\(]+[a-zA-Z0-9\\.\\-_\\"\\,\\ \\(\\)]+[\\)]+}=targetSeasonExists == false || targetSeasonExists() == true && targetSeason.seasonName not in {list_sNameOfSeason}
 [condition][]- [Tt]he [Ss]eries does not belong to the [Ss]eason with [Nn]ame {sNameOfSeason}=targetSeasonExists == false || targetSeasonExists() == true && targetSeason.seasonName != {sNameOfSeason}
