@@ -1273,11 +1273,7 @@ rule "SeriesSelection(COVID-19): In Sep2023+ season, select the Pfizer < 5 yrs s
 	when
 		$ts : TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesRules.seriesName == "COVID19Sep2023PfizerLT5ySeries", targetSeason != null && targetSeason == $tss.seriesSelectionSeason)
 		and
-		not TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", isValid == true, associatedTargetSeries!.targetSeason != $tss.seriesSelectionSeason, associatedTargetSeries!.targetSeason.startsBeforeStartDate($ts.targetSeason, false), 
-			/////// vaccineComponent.cdsConceptName not in ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE520"))
-			vaccineComponent.cdsConceptName not in ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE308", "ICE309", "ICE310", "ICE520"))
-		and
-		not TargetDose(associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason, vaccineComponent.cdsConceptName not in ("ICE308", "ICE309", "ICE310", "ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE520"))
+		not TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", isValid == true,	vaccineComponent.cdsConceptName not in ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE308", "ICE309", "ICE310", "ICE520"))
 		and
 		(
 			exists TargetDose(associatedTargetSeries == $ts, administrationDate < $dateAt5yrs)
@@ -1309,11 +1305,7 @@ rule "SeriesSelection(COVID-19): In Sep2023+ season, select the Moderna < 5 yrs 
 	when
 		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesRules.seriesName == "COVID19Sep2023ModernaLT5ySeries", targetSeason != null && targetSeason == $tss.seriesSelectionSeason)
 		and
-		not TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", isValid == true, associatedTargetSeries!.targetSeason != $tss.seriesSelectionSeason, associatedTargetSeries!.targetSeason.startsBeforeStartDate($ts.targetSeason, false), 
-			/////// vaccineComponent.cdsConceptName not in ("ICE207", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE519"))
-			vaccineComponent.cdsConceptName not in ("ICE207", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE311", "ICE312", "ICE519"))
-		and
-		not TargetDose(associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason, vaccineComponent.cdsConceptName not in ("ICE311", "ICE312", "ICE207", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE519"))
+		not TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", isValid == true, vaccineComponent.cdsConceptName not in ("ICE207", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE311", "ICE312", "ICE519"))
 		and		
 		(
 			exists TargetDose(associatedTargetSeries == $ts, administrationDate < $dateAt5yrs)
