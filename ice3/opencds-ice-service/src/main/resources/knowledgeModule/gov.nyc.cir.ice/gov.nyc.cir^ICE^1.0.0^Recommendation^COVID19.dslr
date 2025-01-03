@@ -94,28 +94,6 @@ rule "COVID-19: Invoke separate agenda group for recommendations in the COVID19S
 		Set the Agenda Group Focus to "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 end
 
-/*
-rule "COVID-19: Invoke separate agenda group for recommendations after the COVID19Sep2023 Season using the COVID19Sep2023 rule set (as of 2024-2025, default behavior is the same as for the Sep2023 season)"
-	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule"
-	when
-		There is a Series $targetSeries that needs forecasting
-			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
-			- the series belongs to the season with name "COVID19Sep2023Season"
-		There is a Season $sept2023season
-			- the name of the Season is "COVID19Sep2023Season"
-			- the Season belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- make note of the fully specified season start date as $dtSeasonStartDateSep2023			
-		There is a Series $associatedTargetSeries identified by $targetSeries
-			- the Series is a seasonal series
-			- the season start date for the Series is > $dtSeasonStartDateSep2023
-	then
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-       	Log that this Series Rule fired for the Series $targetSeries
-		Set the Agenda Group Focus to "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
-end
-*/
-
 
 ////////////////////////////////////////////////////////
 // Agenda Groups for Post Recommendation Checks
@@ -152,30 +130,6 @@ rule "COVID-19: Invoke separate agenda group for post recommendation checks in t
        	Log that this Series Rule fired for the Series $targetSeries
 		Set the Agenda Group Focus to "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
 end
-
-
-/*
-rule "COVID-19: Invoke separate agenda group for post recommendation checks after the COVID19Sep2023 Season using the COVID19Sep2023 rule set (as of 2024-2025, default behavior is the same as for the Sep2023 season)" 
-	dialect "mvel"
-	agenda-group "RecommendationForecast^postCustomRecommendationCheck"
-	when
-		There is a Series $targetSeries
-			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
-			- a forecast for the Series has been made
-			- post processing on the Series forecast has not already been run
-		There is a Season $sept2023season
-			- the name of the Season is "COVID19Sep2023Season"
-			- the Season belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- make note of the fully specified season start date as $dtSeasonStartDateSep2023			
-		There is a Series $associatedTargetSeries identified by $targetSeries
-			- the Series is a seasonal series
-			- the season start date for the Series is > $dtSeasonStartDateSep2023
-		then
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-       	Log that this Series Rule fired for the Series $targetSeries
-		Set the Agenda Group Focus to "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
-end
-*/
 
 
 ////////////////////////////////////////////////////////
