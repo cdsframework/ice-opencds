@@ -217,7 +217,7 @@ rule "COVID-19(Sep2023 >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If a
 end
 
 
-rule "COVID-19(Sept 2023 >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If a shot of CVX 313 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE and the current shot is < 24 days apart, evaluate the shot as Invalid / BELOW_MINIMUM_INTERVAL"
+rule "COVID-19(Sep2023 >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If a shot of CVX 313 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE and the current shot is < 24 days apart, evaluate the shot as Invalid / BELOW_MINIMUM_INTERVAL"
 		extends "COVID-19(Sep2023 >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If a shot of CVX 313 previously administered for target dose 1 was evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE, and there are no prior doses on record, the absolute minimum interval from that shot to target dose 1 is 24 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
@@ -236,7 +236,7 @@ rule "COVID-19(Sept 2023 >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If
 end
 
 
-rule "COVID-19(Sept 2023 >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If a shot of CVX 313 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE and the current shot is >= 24 days apart, do not evaluate as Invalid (doseIntervalCheck)"
+rule "COVID-19(Sep2023 >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If a shot of CVX 313 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE and the current shot is >= 24 days apart, do not evaluate as Invalid (doseIntervalCheck)"
 		extends "COVID-19(Sep2023 >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If a shot of CVX 313 previously administered for target dose 1 was evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE, and there are no prior doses on record, the absolute minimum interval from that shot to target dose 1 is 24 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
@@ -325,7 +325,7 @@ rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 1/Exception 3: If a shot of 
 end
 
 
-rule "COVID-19(Sept 2023 >= 5yrs Series)-->TargetDose 1/Exception 3: If a shot of CVX 211 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_PART_OF_THIS_SERIES and the current shot is >= 24 days apart, do not evaluate as Invalid (doseIntervalCheck)"
+rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 1/Exception 3: If a shot of CVX 211 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_PART_OF_THIS_SERIES and the current shot is >= 24 days apart, do not evaluate as Invalid (doseIntervalCheck)"
 		extends "COVID-19(Sep2023 >= 5yrs Series Abstract)-->TargetDose 1/Exception 3: If a shot of CVX 211 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_PART_OF_THIS_SERIES, the absolute minimum interval from that shot to target dose 1 is 24 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
@@ -352,7 +352,7 @@ end
 // 	+ If a CVX 310 or CVX 311 is administered < the series absolute minimum age for the dose and <= the CVX code absolute maximum age, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES.
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-rule "COVID-19(Sept 2023 >= 5yrs Series)-->TargetDose 2: If a shot is administered before the absolute minimum age and permitted for this dose, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES"
+rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 2: If a shot is administered before the absolute minimum age and permitted for this dose, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
 	when
@@ -379,7 +379,7 @@ rule "COVID-19(Sept 2023 >= 5yrs Series)-->TargetDose 2: If a shot is administer
 end
 
 
-rule "COVID-19(Sep 2023 >= 5yrs Series)-->TargetDose 2: If a CVX 310 or CVX 311 is administered < the series absolute minimum age for the dose and <= the CVX code absolute maximum age, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES"
+rule "COVID-19(Sep2023 >= 5yrs Series)-->TargetDose 2: If a CVX 310 or CVX 311 is administered < the series absolute minimum age for the dose and <= the CVX code absolute maximum age, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
 	when
@@ -429,7 +429,7 @@ end
 //    If administered as target dose 3, follow series interval
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-rule "COVID-19(Sep 2023 Pfizer < 5yrs Series): If a shot was previously administered for target dose 1 or target dose 2 and evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES and the series is not complete, the absolute minimum interval from that shot to this shot is 24 days"
+rule "COVID-19(Sep2023 Pfizer < 5yrs Series): If a shot was previously administered for target dose 1 or target dose 2 and evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES and the series is not complete, the absolute minimum interval from that shot to this shot is 24 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	no-loop true
@@ -465,7 +465,7 @@ end
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-rule "COVID-19(Sep2023 Sep2023 Pfizer < 5yrs Series): If the patient has 1 dose of updated Sept 2023 Pfizer COVID-19 vaccine intended for patients age >= 5 years (CVX 309, CVX 310) at age >= 5 years, then the series is complete."
+rule "COVID-19(Sep2023 Pfizer < 5yrs Series): If the patient has 1 dose of updated Sept 2023 Pfizer COVID-19 vaccine intended for patients age >= 5 years (CVX 309, CVX 310) at age >= 5 years, then the series is complete."
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
 	when
@@ -509,7 +509,7 @@ end
 //        Recommended interval = 28 days 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-rule "COVID-19(Sep 2023 Moderna < 5yrs Series): If a shot previously administered was evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES and the series is not complete, the absolute minimum interval from that shot to target dose 1 is 24 days"
+rule "COVID-19(Sep2023 Moderna < 5yrs Series): If a shot previously administered was evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES and the series is not complete, the absolute minimum interval from that shot to target dose 1 is 24 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	no-loop true
@@ -559,7 +559,7 @@ end
 //    If administered as target dose 3, follow series interval
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-rule "COVID-19(Sep 2023 Mixed Product < 5yrs Series): If a shot previously administered for target dose 1 or target dose 2 was evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES, the absolute minimum interval from that shot to target dose 1 is 24 days"
+rule "COVID-19(Sep2023 Mixed Product < 5yrs Series): If a shot previously administered for target dose 1 or target dose 2 was evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES, the absolute minimum interval from that shot to target dose 1 is 24 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	no-loop true
@@ -870,7 +870,7 @@ rule "COVID-19(Sep2023 Novavax Series): If a CVX 313 is administered for dose 1,
 end
 
 
-rule "COVID-19(Sept 2024 Novavax Series): If a shot is administered before the absolute minimum age for target dose 4, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES"
+rule "COVID-19(Sep2023 Novavax Series): If a shot is administered before the absolute minimum age for target dose 4, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
 	when
@@ -897,7 +897,7 @@ rule "COVID-19(Sept 2024 Novavax Series): If a shot is administered before the a
 end
 
 
-rule "COVID-19(Sept 2024 Novavax Series): If a CVX 310 or CVX 311 is administered before the absolute minimum age for target dose 4 and <= the absolute maximum age, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES"
+rule "COVID-19(Sep2023 Novavax Series): If a CVX 310 or CVX 311 is administered before the absolute minimum age for target dose 4 and <= the absolute maximum age, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
 	when
@@ -962,7 +962,7 @@ end
 // Pfizer/Mixed Product Skip Dose rules
 ///////
 
-rule "COVID-19(Sep2023 __Pfizer__ < 5yrs Series): If the patient has *0* shots in the current season has *1* dose of a prior formulation administered prior to the current season at < 5yrs of age, skip to target dose 2"
+rule "COVID-19(Sep2023 Pfizer__ < 5yrs Series): If the patient has *0* shots in the current season has *1* dose of a prior formulation administered prior to the current season at < 5yrs of age, skip to target dose 2"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
 	salience 999
@@ -997,7 +997,7 @@ rule "COVID-19(Sep2023 __Pfizer__ < 5yrs Series): If the patient has *0* shots i
 end
 
 
-rule "COVID-19 (Sep2023 __Pfizer__ < 5yrs Series): If the patient has *0* shots in the current season but has *2 or more* doses of a prior formulation administered prior to the current season at < 5yrs of age, skip to target dose 3"
+rule "COVID-19(Sep2023 Pfizer__ < 5yrs Series): If the patient has *0* shots in the current season but has *2 or more* doses of a prior formulation administered prior to the current season at < 5yrs of age, skip to target dose 3"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
 	salience 999
@@ -1032,7 +1032,7 @@ rule "COVID-19 (Sep2023 __Pfizer__ < 5yrs Series): If the patient has *0* shots 
 end
 
 
-rule "COVID-19(Sep2023 __Pfizer__ < 5yrs Series): If the patient has shots in the current season and *1* dose of administered prior to the current season start date at < 5yrs of age, dose 1 is not needed; skip to target dose 2."
+rule "COVID-19(Sep2023 Pfizer__ < 5yrs Series): If the patient has shots in the current season and *1* dose of administered prior to the current season start date at < 5yrs of age, dose 1 is not needed; skip to target dose 2."
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	salience 999
@@ -1068,7 +1068,7 @@ rule "COVID-19(Sep2023 __Pfizer__ < 5yrs Series): If the patient has shots in th
 end
 
 
-rule "COVID-19(Sep2023 __Pfizer__ < 5yrs Series): If the patient has shots in the current season and *2 or more* doses of administered prior to the current season start date at < 5yrs of age, skip to target dose 3."
+rule "COVID-19(Sep2023 Pfizer__ < 5yrs Series): If the patient has shots in the current season and *2 or more* doses of administered prior to the current season start date at < 5yrs of age, skip to target dose 3."
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	salience 999
@@ -1107,7 +1107,7 @@ end
 // Mixed Product Series Skip Dose Rules
 ///////
 
-rule "COVID-19(Sep2023 __Mixed Product__ < 5yrs Series): If the patient has *0* shots in the current season has *1* dose of a prior formulation administered prior to the current season at < 5yrs of age, skip to target dose 2"
+rule "COVID-19(Sep2023 Mixed Product__ < 5yrs Series): If the patient has *0* shots in the current season has *1* dose of a prior formulation administered prior to the current season at < 5yrs of age, skip to target dose 2"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
 	salience 999
@@ -1140,7 +1140,7 @@ rule "COVID-19(Sep2023 __Mixed Product__ < 5yrs Series): If the patient has *0* 
 end
 
 
-rule "COVID-19 (Sep2023 __Mixed Product__ < 5yrs Series): If the patient has *0* shots in the current season but has *2 or more* doses of a prior formulation administered prior to the current season at < 5yrs of age, skip to target dose 3"
+rule "COVID-19(Sep2023 Mixed Product__ < 5yrs Series): If the patient has *0* shots in the current season but has *2 or more* doses of a prior formulation administered prior to the current season at < 5yrs of age, skip to target dose 3"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
 	salience 999
@@ -1173,7 +1173,7 @@ rule "COVID-19 (Sep2023 __Mixed Product__ < 5yrs Series): If the patient has *0*
 end
 
 
-rule "COVID-19(Sep2023 __Mixed Product__ < 5yrs Series): If the patient has shots in the current season and *1* dose of a prior formulation administered prior to the current season start date at < 5yrs of age, dose 1 is not needed; skip to target dose 2."
+rule "COVID-19(Sep2023 Mixed Product__ < 5yrs Series): If the patient has shots in the current season and *1* dose of a prior formulation administered prior to the current season start date at < 5yrs of age, dose 1 is not needed; skip to target dose 2."
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	salience 999
@@ -1207,7 +1207,7 @@ rule "COVID-19(Sep2023 __Mixed Product__ < 5yrs Series): If the patient has shot
 end
 
 
-rule "COVID-19(Sep2023 __Mixed Product__ < 5yrs Series): If the patient has shots in the current season and *2 or more* doses of a prior formulation administered prior to the current season start date at < 5yrs of age, skip to target dose 3."
+rule "COVID-19(Sep2023 Mixed Product__ < 5yrs Series): If the patient has shots in the current season and *2 or more* doses of a prior formulation administered prior to the current season start date at < 5yrs of age, skip to target dose 3."
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	salience 999
@@ -1245,7 +1245,7 @@ end
 // Moderna Series Skip Dose rules
 ///////
 
-rule "COVID-19 (Sep2023 __Moderna__ < 5yrs Series): If the patient has *0* shots in the current season but *1 or more* doses of a prior formulation administered prior to the current season start date at < 5yrs of age, skip to target dose 2"
+rule "COVID-19(Sep2023 Moderna__ < 5yrs Series): If the patient has *0* shots in the current season but *1 or more* doses of a prior formulation administered prior to the current season start date at < 5yrs of age, skip to target dose 2"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
 	salience 999
@@ -1272,7 +1272,7 @@ rule "COVID-19 (Sep2023 __Moderna__ < 5yrs Series): If the patient has *0* shots
 end
 
 
-rule "COVID-19(Sep2023 __Moderna__ < 5yrs Series): if the patient has shots in the current season and *1 or more* doses of a prior formulation administered prior to current season start date at < 5yrs of age, skip to target dose 2."
+rule "COVID-19(Sep2023 Moderna__ < 5yrs Series): if the patient has shots in the current season and *1 or more* doses of a prior formulation administered prior to current season start date at < 5yrs of age, skip to target dose 2."
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	salience 999
@@ -1303,7 +1303,7 @@ end
 // Novavax Skip Dose Rule
 ///////
 
-rule "COVID-19(Novavax Series): If CVX 313 was administered for dose 1 or dose 2, dose 3 is not needed. Skip to target dose 4."
+rule "COVID-19(Sep2023 Novavax__ Series): If CVX 313 was administered for dose 1 or dose 2, dose 3 is not needed. Skip to target dose 4."
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	salience 999
