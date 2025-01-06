@@ -284,6 +284,7 @@ end
 
 ///////
 // In the 2024-2025 season, the absolute minimum interval (see evaluation rules), minimum interval and recommended interval from dose 1 to dose 2 are, respectively, 8w-4d, 8w and 6m. 
+// This overrides the value set in the series table, which was for 2023-2024 season. 
 ///////
 
 rule "COVID-19(Sep2023+ >= 5yrs): For the 2024-2025 season, the minimum interval and recommended interval from dose 1 to dose 2 are, respectively, to 8w and 6m (*recommendationIntervalCheck*)"
@@ -294,15 +295,16 @@ rule "COVID-19(Sep2023+ >= 5yrs): For the 2024-2025 season, the minimum interval
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the name of the series is "COVID19Sep2023gte5Series"
+			- the Series belongs to the Season with name "COVID19Aug2024Season"
 			- the Series is not Complete
 			- the effective dose number in the Series is == 2
 		There is an administered shot $mostRecentShot
-			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the shot belongs to the Series $targetSeries
 			- that has already been evaluated
 			- the shot is not ignored
 			- make note of the date this shot was administered as $mostRecentShotDate
 		There does not exist an administered shot
-			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the shot belongs to the Series $targetSeries
 			- the administration date of the shot is > $mostRecentShotDate
 			- the shot is not ignored
 	then
