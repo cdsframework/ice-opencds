@@ -206,15 +206,19 @@ rule "COVID-19(Sep2023+ >= 5yrs Series): If a shot of CVX 313 is administered fo
 			- the vaccine administered is "ICE313"
 			- make note of the date this shot was administered as $administrationDate
 			- make note of the associated series as $associatedTargetSeries
+		There is a Series $targetSeries identified by $associatedTargetSeries
+			- make note of the season start date as $seasonStartDate
+		There does not exist an administered shot
+			- the shot belongs to the Series $associatedTargetSeries
+			- that has already been evaluated and whose shot validity is VALID
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- that has already been evaluated and whose shot validity is VALID
-			- the administration date of the shot is < $administrationDate	
+			- the administration date of the shot is < $seasonStartDate
 	then
 		Remove all evaluation reasons from shot $currentShot
 		Set the shot status of $currentShot to Accepted
 		Include the reason for shot $currentShot Accepted due to "Vaccine Not Allowed For This Dose"
-		Logically insert an IceFact "COVID19_CVX_313_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1" with TargetDose $currentShot into working memory
 		Record that this dose rule was Processed for the TargetDose $currentShot
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
@@ -237,34 +241,17 @@ end
 // This rule is encompassed by the one above it, but we put the more precise rule because we need to know that this occurred
 
 rule "COVID-19(Sep2023+ >= 5yrs Series)-->TargetDose 1/Exception 2: Exception 2: If a shot of CVX 313 is administered for target dose 1 to a patient age 5 years and < 12 years - 4 days, and it is the only dose on record, and the CVX 313 would otherwise be considered valid, target dose 1 is not fulfilled"
+		extends "COVID-19(Sep2023+ >= 5yrs Series): If a shot of CVX 313 is administered for target dose 1, and there are no previous doses on record, evaluate the shot as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
+	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
 	when
-		There is an administered shot $currentShot that needs to be evaluated
-			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the shot belongs to the Series with name "COVID19Sep2023gte5Series"
-			- the dose number in the series is == 1
-			- the series that the shot belongs to is not complete
-			- make note of the date this shot was administered as $currentShotDate
-			- make note of the associated series as $associatedTargetSeries
-		// There exists an IceFact  HERE
-		
-		There does not exist an administered shot
-			- the shot belongs to the Series $associatedTargetSeries
-			- that has already been evaluated and whose shot validity is VALID
-		There does not exist an administered shot
-			- that has already been evaluated and whose shot validity is VALID
-			- the administration date of the shot is < $seasonStartDate
 		The patient information $patientInformation must be known to complete writing this rule
-			- make note of the patient's birthdate as $dtBirthDate
-		Confirm elapsed time between $birthdate and $currentShotDate >= "5y" && elapsed time between $birthdate and $currentShotDate <= "12y-4d"
+			- make note of the patient's birthdate as $birthdate
+		Confirm elapsed time between $birthdate and $administrationDate >= "5y" && elapsed time between $birthdate and $administrationDate < "12y-4d"
 	then
-		/*
-		Set the shot status of $currentShot to Invalid
-		Include the reason for shot $currentShot Invalid due to "Vaccine Not Allowed For This Dose"
+		Insert an IceFact "INVALID_CVX_313_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1" with TargetDose $currentShot into working memory
 		Record that this dose rule was Processed for the TargetDose $currentShot
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
-		*/
 end
 
 
@@ -279,26 +266,17 @@ rule "COVID-19(Sep2023+ >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If 
 			- the series that the shot belongs to is not complete
 			- make note of the date this shot was administered as $currentShotDate
 			- make note of the associated series as $associatedTargetSeries
-		There is an administered shot $previousShot
-			- the shot belongs to the Series $associatedTargetSeries
-			- that has already been evaluated and whose shot validity is ACCEPTED
-			- the vaccine administered is "ICE313"
-			- the administration date of the shot is < $currentShotDate
-			- make note of Accepted evaluation reasons for this shot as $acceptedReasons
-			- the collection $acceptedReasons contains "EVALUATION_REASON_CONCEPT.VACCINE_NOT_ALLOWED_FOR_THIS_DOSE" 			
-			- make note of the date this shot was administered as $previousShotDate
-		There does not exist an administered shot
-			- the shot belongs to the Series $associatedTargetSeries
-			- the vaccine administered is "ICE313"
-			- the administration date of the shot is > $previousShotDate
-			- the administration date of the shot is < $currentShotDate
+		There is an IceFact $iceFactCVX313NotValid
+			- that has associated series $associatedTargetSeries
+			- that has finding "INVALID_CVX_313_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1"
+			- make note of the date the associated shot was administered as $cvx313administrationDate
 	then
 		Record that this dose rule was Processed for the TargetDose $currentShot
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
 
 
-rule "COVID-19(Sep2023+ >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If a shot of CVX 313 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE and the current shot is < 24 days apart, evaluate the shot as Invalid / BELOW_MINIMUM_INTERVAL"
+rule "COVID-19(Sep2023+ >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of CVX 313 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE and the current shot is < 24 days apart, evaluate the shot as Invalid / BELOW_MINIMUM_INTERVAL"
 		extends "COVID-19(Sep2023+ >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If a shot of CVX 313 previously administered for target dose 1 was evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE, and there are no prior doses on record, the absolute minimum interval from that shot to target dose 1 is 24 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
@@ -309,7 +287,7 @@ rule "COVID-19(Sep2023+ >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If 
 		There does not exist an IceFact
 			- that has associated administered shot $currentShot
 			- that has finding SupportedFactConcept._BELOW_MINIMUM_INTERVAL.conceptCodeValue
-		Confirm Elapsed time between $previousShotDate and $currentShotDate < "24d"
+		Confirm Elapsed time between $cvx313administrationDate and $currentShotDate < "24d"
 	then
 		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
 		Record that this dose rule was Processed for the TargetDose $currentShot
@@ -317,7 +295,7 @@ rule "COVID-19(Sep2023+ >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If 
 end
 
 
-rule "COVID-19(Sep2023+ >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If a shot of CVX 313 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE and the current shot is >= 24 days apart, do not evaluate as Invalid (doseIntervalCheck)"
+rule "COVID-19(Sep2023+ >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of CVX 313 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE and the current shot is >= 24 days apart, do not evaluate as Invalid (doseIntervalCheck)"
 		extends "COVID-19(Sep2023+ >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If a shot of CVX 313 previously administered for target dose 1 was evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE, and there are no prior doses on record, the absolute minimum interval from that shot to target dose 1 is 24 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
@@ -325,7 +303,7 @@ rule "COVID-19(Sep2023+ >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If 
 	no-loop true
 	salience 10
 	when
-		Confirm Elapsed time between $previousShotDate and $currentShotDate >= "24d"
+		Confirm Elapsed time between $cvx313administrationDate and $currentShotDate >= "24d"
 	then
 		Record that this dose rule was Processed for the TargetDose $currentShot
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
