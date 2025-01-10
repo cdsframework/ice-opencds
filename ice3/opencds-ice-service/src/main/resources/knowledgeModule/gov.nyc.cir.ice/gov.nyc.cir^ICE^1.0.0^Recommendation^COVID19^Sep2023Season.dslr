@@ -548,7 +548,7 @@ end
 //     + Recommended interval = 28 days. If the patient is < 12 years as of the evaluation date and is < 12 years at the recommended due date), return recommended reason code ADMINISTER_mRNA_VACCINE.
 ///////
 
-rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If a previous shot of CVX 313 administered for target dose 1 was determined to be COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1, the recommended interval from that shot to target dose 1 is 28 days"
+rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If a previous shot of CVX 313 administered for target dose 1 was determined to be COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1, the recommended interval to the next dose is 28 days. Administer mRNA vaccine."
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "recommendationIntervalCheck"
@@ -559,9 +559,6 @@ rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If a previous shot o
 			- the name of the Series is "COVID19Sep2023gte5Series"
 			- the effective dose number in the series is == 1
 			- the Series is not complete
-		There does not exist an administered shot
-			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- that has already been evaluated and whose shot validity is VALID
 		There is an IceFact $iceFactCVX313NotValid
 			- that has associated series $targetSeries
 			- that has finding "COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1"
@@ -575,6 +572,7 @@ rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If a previous shot o
 		Add "28d" to $cvx313administrationDate and make note of the newly calculated date as $dtCalculated
 		Set the recommendation Earliest Forecast Date for $r to $dtCalculated
 		Set the recommendation Recommended Forecast Date for $r to $dtCalculated
+		// Set the Recommendation Reason for $r to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_mRNA_VACCINE"
 		Include the Recommendation $r for Consideration in the final forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
@@ -582,7 +580,7 @@ end
 
 
 rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: activation-group extension => If a shot of CVX 313 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE, and there are no prior doses on record, the earliest interval from that shot to target dose 1 is 28 days"
-		extends "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If a previous shot of CVX 313 administered for target dose 1 was determined to be COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1, the recommended interval from that shot to target dose 1 is 28 days"
+		extends "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If a previous shot of CVX 313 administered for target dose 1 was determined to be COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1, the recommended interval to the next dose is 28 days. Administer mRNA vaccine."
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "earliestIntervalCheck"
@@ -596,7 +594,7 @@ rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: activation-group ext
 end
 
 
-rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If the patient is < 12 years as of the evaluation date and is < 12 years at the recommended due date), CVX 313 was administered for target dose 1 and it is Invalid, return recommended reason code ADMINISTER_mRNA_VACCINE."
+rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If the patient is < 12y as of the evaluation date and the recommended due date, and the most recent shot was COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1, return recommended reason code ADMINISTER_mRNA_VACCINE"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
 	when
@@ -607,13 +605,17 @@ rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If the patient is < 
 			- the effective dose number in the series is == 1
 			- make note of the recommendation date as $recommendationDate
 			- post processing on the Series forecast has not already been run
-		There is an administered shot $previousShot
-			- the shot belongs to the Series $targetSeries
-			- the dose number in the series is == 1
-			- the vaccine administered is "ICE313"
-			- that has already been evaluated and whose shot validity is ACCEPTED
-			- make note of Accepted evaluation reasons for this shot as $acceptedReasons
-			- the collection $acceptedReasons contains "EVALUATION_REASON_CONCEPT.VACCINE_NOT_ALLOWED_FOR_THIS_DOSE" 
+		There is an IceFact $iceFactCVX313NotValid
+			- that has associated series $targetSeries
+			- that has finding "COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1"
+			- make note of the date the associated shot was administered as $cvx313administrationDate	
+		//There is an administered shot $previousShot
+		//	- the shot belongs to the Series $targetSeries
+		//	- the dose number in the series is == 1
+		//	- the vaccine administered is "ICE313"
+		//	- that has already been evaluated and whose shot validity is ACCEPTED
+		//	- make note of Accepted evaluation reasons for this shot as $acceptedReasons
+		//	- the collection $acceptedReasons contains "EVALUATION_REASON_CONCEPT.VACCINE_NOT_ALLOWED_FOR_THIS_DOSE" 
 		The Patient information $patientInfo must be known to complete writing this rule
 			- make note of the Patient's birthdate as $birthDate
 		Confirm elapsed time between $birthDate and evalTime < "12y" && elapsed time between $birthDate and $recommendationDate < "12y"
