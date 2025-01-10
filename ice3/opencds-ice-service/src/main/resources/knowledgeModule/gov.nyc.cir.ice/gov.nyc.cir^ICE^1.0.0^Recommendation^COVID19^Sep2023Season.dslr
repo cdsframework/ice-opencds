@@ -777,11 +777,62 @@ end
 
 
 
-
 /*****************************************************************************************************************************************************************************************************************
  ===> Series: Pfizer < 5 yrs
 *****************************************************************************************************************************************************************************************************************/
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Interval from a Prior Formulation or Non-Pfizer Vaccine
+//    If a prior formulation COVID-19 vaccine (excluding non-US vaccines) or a non-Pfizer updated seasonal COVID-19 vaccine is administered as target dose 1 or target dose 2, intervals to the next target dose are: 
+//        Absolute minimum interval = 24 days
+//        Minimum interval = 28 days
+//        Recommended interval = 28 days
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a prior formulation COVID-19 vaccine (excluding non-US vaccines) or a non-Pfizer updated seasonal COVID-19 vaccine is administered as target dose 1 or target dose 2, the minimum/recommended interval to the next dose is 28 days(*recommendationIntervalCheck*)"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
+	activation-group "recommendationIntervalCheck"
+	when
+		There is a Series $targetSeries that needs forecasting
+			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
+			- the name of the Series is "COVID19Sep2023PfizerLT5ySeries"
+			- the Series is not complete
+		There is an administered shot $mostRecentShot
+			- the shot belongs to the series $targetSeries
+			- make note of the date this shot was administered as $mostRecentShotDate
+			- the vaccine administered a member of ("ICE207", "ICE210", "ICE211", "ICE212", "ICE213", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE311", "ICE312", "ICE313")
+			- the shot is not ignored
+		There does not exist an administered shot
+			- the shot belongs to the series $targetSeries
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the administration date of the shot is > $mostRecentShotDate
+			- the shot is not ignored
+	then
+		Create a Recommendation as $r for the Series $targetSeries
+		Add "28d" to $mostRecentShotDate and make note of the newly calculated date as $dtCalculated
+		Set the recommendation Earliest Forecast Date for $r to $dtCalculated
+		Set the recommendation Recommended Forecast Date for $r to $dtCalculated
+		Include the Recommendation $r for Consideration in the final forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+       	Log that this Series Rule fired for the Series $targetSeries
+end
+
+
+rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a prior formulation COVID-19 vaccine (excluding non-US vaccines) or a non-Pfizer updated seasonal COVID-19 vaccine is administered as target dose 1 or target dose 2, the minimum/recommended interval to the next dose is 28 days(*earliestIntervalCheck*)"
+		extends "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a prior formulation COVID-19 vaccine (excluding non-US vaccines) or a non-Pfizer updated seasonal COVID-19 vaccine is administered as target dose 1 or target dose 2, the minimum/recommended interval to the next dose is 28 days(*recommendationIntervalCheck*)"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
+	activation-group "earliestIntervalCheck"
+	when
+		// Series Table Earliest Age will be overridden by this rule and will not be enforced
+	then
+		// Nothing to do; earliest forecast date set in parent rule
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+       	Log that this Series Rule fired for the Series $targetSeries
+end	
+	
+	
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ===> Pfizer < 5 yrs Series  
 // If a shot is administered below the series absolute minimum age (< 6m - 4 days) in this season (on or after 9/12/2023):
@@ -828,7 +879,7 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a shot was previously administ
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "earliestAgeCheck"
-when
+	when
 		// Series Table Earliest Age will be overridden by this rule and will not be enforced
 	then
 		// Nothing to do; earliest forecast date set in parent rule

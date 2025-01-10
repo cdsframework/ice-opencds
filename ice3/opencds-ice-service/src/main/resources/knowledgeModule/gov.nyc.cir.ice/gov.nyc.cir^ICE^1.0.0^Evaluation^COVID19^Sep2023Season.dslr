@@ -479,7 +479,7 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a CVX 308 is administered for 
 			- the shot belongs to the Series with name "COVID19Sep2023PfizerLT5ySeries"
 			- the series that the shot belongs to is not complete
 			- the vaccine administered is "ICE308"
-			- the dose number in the Series is one of ("2","3")
+			- the dose number in the Series is one of (2, 3)
 			- make note of the associated series as $associatedTargetSeries
 		There is a Series $targetSeries identified by $associatedTargetSeries
 			- the Series belongs to the Season with name "COVID19Sep2023Season"
@@ -508,7 +508,7 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a shot was previously administ
 		There is an administered shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the shot belongs to the Series with name "COVID19Sep2023PfizerLT5ySeries"
-			- the dose number in the Series is one of ("1","2")
+			- the dose number in the Series is one of (1, 2)
 			- the series that the shot belongs to is not complete
 			- make note of the date this shot was administered as $currentShotDate
 			- make note of the dose number as $targetDoseNumber
@@ -559,6 +559,40 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If the patient has 1 dose of upda
 		Refresh all facts in the Series $targetSeries
 		Record that this dose rule was Processed for the TargetDose $validShot
 		Log that this dose rule fired for the dose $validShot in the Series $targetSeries
+end
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Interval from a Prior Formulation or Non-Pfizer Vaccine
+//    If a prior formulation COVID-19 vaccine (excluding non-US vaccines) or a non-Pfizer updated seasonal COVID-19 vaccine is administered as target dose 1 or target dose 2, intervals to the next target dose are: 
+//        Absolute minimum interval = 24 days
+//        Minimum interval = 28 days
+//        Recommended interval = 28 days
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a prior formulation COVID-19 vaccine (excluding non-US vaccines) or a non-Pfizer updated seasonal COVID-19 vaccine is administered as target dose 1 or target dose 2, the absolute minimum interval to the next dose is 24 days"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
+	activation-group "doseIntervalCheck"
+	when
+		There is an administered shot $currentShot that needs to be evaluated
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850" and the Series with name "COVID19Sep2023PfizerLT5ySeries"
+			- the Series that the shot belongs to is not complete
+			- make note of the date this shot was administered as $currentShotDate
+			- make note of the associated series as $associatedTargetSeries
+		There is an administered shot $previousShot
+			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
+			- the administration date of the shot is < $currentShotDate
+			- the vaccine administered a member of ("ICE207", "ICE210", "ICE211", "ICE212", "ICE213", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE311", "ICE312", "ICE313")
+			- make note of the date this shot was administered as $previousShotDate
+		There does not exist an administered shot
+			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
+			- the administration date of the shot is > $previousShotDate
+			- the administration date of the shot is < $currentShotDate
+		Confirm Elapsed time between $previousShotDate and $currentShotDate < "24d"
+	then
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
 
 /*****************************************************************************************************************************************************************************************************************
@@ -638,7 +672,7 @@ rule "COVID-19(Sep2023+ Mixed Product < 5yrs Series): If a shot previously admin
 		There is an administered shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the shot belongs to the Series with name "COVID19Sep2023MixedProductLT5ySeries"
-			- the dose number in the Series is one of ("1","2")
+			- the dose number in the Series is one of (1, 2)
 			- the series that the shot belongs to is not complete
 			- make note of the date this shot was administered as $currentShotDate
 			- make note of the dose number as $targetDoseNumber
