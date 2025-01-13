@@ -55,14 +55,18 @@ global java.util.Date evalTime
 global org.cdsframework.ice.service.Schedule schedule
 
 
-/*****************************************************************************************************************************************************************************************************************
-===> PRIOR FORMULATION of COVID-19 Vaccine Administered on or after the 9/12/2023
- If the patient has a prior formulation COVID-19 shot that does not count towards U.S. vaccination (CVX 500, CVX 501, CVX 503, CVX 504, CVX 505, CVX 506, CVX 507, CVX 508, CVX 509, CVX 513, CVX 514, CVX 515, CVX 516, CVX 517, CVX 518, CVX 521) administered on or after 9/12/2023, the intervals to the next target dose are: 
-     + Absolute Minimum Interval = 8 weeks - 4 days
-     + Minimum Interval = 8 weeks
-     + Recommended Interval = 8 weeks 
- /****************************************************************************************************************************************************************************************************************/
 
+/*****************************************************************************************************************************************************************************************************************
+ ===> Series: ALL
+*****************************************************************************************************************************************************************************************************************/
+
+////////
+// ===> PRIOR FORMULATION of COVID-19 Vaccine Administered on or after the 9/12/2023
+// If the patient has a prior formulation COVID-19 shot that does not count towards U.S. vaccination (CVX 500, CVX 501, CVX 503, CVX 504, CVX 505, CVX 506, CVX 507, CVX 508, CVX 509, CVX 513, CVX 514, CVX 515, CVX 516, CVX 517, CVX 518, CVX 521) administered on or after 9/12/2023, the intervals to the next target dose are: 
+//    + Absolute Minimum Interval = 8 weeks - 4 days
+//    + Minimum Interval = 8 weeks
+//    + Recommended Interval = 8 weeks 
+///////
 rule "COVID-19(Sep2023+): If a prior formulation that does not count towards U.S. vaccination is administered (for any Sept 2023 onward COVID-19 Series), recommend earliest & recommended interval of 8 weeks to the next dose"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
@@ -73,12 +77,12 @@ rule "COVID-19(Sep2023+): If a prior formulation that does not count towards U.S
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the Series is not Complete
 		There is an administered shot $priorShot
-			- the shot belongs to the Series $targetSeries
+			/////// - the shot belongs to the Series $targetSeries
 			- that has already been evaluated
 			- the vaccine administered a member of ("ICE500", "ICE501", "ICE503", "ICE504", "ICE505", "ICE506", "ICE507", "ICE508", "ICE509", "ICE513", "ICE514", "ICE515", "ICE516", "ICE517", "ICE518", "ICE521")
 			- make note of the Date this Shot was Administered as $previousShotDate
 		There does not exist an administered shot
-			- the shot belongs to the Series $targetSeries
+			/////// - the shot belongs to the Series $targetSeries
 			- that has already been evaluated
 			- the administration date of the shot is > $previousShotDate
 			- the vaccine administered a member of ("ICE500", "ICE501", "ICE503", "ICE504", "ICE505", "ICE506", "ICE507", "ICE508", "ICE509", "ICE513", "ICE514", "ICE515", "ICE516", "ICE517", "ICE518", "ICE521")
@@ -92,17 +96,12 @@ rule "COVID-19(Sep2023+): If a prior formulation that does not count towards U.S
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
-/*****************************************************************************************************************************************************************************************************************
- END ===> Series: ALL; Prior formulation administered in this season
-*****************************************************************************************************************************************************************************************************************/
 
-
-/*****************************************************************************************************************************************************************************************************************
-For all COVID-19 vaccine seasons: 
-    * COVID-19 shots administered are evaluated based on the rules in effect as of the shot administration date.  (evaluation rule, handled in evaluation rule set)
-    * COVID-19 recommendations are based on the rules in effect as of the evaluation date. (recommendation rule, handled here)
-*****************************************************************************************************************************************************************************************************************/
-
+///////
+// For all COVID-19 vaccine seasons: 
+//    * COVID-19 shots administered are evaluated based on the rules in effect as of the shot administration date.  (evaluation rule, handled in evaluation rule set)
+//    * COVID-19 recommendations are based on the rules in effect as of the evaluation date. (recommendation rule, handled here)
+///////
 rule "COVID-19(Sep2023+): If the evaluation date is prior to the 2024-2025 season start date (8/22/2024), the target series is in the 2023-2024 season, and the series is complete, recommendation is NOT_RECOMMENDED / COMPLETE"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
@@ -124,10 +123,11 @@ rule "COVID-19(Sep2023+): If the evaluation date is prior to the 2024-2025 seaso
 end
 
 
-/*****************************************************************************************************************************************************************************************************************
- When recommending in the Seasonal COVID-19 Pfizer Series (< 5 years) or the Seasonal COVID-19 Moderna Series (< 5 years), recommend at the CVX code level. Recommend the vaccine product applicable 
- for the series and the patient's age, based on the COVID-19 Vaccines table
-*****************************************************************************************************************************************************************************************************************/
+/////////////////////
+// START
+// When recommending in the Seasonal COVID-19 Pfizer Series (< 5 years) or the Seasonal COVID-19 Moderna Series (< 5 years), recommend at the CVX code level. Recommend the vaccine product applicable 
+// for the series and the patient's age, based on the COVID-19 Vaccines table
+/////////////////////
 
 rule "COVID-19(Sep2023+ Moderna < 5yrs Series Abstract): Recommend the appropriate age-specific vaccine"
 	dialect "mvel"
@@ -246,10 +246,15 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If the next recommended dose is a
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
+/////////////////////
+// END Recommending at the CVX code level for Moderna/Pfizer < 5yrs Series... 
+/////////////////////
 
-/*****************************************************************************************************************************************************************************************************************
- Recommendation Age Rules ===> All Series ; v1.42 release logic, still applicable
-*****************************************************************************************************************************************************************************************************************/
+
+/////////////////////
+// START
+// Recommendation Age Rules ===> All Series ; v1.42 release logic, still applicable
+/////////////////////
 
 rule "COVID-19(Sep2023+): If there are no shots administered, set the earliest/recommended/overdue age to the latter of age 6 months or the current season start date (*recommendationAgeCheck*)"
 	dialect "mvel"
@@ -301,15 +306,26 @@ when
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
+/////////////////////
+// END Recommendation Age Rules ===> All Series ; v1.42 release logic, still applicable
+/////////////////////
+
+
+/////////////////////
+// Recommended Interval Rules ===> All Series
+/////////////////////
+
+rule "COVID-19(Sep2023+): If a shot was administered in the prior season and there are no administered shots in the current season, include the recommended interval from the prior shot to the next target dose"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
+	when
+	
+	then
+	
+end
+
 /*****************************************************************************************************************************************************************************************************************
- END Recommendation Age Rules ===> All Series
-*****************************************************************************************************************************************************************************************************************/
-
-
-
-
-/*****************************************************************************************************************************************************************************************************************
- ===> Series: >= 5 yrs
+ ===> Series: >= 5 yrs START
 *****************************************************************************************************************************************************************************************************************/
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -836,12 +852,12 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a prior formulation COVID-19 v
 			- the effective dose number in the Series is <= 2
 			- the Series is not complete
 		There is an administered shot $mostRecentShot
-			- the shot belongs to the series $targetSeries
-			- make note of the date this shot was administered as $mostRecentShotDate
+			/////// - the shot belongs to the series $targetSeries
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the vaccine administered a member of ("ICE207", "ICE210", "ICE211", "ICE212", "ICE213", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE311", "ICE312", "ICE313")
 			- the shot is not ignored
+			- make note of the date this shot was administered as $mostRecentShotDate
 		There does not exist an administered shot
-			- the shot belongs to the series $targetSeries
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the administration date of the shot is > $mostRecentShotDate
 			- the shot is not ignored
