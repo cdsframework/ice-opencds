@@ -38,6 +38,7 @@ import org.cdsframework.ice.service.ICEFactTypeFinding
 import org.cdsframework.ice.service.ICELogicHelper
 import org.cdsframework.ice.service.Recommendation
 import org.cdsframework.ice.service.RecommendationStatus
+import org.cdsframework.ice.service.Season
 import org.cdsframework.ice.service.Schedule
 import org.cdsframework.ice.service.SeriesRules
 import org.cdsframework.ice.service.TargetDose
@@ -97,6 +98,33 @@ end
 
 
 /*****************************************************************************************************************************************************************************************************************
+For all COVID-19 vaccine seasons: 
+    * COVID-19 shots administered are evaluated based on the rules in effect as of the shot administration date.  (evaluation rule, handled in evaluation rule set)
+    * COVID-19 recommendations are based on the rules in effect as of the evaluation date. (recommendation rule, handled here)
+*****************************************************************************************************************************************************************************************************************/
+
+rule "COVID-19(Sep2023+): If the evaluation date is prior to the 2024-2025 season start date (8/22/2024), the target series is in the 2023-2024 season, and the series is complete, recommendation is NOT_RECOMMENDED / COMPLETE"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
+	when
+		There is a Series $targetSeries that needs forecasting
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the Series is Complete
+			- the Series belongs to the Season with name "COVID19Sep2023Season"
+		There is a Season $season20242025
+			- the name of the Season is "COVID19Aug2024Season"
+			- the fully specified season start date is > evalTime
+	then
+		Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
+		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
+		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Mark Forecasting of the Series $targetSeries Complete
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+       	Log that this Series Rule fired for the Series $targetSeries
+end
+
+
+/*****************************************************************************************************************************************************************************************************************
  When recommending in the Seasonal COVID-19 Pfizer Series (< 5 years) or the Seasonal COVID-19 Moderna Series (< 5 years), recommend at the CVX code level. Recommend the vaccine product applicable 
  for the series and the patient's age, based on the COVID-19 Vaccines table
 *****************************************************************************************************************************************************************************************************************/
@@ -111,6 +139,9 @@ rule "COVID-19(Sep2023+ Moderna < 5yrs Series Abstract): Recommend the appropria
 			- the name of the Series is "COVID19Sep2023ModernaLT5ySeries"
 			- make note of the Recommendation Date as $recommendationDate
 			- post processing on the Series forecast has not already been run
+		There exists an administered shot
+			- the shot belongs to the Series $targetSeries
+			- that has already been evaluated and whose shot validity is VALID
 		The patient information $assign_oEvaluatedPerson must be known to complete writing this rule
 			- make note of the patient's birthdate as $dtBirthDate
 	then
@@ -160,6 +191,9 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series Abstract): Recommend the appropriat
 			- the name of the Series is "COVID19Sep2023PfizerLT5ySeries"
 			- make note of the Recommendation Date as $recommendationDate
 			- post processing on the Series forecast has not already been run
+		There exists an administered shot
+			- the shot belongs to the Series $targetSeries
+			- that has already been evaluated and whose shot validity is VALID
 		The patient information $assign_oEvaluatedPerson must be known to complete writing this rule
 			- make note of the patient's birthdate as $dtBirthDate
 	then
@@ -799,6 +833,7 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a prior formulation COVID-19 v
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
 			- the name of the Series is "COVID19Sep2023PfizerLT5ySeries"
+			- the effective dose number in the Series is <= 2
 			- the Series is not complete
 		There is an administered shot $mostRecentShot
 			- the shot belongs to the series $targetSeries
@@ -853,7 +888,7 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a shot was previously administ
 			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
 			- the name of the Series is "COVID19Sep2023PfizerLT5ySeries"
 			- the Series is not complete
-			- the effective number of doses administered in the Series is <= 2
+			- the effective dose number in the Series is <= 2
 		There is an administered shot $mostRecentShot
 			- the shot belongs to the series $targetSeries
 			- make note of the date this shot was administered as $mostRecentShotDate
