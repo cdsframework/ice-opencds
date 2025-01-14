@@ -68,7 +68,6 @@ rule "COVID-19(Sep2023+ Abstract): If a COVID-19 shot that does not count toward
 			- make note of the associated series as $associatedTargetSeries
 		There is an administered shot $previousShot distinct from $currentShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			/////// - the shot belongs to the Series $associatedTargetSeries
 			- that has already been evaluated
 			- the administration date of the shot is >= "12-Sep-2023"
 			- the administration date of the shot is < $currentShotDate
@@ -76,7 +75,6 @@ rule "COVID-19(Sep2023+ Abstract): If a COVID-19 shot that does not count toward
 			- make note of the date this shot was administered as $previousShotDate
 		There does not exist another administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			/////// - the shot belongs to the Series $associatedTargetSeries
 			- the vaccine administered a member of ("ICE500", "ICE501", "ICE503", "ICE504", "ICE505", "ICE506", "ICE507", "ICE508", "ICE509", "ICE513", "ICE514", "ICE515", "ICE516", "ICE517", "ICE518", "ICE521")
 			- the administration date of the shot is > $previousShotDate
 			- the administration date of the shot is < $currentShotDate
