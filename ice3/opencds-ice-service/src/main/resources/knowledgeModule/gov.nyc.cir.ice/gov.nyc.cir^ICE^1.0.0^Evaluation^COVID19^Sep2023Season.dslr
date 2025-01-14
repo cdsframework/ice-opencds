@@ -67,13 +67,14 @@ rule "COVID-19(Sep2023+ Abstract): If a prior formulation that does not count to
 			- make note of the date this shot was administered as $currentShotDate
 			- make note of the associated series as $associatedTargetSeries
 		There is an administered shot $previousShot distinct from $currentShot
-			- the shot belongs to the series $associatedTargetSeries
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- that has already been evaluated
+			- the administration date of the shot is >= "12-Sep-2023"
 			- the administration date of the shot is <= $currentShotDate
 			- the vaccine administered a member of ("ICE500", "ICE501", "ICE503", "ICE504", "ICE505", "ICE506", "ICE507", "ICE508", "ICE509", "ICE513", "ICE514", "ICE515", "ICE516", "ICE517", "ICE518", "ICE521")
 			- make note of the date this shot was administered as $previousShotDate
 		There does not exist another administered shot
-			- the shot belongs to the series $associatedTargetSeries
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the vaccine administered a member of ("ICE500", "ICE501", "ICE503", "ICE504", "ICE505", "ICE506", "ICE507", "ICE508", "ICE509", "ICE513", "ICE514", "ICE515", "ICE516", "ICE517", "ICE518", "ICE521")
 			- the administration date of the shot is > $previousShotDate
 			- the administration date of the shot is <= $currentShotDate
@@ -847,7 +848,7 @@ rule "COVID-19(Sep2023+ >= 5yrs): If the absolute minimum interval from the prio
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
 
-
+/*
 rule "COVID-19(Sep2023+ Pfizer/Moderna/Mixed Product < 5yrs; Novavax Series): If a shot was administered prior to target dose 1 (prior season) but has never received any (valid) doses, the absolute minimum interval from the prior shot to the current shot is 8w-4d"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
@@ -881,7 +882,7 @@ rule "COVID-19(Sep2023+ Pfizer/Moderna/Mixed Product < 5yrs; Novavax Series): If
 		Record that this dose rule was Processed for the TargetDose $currentShot
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
 end
-
+*/
 
 rule "COVID-19(Sep2023+ Moderna < 5rs Series): If there are no doses in the current season but target is dose 2 (due to skip), and there were >=2 doses in a prior season, then absolute minimum interval from the prior shot to the current shot is 8w-4d"
 	dialect "mvel"
