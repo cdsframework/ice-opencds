@@ -2517,6 +2517,7 @@ rule "RecommendationForecast.recommendBasedOnEarliestRecommendedAgeRule" ruleflo
 		$ts.recommendNextShotBasedOnEarliestRecommendedAgeRule($person.demographics.birthTime, $evalTime.getEvalTimeValue());
 		$ts.addSeriesRuleProcessed(_RULENAME);
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeries " + $ts.seriesName);
+		/////// ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeries " + $ts.seriesName + "; dose number to recommend: " + $ts.doseNumberToRecommend);
 end 
 
 
@@ -2535,6 +2536,7 @@ rule "RecommendationForecast.recommendBasedOnRecommendedIntervalRule" ruleflow-g
 		$ts.recommendNextShotBasedOnEarliestRecommendedIntervalRule($evalTime.getEvalTimeValue());
 		$ts.addSeriesRuleProcessed(_RULENAME);
 		ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeries " + $ts.seriesName);
+		/////// ICELogicHelper.logDRLDebugMessage(_RULENAME, "TargetSeries " + $ts.seriesName + "; dose number to recommend: " + $ts.doseNumberToRecommend);
 end
 
 
