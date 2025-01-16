@@ -153,8 +153,7 @@ rule "COVID-19(Sep2023+ Moderna < 5yrs Series): If the next recommended dose is 
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
 	when
-		/////// Confirm the date $recommendationDate is on the same date or after "12-Sep-2023" && elapsed time between $dtBirthDate and $recommendationDate >= "6m" && elapsed time between $dtBirthDate and $recommendationDate < "12y"
-		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "6m" && elapsed time between $dtBirthDate and $recommendationDate < "12y"
+		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "6m" && elapsed time between $dtBirthDate and $recommendationDate < "12y" && elapsed time between $dtBirthDate and evalTime < "12y"
 	then
 		Create a Recommendation as $oRecommendation for the Series $targetSeries
 		Set the Recommendation Vaccine for $oRecommendation to "ICE311"
@@ -169,7 +168,7 @@ rule "COVID-19(Sep2023+ Moderna < 5yrs Series): If the next recommended dose is 
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
 	when
-		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "12y"
+		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "12y" || $recommendationDate <= evalTime && elapsed time between $dtBirthDate and evalTime >= "12y"
 	then
 		Create a Recommendation as $oRecommendation for the Series $targetSeries
 		Set the Recommendation Vaccine for $oRecommendation to "ICE312"
@@ -202,7 +201,7 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If the next recommended dose is a
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
 	when
-		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "6m" && elapsed time between $dtBirthDate and $recommendationDate < "5y"
+		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "6m" && elapsed time between $dtBirthDate and $recommendationDate < "5y" && elapsed time between $dtBirthDate and evalTime < "5y" 
 	then
 		Create a Recommendation as $oRecommendation for the Series $targetSeries
 		Set the Recommendation Vaccine for $oRecommendation to "ICE308"
@@ -217,7 +216,8 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If the next recommended dose is a
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
 	when
-		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "5y" && elapsed time between $dtBirthDate and $recommendationDate < "12y"
+		/////// Confirm elapsed time between $dtBirthDate and $recommendationDate >= "5y" && elapsed time between $dtBirthDate and $recommendationDate < "12y" || elapsed time between $dtBirthDate and evalTime >= "5y" && elapsed time between $dtBirthDate and evalTime < "12y" && that the following is true: $recommendationDate <= evalTime
+		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "5y" && elapsed time between $dtBirthDate and $recommendationDate < "12y" || $recommendationDate <= evalTime && elapsed time between $dtBirthDate and evalTime >= "5y" && elapsed time between $dtBirthDate and evalTime < "12y"
 	then
 		Create a Recommendation as $oRecommendation for the Series $targetSeries
 		Set the Recommendation Vaccine for $oRecommendation to "ICE310"
@@ -232,7 +232,7 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If the next recommended dose is a
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
 	when
-		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "12y"
+		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "12y" || $recommendationDate <= evalTime && elapsed time between $dtBirthDate and evalTime >= "12y"
 	then
 		Create a Recommendation as $oRecommendation for the Series $targetSeries
 		Set the Recommendation Vaccine for $oRecommendation to "ICE309"
@@ -816,13 +816,13 @@ end
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Interval from a Prior Formulation or Non-Pfizer Vaccine
-//    If a prior formulation COVID-19 vaccine (excluding non-US vaccines) or a non-Pfizer updated seasonal COVID-19 vaccine is administered as target dose 1 or target dose 2, intervals to the next target dose are: 
+//    If a prior formulation COVID-19 vaccine (excluding non-US vaccines that do not count towards U.S. vaccination) or a non-Pfizer updated seasonal COVID-19 vaccine is administered as target dose 1 or target dose 2, intervals to the next target dose are: 
 //        Absolute minimum interval = 24 days
 //        Minimum interval = 28 days
 //        Recommended interval = 28 days
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a prior formulation COVID-19 vaccine (excluding non-US vaccines) or a non-Pfizer updated seasonal COVID-19 vaccine is administered as target dose 1 or target dose 2, the minimum/recommended interval to the next dose is 28 days(*recommendationIntervalCheck*)"
+rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a prior formulation COVID-19 vaccine (excluding non-US vaccines that do not count towards US vaccination) or a non-Pfizer updated seasonal COVID-19 vaccine is administered on or after 9/12/2023 for target dose 1 or target dose 2, the minimum/recommended interval to the next dose is 28 days(*recommendationIntervalCheck*)"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "recommendationIntervalCheck"
@@ -835,7 +835,8 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a prior formulation COVID-19 v
 		There is an administered shot $mostRecentShot
 			/////// - the shot belongs to the series $targetSeries
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- the vaccine administered a member of ("ICE207", "ICE208", "ICE210", "ICE211", "ICE212", "ICE213", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE300", "ICE301", "ICE302", "ICE311", "ICE312", "ICE313")
+			- the administration date of the shot is >= "12-Sep-2023"
+			- the vaccine administered a member of ("ICE207", "ICE208", "ICE210", "ICE211", "ICE212", "ICE213", "ICE217", "ICE218", "ICE219", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE300", "ICE301", "ICE302", "ICE311", "ICE312", "ICE313", "ICE520")
 			- the shot is not ignored
 			- make note of the date this shot was administered as $mostRecentShotDate
 		There does not exist an administered shot
@@ -853,8 +854,8 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a prior formulation COVID-19 v
 end
 
 
-rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a prior formulation COVID-19 vaccine (excluding non-US vaccines) or a non-Pfizer updated seasonal COVID-19 vaccine is administered as target dose 1 or target dose 2, the minimum/recommended interval to the next dose is 28 days(*earliestIntervalCheck*)"
-		extends "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a prior formulation COVID-19 vaccine (excluding non-US vaccines) or a non-Pfizer updated seasonal COVID-19 vaccine is administered as target dose 1 or target dose 2, the minimum/recommended interval to the next dose is 28 days(*recommendationIntervalCheck*)"
+rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a prior formulation COVID-19 vaccine (excluding non-US vaccines that do not count towards US vaccination) or a non-Pfizer updated seasonal COVID-19 vaccine is administered as target dose 1 or target dose 2, the minimum/recommended interval to the next dose is 28 days(*earliestIntervalCheck*)"
+		extends "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a prior formulation COVID-19 vaccine (excluding non-US vaccines that do not count towards US vaccination) or a non-Pfizer updated seasonal COVID-19 vaccine is administered on or after 9/12/2023 for target dose 1 or target dose 2, the minimum/recommended interval to the next dose is 28 days(*recommendationIntervalCheck*)"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "earliestIntervalCheck"
