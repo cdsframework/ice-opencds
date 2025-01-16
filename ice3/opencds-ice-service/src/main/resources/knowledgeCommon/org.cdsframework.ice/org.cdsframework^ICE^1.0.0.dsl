@@ -514,6 +514,7 @@
 [condition][]There is {entity:an |another |}IceFact {oICEFactTypeFinding}={oICEFactTypeFinding} : ICEFactTypeFinding()
 [condition][]- [Tt]hat has [Ff]inding {sIceResultFinding}=iceResultFinding == {sIceResultFinding}
 [condition][]- [Tt]hat has [Aa]ssociated [Ss]eries {oTargetSeries}=associatedTargetSeries == {oTargetSeries}
+[condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot [Dd]ate {aOp:[\=\\<\\>\\!]+}  {dtOtherDate}=targetDose.administrationDate {aOp} {dtOtherDate}
 [condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot {oTargetDose} {attr}=targetDose == {oTargetDose} {attr}
 [condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot {oTargetDose}=targetDose == {oTargetDose}
 [condition][]- [Tt]here is an [Aa]ssociated [Aa]dministered [Ss]hot in the [Ss]eries {refer_oTargetSeries}=associatedTargetSeries == {refer_oTargetSeries}, targetDose != null 
