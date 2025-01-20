@@ -1247,6 +1247,8 @@ rule "SeriesSelection(COVID-19): In Sep2023+ season, select the Mixed Product Se
 		(
 			exists TargetDose(associatedTargetSeries == $ts, administrationDate < $dateAt5yrs)
 			or
+			eval(evalTime < $dateAt5yrs)
+			or
 			(
 				$tspriorseasonseries : TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.850", targetSeason != null, isSeriesComplete() == false, targetSeason.startsBeforeStartDate($ts.targetSeason, false))
 				and
@@ -1286,6 +1288,9 @@ rule "SeriesSelection(COVID-19): In Sep2023+ season, select the Pfizer < 5 yrs s
 		(
 			// A dose was administered in the target series that was at less than 5 years of age 
 			exists TargetDose(associatedTargetSeries == $ts, administrationDate < $dateAt5yrs)
+			or
+			// The patient is less than 5 years of age at the evaluation date
+			eval(evalTime < $dateAt5yrs)
 			or
 			// The prior season < 5yr series was started but not completed
 			(
@@ -1327,6 +1332,9 @@ rule "SeriesSelection(COVID-19): In Sep2023 season, select the Moderna < 5 yrs s
 		(
 			// A dose was administered in the target series that was at less than 5 years of age 
 			exists TargetDose(associatedTargetSeries == $ts, administrationDate < $dateAt5yrs)
+			or
+			// The patient is less than 5 years of age at the evaluation date
+			eval(evalTime < $dateAt5yrs)
 			or
 			// The prior season < 5yr series was started but not completed
 			(
