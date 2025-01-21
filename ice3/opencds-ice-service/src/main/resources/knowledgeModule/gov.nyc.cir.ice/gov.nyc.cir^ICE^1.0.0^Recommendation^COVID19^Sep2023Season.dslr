@@ -60,13 +60,16 @@ global org.cdsframework.ice.service.Schedule schedule
  ===> Series: ALL
 *****************************************************************************************************************************************************************************************************************/
 
-////////
-// ===> PRIOR FORMULATION of COVID-19 Vaccine Administered on or after the 9/12/2023
-// If the patient has a prior formulation COVID-19 shot that does not count towards U.S. vaccination (CVX 500, CVX 501, CVX 503, CVX 504, CVX 505, CVX 506, CVX 507, CVX 508, CVX 509, CVX 513, CVX 514, CVX 515, CVX 516, CVX 517, CVX 518, CVX 521) administered on or after 9/12/2023, the intervals to the next target dose are: 
-//    + Absolute Minimum Interval = 8 weeks - 4 days
-//    + Minimum Interval = 8 weeks
-//    + Recommended Interval = 8 weeks 
-///////
+/////////////////////
+// ===> Non-U.S. vaccine that does not count towards vaccination, administered on or after 9/12/2023   
+//    If the patient has a prior formulation COVID-19 shot that does not count towards U.S. vaccination (CVX 500, CVX 501, CVX 503, CVX 504, CVX 505, CVX 506, CVX 507, CVX 508, CVX 509, CVX 513, CVX 514, CVX 515, CVX 516, CVX 517, CVX 518, CVX 521) administered on or after 9/12/2023, 
+//    the intervals to the next target dose are: 
+//        + Absolute Minimum Interval = 8 weeks - 4 days
+//        + Minimum Interval = 8 weeks
+//        + Recommended Interval = 8 weeks 
+//    If a prior formulation of a COVID-19 vaccine, excluding CVX 211, is administered on or after 9/12/2023, then the Evaluation is Invalid and the reason code is VACCINE_NOT_ALLOWED_FOR_THIS_DOSE.
+//////////////////////
+
 rule "COVID-19(Sep2023+): If a prior formulation that does not count towards U.S. vaccination is administered on or after 9/12/2023 (for any Sept 2023 onward COVID-19 Series), recommend earliest & recommended interval of 8 weeks to the next dose"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
@@ -80,7 +83,7 @@ rule "COVID-19(Sep2023+): If a prior formulation that does not count towards U.S
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- that has already been evaluated
 			- the vaccine administered a member of ("ICE500", "ICE501", "ICE503", "ICE504", "ICE505", "ICE506", "ICE507", "ICE508", "ICE509", "ICE513", "ICE514", "ICE515", "ICE516", "ICE517", "ICE518", "ICE521")
-			- the administration date of the shot is >= "12-Sep-2023"
+			/////// (check not needed; already included in definition of season) - the administration date of the shot is >= "12-Sep-2023"
 			- make note of the Date this Shot was Administered as $previousShotDate
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
