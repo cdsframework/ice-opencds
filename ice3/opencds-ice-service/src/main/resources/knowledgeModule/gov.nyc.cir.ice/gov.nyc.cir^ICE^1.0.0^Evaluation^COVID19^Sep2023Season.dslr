@@ -167,7 +167,7 @@ end
 // This overrides the value set in the series table, which was for 2023-2024 season. 
 ///////
 
-rule "COVID-19(Sep2023+ >= 5yrs Series): For the 2024-2025 season, the absolute minimum interval from (invalid) target dose 1 to dose 2 is 8w-4d (*doseIntervalCheck*)"
+rule "COVID-19(Sep2023+ >= 5yrs Series): For the 2024-2025 season, the absolute minimum interval from (invalid) dose 1 is 8w-4d (*doseIntervalCheck*)"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheck"
