@@ -83,7 +83,7 @@ rule "COVID-19(Sep2023+): If a prior formulation that does not count towards U.S
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- that has already been evaluated
 			- the vaccine administered a member of ("ICE500", "ICE501", "ICE503", "ICE504", "ICE505", "ICE506", "ICE507", "ICE508", "ICE509", "ICE513", "ICE514", "ICE515", "ICE516", "ICE517", "ICE518", "ICE521")
-			/////// (check not needed; already included in definition of season) - the administration date of the shot is >= "12-Sep-2023"
+			- the administration date of the shot is >= "12-Sep-2023"
 			- make note of the Date this Shot was Administered as $previousShotDate
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"

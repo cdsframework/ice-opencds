@@ -50,7 +50,7 @@ global java.util.Date evalTime
 
 
 /*****************************************************************************************************************************************************************************************************************
- ===> Series: >= 5 yrs
+ ===> Series: ALL. General Rules.
 /*****************************************************************************************************************************************************************************************************************/
 
 /////////////////////
@@ -74,7 +74,7 @@ rule "COVID-19(Sep2023+ Abstract): If a COVID-19 shot that does not count toward
 		There is an administered shot $previousShot distinct from $currentShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- that has already been evaluated
-			/////// (check not needed; already included in definition of season) - the administration date of the shot is >= "12-Sep-2023"
+			- the administration date of the shot is >= "12-Sep-2023"
 			- the administration date of the shot is < $currentShotDate
 			- the vaccine administered a member of ("ICE500", "ICE501", "ICE503", "ICE504", "ICE505", "ICE506", "ICE507", "ICE508", "ICE509", "ICE513", "ICE514", "ICE515", "ICE516", "ICE517", "ICE518", "ICE521")
 			- make note of the date this shot was administered as $previousShotDate
@@ -199,7 +199,7 @@ rule "COVID-19(Sep2023+): For the 2023-2024 season, the absolute minimum interva
 end
 
 /*****************************************************************************************************************************************************************************************************************
- ===> All Series END
+ END Series: All. General Rules.
 /*****************************************************************************************************************************************************************************************************************/
 
 
