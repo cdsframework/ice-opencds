@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:iceSeriesSpecificationFile xmlns:ns2="org.cdsframework.util.support.data.ice.series">
     <ns2:seriesId>QsE4arGecqfLBS36jtlJgW2KH0YrW0rjG29cw5Jn47bygF9G58EvJnupw1TKgRdj</ns2:seriesId>
-    <ns2:name>COVID-19 September 2023 Series (>=5 years)</ns2:name>
+    <ns2:name>COVID-19 Seasonal GTE5 Series</ns2:name>
     <ns2:code>COVID19Sep2023gte5Series</ns2:code>
     <ns2:cdsVersion>gov.nyc.cir^ICE^1.0.0</ns2:cdsVersion>
 	<ns2:recurringDosesAfterSeriesComplete>no</ns2:recurringDosesAfterSeriesComplete>

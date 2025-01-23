@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:iceSeriesSpecificationFile xmlns:ns2="org.cdsframework.util.support.data.ice.series">
     <ns2:seriesId>4xWdvcBDYLVAwpoyqcn4h8fWbRbIEsdz7db0FPe2Q0W1aC1g5ZlU70XMaQHpG353</ns2:seriesId>
-    <ns2:name>COVID-19 September 2023 Pfizer LT 5y Series</ns2:name>
+    <ns2:name>COVID-19 Seasonal Pfizer LT 5y Series</ns2:name>
     <ns2:code>COVID19Sep2023PfizerLT5ySeries</ns2:code>
     <ns2:cdsVersion>gov.nyc.cir^ICE^1.0.0</ns2:cdsVersion>
 	<ns2:recurringDosesAfterSeriesComplete>false</ns2:recurringDosesAfterSeriesComplete>

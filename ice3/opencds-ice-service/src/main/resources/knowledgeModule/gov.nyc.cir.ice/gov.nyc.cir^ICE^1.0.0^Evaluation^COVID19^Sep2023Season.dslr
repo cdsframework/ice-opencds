@@ -998,6 +998,41 @@ end
  ===> Series: Novavax Series Special Rules
 /*****************************************************************************************************************************************************************************************************************/
 
+///////
+// In the 2023-2024 season, the absolute minimum interval (see evaluation rules), minimum interval and recommended interval from dose 3 to dose 4 are, respectively, 8w-4d, 8w and 6m.
+// Absolute minimum interval rule is in this rule file; recommended interval rules are in the recommendation rule file.
+// This overrides the value set in the series table, which is set for the latest season. 
+///////
+
+rule "COVID-19(Sep2023+ Novavax Series): For the 2023-2024 season, the absolute minimum interval from (invalid) dose 1 is 8w-4d (*doseIntervalCheck*)"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
+	activation-group "doseIntervalCheck"
+	when
+		There is an Administered Shot $currentShot that needs to be evaluated
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the shot belongs to the Series with name "COVID19Sep2023NovavaxSeries"
+			- the dose number in the Series is == 4
+			- make note of the date this shot was administered as $dtAdministrationDateCurrentShot
+			- make note of the Associated Series as $associatedTargetSeries
+		There is an administered shot $previousDose
+			- the shot belongs to the Series $associatedTargetSeries
+			- the administration date of the shot is < $dtAdministrationDateCurrentShot
+			- that has already been evaluated
+			- make note of the date this shot was administered as $dtAdministrationDatePreviousDose
+		There does not exist an administered shot
+			- the shot belongs to the Series $associatedTargetSeries
+			- that has already been evaluated
+			- the administration date of the shot is > $dtAdministrationDatePreviousDose
+			- the administration date of the shot is < $dtAdministrationDateCurrentShot
+		Confirm Elapsed time between $dtAdministrationDatePreviousDose and $dtAdministrationDateCurrentShot < "8w-4d"
+	then
+		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
+end
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // If the patient is age >= 5 years and < 12 years and CVX 313 is administered as dose 1, evaluate and recommend using the following intervals:  
 //     Absolute Minimum Interval = 17 days
