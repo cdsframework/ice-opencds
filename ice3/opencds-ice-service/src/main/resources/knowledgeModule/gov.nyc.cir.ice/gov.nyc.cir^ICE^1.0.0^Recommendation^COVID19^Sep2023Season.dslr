@@ -1225,19 +1225,6 @@ rule "COVID-19(Sep2023+ Novavax Series): If a shot was administered for any dose
 end
 */
 
-/////////////////////
-// mRNA Administered for Target Dose 2
-// If a CVX 213, CVX 309, or CVX 312 is administered for target dose 2, and target dose 2 is administered < 8 weeks - 4 days from dose 1, evaluate as Invalid / Below Minimum Interval.
-/////////////////////
-
-rule "COVID-19(Sep2023+ Novavax Series): "
-	dialect "mvel"
-	when
-	
-	then
-	
-end
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // If the patient is age >= 5 years and < 12-4d years and CVX 313 is administered as dose 1, evaluate and recommend using the following intervals:  
