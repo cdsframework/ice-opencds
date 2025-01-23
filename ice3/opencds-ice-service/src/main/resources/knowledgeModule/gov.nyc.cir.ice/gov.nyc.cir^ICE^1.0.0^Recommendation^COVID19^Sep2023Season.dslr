@@ -319,7 +319,7 @@ end
 rule "COVID-19(Sep2023+): For the 2023-2024 season, the minimum interval and recommended interval from invalid shot prior to 9/12/2023 are 8w (*recommendationIntervalCheck*)"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
-	activation-group "recommendationIntervalCheck"
+	/////// activation-group "recommendationIntervalCheck"
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -342,7 +342,7 @@ rule "COVID-19(Sep2023+): For the 2023-2024 season, the minimum interval and rec
 	then
 		Create a Recommendation as $r for the Series $targetSeries
 		Add "8w" to $mostRecentShotDate and make note of the newly calculated date as $dtCalculatedEarliest
-		Add "6m" to $mostRecentShotDate and make note of the newly calculated date as $dtCalculatedRecommended
+		Add "8w" to $mostRecentShotDate and make note of the newly calculated date as $dtCalculatedRecommended
 		Set the recommendation Earliest Forecast Date for $r to $dtCalculatedEarliest
 		Set the recommendation Recommended Forecast Date for $r to $dtCalculatedRecommended
 		Include the Recommendation $r for Consideration in the final forecast of the Series
@@ -354,7 +354,7 @@ rule "COVID-19(Sep2023+): For the 2023-2024 season, the minimum interval and rec
 		extends "COVID-19(Sep2023+): For the 2023-2024 season, the minimum interval and recommended interval from invalid shot prior to 9/12/2023 are 8w (*recommendationIntervalCheck*)"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
-	activation-group "earliestIntervalCheck"
+	/////// activation-group "earliestIntervalCheck"
 	when
 		// Conditions checked in parent rule; no additional conditions to check	
 	then

@@ -1276,27 +1276,23 @@ rule "SeriesSelection(COVID-19): In Sep2023+ season, select the Pfizer < 5 yrs s
 	when
 		$ts : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesRules.seriesName == "COVID19Sep2023PfizerLT5ySeries", targetSeason != null && targetSeason == $tss.seriesSelectionSeason)
 		and
-		// There is not a valid dose that is not a Pfizer in the current or prior season
+		// There is not a valid dose that is not a Pfizer in the current or prior season in a < 5y series
 		not TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason || associatedTargetSeries!.targetSeason.startsBeforeStartDate($ts.targetSeason, false), isValid == true, 
-			vaccineComponent.cdsConceptName not in ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE308", "ICE309", "ICE310", "ICE520"))
+			vaccineComponent.cdsConceptName not in ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE308", "ICE309", "ICE310", "ICE520"), associatedTargetSeries.seriesRules.seriesName not in ("COVID19Sep2023gte5Series", "COVID19Sep2023NovavaxSeries"))
 		and
 		// There exists a valid dose is Pfizer in the current or prior season
 		exists TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason || associatedTargetSeries!.targetSeason.startsBeforeStartDate($ts.targetSeason, false), isValid == true, 
 			vaccineComponent.cdsConceptName in ("ICE208", "ICE217", "ICE218", "ICE219", "ICE300", "ICE301", "ICE302", "ICE308", "ICE309", "ICE310", "ICE520"))
 		and
-		// EITHER:
 		(
-			// A dose was administered in the target series that was at less than 5 years of age 
-			exists TargetDose(associatedTargetSeries == $ts, administrationDate < $dateAt5yrs)
-			or
-			// The patient is less than 5 years of age at the evaluation date
 			eval(evalTime < $dateAt5yrs)
 			or
-			// The prior season < 5yr series was started but not completed
 			(
-				$tspriorseasonseries : TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.850", targetSeason != null, isSeriesComplete() == false, targetSeason.startsBeforeStartDate($ts.targetSeason, false))
+				exists TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", associatedTargetSeries == $ts, administrationDate < $dateAt5yrs)
+				or
+				exists TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", administrationDate < $dateAt5yrs, isValid == true, associatedTargetSeries!.targetSeason.startsBeforeStartDate($ts.targetSeason, false))
 				and
-				exists TargetDose(associatedTargetSeries == $tspriorseasonseries, isValid == true, administrationDate < $dateAt5yrs)
+				$tspriorseasonseries : TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.850", targetSeason != null, isSeriesComplete() == false, targetSeason.startsBeforeStartDate($ts.targetSeason, false))
 				and
 				not TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.850", this != $tspriorseasonseries, targetSeason != null, targetSeason.startsAfterStartDate($tspriorseasonseries!.targetSeason, false), targetSeason.startsBeforeStartDate($ts!.targetSeason, false))
 			)
@@ -1322,25 +1318,21 @@ rule "SeriesSelection(COVID-19): In Sep2023 season, select the Moderna < 5 yrs s
 		and
 		// There is not a valid dose that is not a Moderna in the current or prior season
 		not TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason || associatedTargetSeries!.targetSeason.startsBeforeStartDate($ts.targetSeason, false), isValid == true, 
-			vaccineComponent.cdsConceptName not in ("ICE207", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE311", "ICE312", "ICE519"))
+			vaccineComponent.cdsConceptName not in ("ICE207", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE311", "ICE312", "ICE519"), associatedTargetSeries.seriesRules.seriesName not in ("COVID19Sep2023gte5Series", "COVID19Sep2023NovavaxSeries"))
 		and
 		// There exists a valid dose is Moderna in the current or prior season
 		exists TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason || associatedTargetSeries!.targetSeason.startsBeforeStartDate($ts.targetSeason, false), isValid == true, 
 			vaccineComponent.cdsConceptName in ("ICE207", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE311", "ICE312", "ICE519"))
 		and
-		// EITHER:
 		(
-			// A dose was administered in the target series that was at less than 5 years of age 
-			exists TargetDose(associatedTargetSeries == $ts, administrationDate < $dateAt5yrs)
-			or
-			// The patient is less than 5 years of age at the evaluation date
 			eval(evalTime < $dateAt5yrs)
 			or
-			// The prior season < 5yr series was started but not completed
 			(
-				$tspriorseasonseries : TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.850", targetSeason != null, isSeriesComplete() == false, targetSeason.startsBeforeStartDate($ts.targetSeason, false))
+				exists TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", associatedTargetSeries == $ts, administrationDate < $dateAt5yrs)
+				or
+				exists TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", administrationDate < $dateAt5yrs, isValid == true, associatedTargetSeries!.targetSeason.startsBeforeStartDate($ts.targetSeason, false))
 				and
-				exists TargetDose(associatedTargetSeries == $tspriorseasonseries, isValid == true, administrationDate < $dateAt5yrs)
+				$tspriorseasonseries : TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.850", targetSeason != null, isSeriesComplete() == false, targetSeason.startsBeforeStartDate($ts.targetSeason, false))
 				and
 				not TargetSeries(vaccineGroup == "VACCINE_GROUP_CONCEPT.850", this != $tspriorseasonseries, targetSeason != null, targetSeason.startsAfterStartDate($tspriorseasonseries!.targetSeason, false), targetSeason.startsBeforeStartDate($ts!.targetSeason, false))
 			)
