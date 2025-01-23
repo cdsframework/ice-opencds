@@ -1149,9 +1149,52 @@ END Series: Mixed Product < 5 yrs
 
 
 /*************************************************************************************************************************************************************************************
- ===> Series: Sep2023 Novavax
+ ===> Series: Sep2023+ Novavax
 /************************************************************************************************************************************************************************************/
 
+/////////////////////
+// In the 2023-2024 season, the absolute minimum interval (see evaluation rules), minimum interval and recommended interval from dose 3 to dose 4 are, respectively, 8w-4d, 8w and 6m.
+// Absolute minimum interval rule is in this rule file; recommended interval rules are in the recommendation rule file.
+// This overrides the value set in the series table, which is set for the latest season. 
+/////////////////////
+
+rule "COVID-19(Sep2023+ Novavax Series): For the 2023-2024 season, the minimum interval and recommended interval from dose 3 to dose 4 are, respectively, to 4m and 4m (*recommendationIntervalCheck*)"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
+	activation-group "recommendationIntervalCheck"
+	when
+		There is a Series $targetSeries that needs forecasting
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the name of the series is "COVID19Sep2023NovavaxSeries"
+			- the Series belongs to the Season with name "COVID19Sep2023Season"
+			- the Series is not Complete
+			- the effective dose number in the Series is == 4
+			- make note of the date that the most recent shot was administered as $mostRecentShotDate
+	then
+		Create a Recommendation as $r for the Series $targetSeries
+		Add "4m" to $mostRecentShotDate and make note of the newly calculated date as $dtCalculatedEarliest
+		Add "4m" to $mostRecentShotDate and make note of the newly calculated date as $dtCalculatedRecommended
+		Set the recommendation Earliest Forecast Date for $r to $dtCalculatedEarliest
+		Set the recommendation Recommended Forecast Date for $r to $dtCalculatedRecommended
+		Include the Recommendation $r for Consideration in the final forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+       	Log that this Series Rule fired for the Series $targetSeries
+end
+
+rule "COVID-19(Sep2023+ Novavax Series): For the 2023-2024 season, the minimum interval and recommended interval from dose 3 to dose 4 are, respectively, to 4m and 4m (*earliestIntevalCheck*)"
+		extends "COVID-19(Sep2023+ Novavax Series): For the 2023-2024 season, the minimum interval and recommended interval from dose 3 to dose 4 are, respectively, to 4m and 4m (*recommendationIntervalCheck*)"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
+	activation-group "earliestIntervalCheck"
+	when
+		// Conditions checked in parent rule; no additional conditions to check	
+	then
+		// Nothing to do; earliest forecast date set in parent rule
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+       	Log that this Series Rule fired for the Series $targetSeries
+end
+
+/*
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // If the series has not been completed but the number of doses to complete the Novavax series has been met, then the series must
 // have been completed with all prior CVX 211 vaccine. The minimum/recommended interval to the next dose (which should be a CVX 311) is 8w 
@@ -1180,16 +1223,30 @@ rule "COVID-19(Sep2023+ Novavax Series): If a shot was administered for any dose
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
 end
+*/
+
+/////////////////////
+// mRNA Administered for Target Dose 2
+// If a CVX 213, CVX 309, or CVX 312 is administered for target dose 2, and target dose 2 is administered < 8 weeks - 4 days from dose 1, evaluate as Invalid / Below Minimum Interval.
+/////////////////////
+
+rule "COVID-19(Sep2023+ Novavax Series): "
+	dialect "mvel"
+	when
+	
+	then
+	
+end
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// If the patient is age >= 5 years and < 12 years and CVX 313 is administered as dose 1, evaluate and recommend using the following intervals:  
+// If the patient is age >= 5 years and < 12-4d years and CVX 313 is administered as dose 1, evaluate and recommend using the following intervals:  
 //     Minimum Interval = 4 weeks
 //     Recommended Interval = 4 weeks. 
 // Furthermore, if the patient is < 12 years as of the evaluation date and is < 12 years at the recommended due date), return recommended reason code ADMINISTER_mRNA_VACCINE.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-rule "COVID-19(Sep2023+ Novavax Series): If a CVX 313 is administered as (valid) dose 1 to a patient >= 5 yrs and < 12 yrs-4 days, recommend earliest/recommended interval of 8 weeks from dose 1"
+rule "COVID-19(Sep2023+ Novavax Series): If a CVX 313 is administered as (valid) dose 1 to a patient >= 5 yrs and < 12 yrs-4 days, recommend earliest/recommended interval of 4 weeks from dose 1"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "recommendationAgeCheck"
@@ -1224,8 +1281,8 @@ rule "COVID-19(Sep2023+ Novavax Series): If a CVX 313 is administered as (valid)
 end
 
 
-rule "COVID-19(Sep2023+ Novavax Series):activation-group extension => If a CVX 313 is administered as (valid) dose 1 to a patient >= 5 yrs and < 12 yrs, recommend earliest/recommended interval of 8 weeks from dose 1"
-		extends "COVID-19(Sep2023+ Novavax Series): If a CVX 313 is administered as (valid) dose 1 to a patient >= 5 yrs and < 12 yrs-4 days, recommend earliest/recommended interval of 8 weeks from dose 1"
+rule "COVID-19(Sep2023+ Novavax Series):activation-group extension => If a CVX 313 is administered as (valid) dose 1 to a patient >= 5 yrs and < 12 yrs, recommend earliest/recommended interval of 4 weeks from dose 1"
+		extends "COVID-19(Sep2023+ Novavax Series): If a CVX 313 is administered as (valid) dose 1 to a patient >= 5 yrs and < 12 yrs-4 days, recommend earliest/recommended interval of 4 weeks from dose 1"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "earliestAgeCheck"
@@ -1261,30 +1318,7 @@ end
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// For target dose 4, the recommended date is the later of the calculated forecast date or February 28, 2024.
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-rule "COVID-19(Sep2023+ Novavax Series): For target dose 4, the earliest & recommended date is the latter of the calculated forecast date or 2/28/2024"
-	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
-	when
-		There is a Series $targetSeries that needs forecasting
-			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
-			- the name of the Series is "COVID19Sep2023NovavaxSeries"
-			- the effective dose number in the Series is == 4
-			The patient information $oEvaluatedPerson must be known to complete writing this rule
-        	- make note of the date as $dtDateAtAge65y when the patient is "65y" of age
-	then
-		Create a Recommendation as $r for the Series $targetSeries
-		Set the recommendation Earliest Forecast Date for $r to the latter of $dtDateAtAge65y and "28-Feb-2024"
-		Set the recommendation Recommended Forecast Date for $r to the latter of $dtDateAtAge65y and "28-Feb-2024"
-		Include the Recommendation $r for Consideration in the final forecast of the Series
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-       	Log that this Series Rule fired for the Series $targetSeries
-end
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// For target dose 4, if the recommended date is >= 1 year from the evaluation date, mark the series NOT_RECOMMENDED / COMPLETE
+// For target dose 4, if the recommendation date is >= 1 year from the evaluation date, recommendation is NOT_RECOMMENDED / COMPLETE
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 rule "COVID-19(Sep2023+ Novavax Series): If the recommendation date for dose 4 is >= 1 year from the evaluation date, recommendation is NOT_RECOMMENDED / COMPLETE"
 	dialect "mvel"
@@ -1304,6 +1338,28 @@ rule "COVID-19(Sep2023+ Novavax Series): If the recommendation date for dose 4 i
 		Create a Recommendation as $recommendation with Status RecommendationStatus.NOT_RECOMMENDED for the Series $targetSeries
 		Set the Recommendation Reason for $recommendation to "RECOMMENDATION_REASON_CONCEPT.COMPLETE"
 		Include the Recommendation $recommendation for Consideration in the final Forecast of the Series
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+       	Log that this Series Rule fired for the Series $targetSeries
+end
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// For target dose 4, the recommended date is the later of the calculated forecast date or February 28, 2024.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+rule "COVID-19(Sep2023+ Novavax Series): For target dose 4, the earliest & recommended date is the latter of the calculated forecast date or 2/28/2024"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
+	when
+		There is a Series $targetSeries that needs forecasting
+			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
+			- the name of the Series is "COVID19Sep2023NovavaxSeries"
+			- the effective dose number in the Series is == 4
+			The patient information $oEvaluatedPerson must be known to complete writing this rule
+        	- make note of the date as $dtDateAtAge65y when the patient is "65y" of age
+	then
+		Create a Recommendation as $r for the Series $targetSeries
+		Set the recommendation Earliest Forecast Date for $r to the latter of $dtDateAtAge65y and "28-Feb-2024"
+		Set the recommendation Recommended Forecast Date for $r to the latter of $dtDateAtAge65y and "28-Feb-2024"
+		Include the Recommendation $r for Consideration in the final forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
 end
