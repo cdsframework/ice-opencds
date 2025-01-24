@@ -372,11 +372,11 @@ end
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////
-// In the 2024-2025 season, the absolute minimum interval (see evaluation rules), minimum interval and recommended interval from dose 1 to dose 2 are, respectively, 8w-4d, 8w and 6m. 
+// In the 2023-2024 season, the absolute minimum interval (see evaluation rules), minimum interval and recommended interval from dose 1 to dose 2 are, respectively, 4m-4d, 4m and 4m. 
 // This overrides the value set in the series table, which was for 2023-2024 season. 
 ///////
 
-rule "COVID-19(Sep2023+ >= 5yrs): For the 2024-2025 season, the minimum interval and recommended interval from dose 1 to dose 2 are, respectively, to 8w and 6m (*recommendationIntervalCheck*)"
+rule "COVID-19(Sep2023+ >= 5yrs): For the 2023-2024 season, the minimum interval and recommended interval from dose 1 to dose 2 are, respectively, to 4m and 4m (*recommendationIntervalCheck*)"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "recommendationIntervalCheck"
@@ -384,7 +384,7 @@ rule "COVID-19(Sep2023+ >= 5yrs): For the 2024-2025 season, the minimum interval
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the name of the series is "COVID19Sep2023gte5Series"
-			- the Series belongs to the Season with name "COVID19Aug2024Season"
+			- the Series belongs to the Season with name "COVID19Sep2023Season"
 			- the Series is not Complete
 			- the effective dose number in the Series is == 1
 		There is an administered shot $mostRecentShot
@@ -400,8 +400,8 @@ rule "COVID-19(Sep2023+ >= 5yrs): For the 2024-2025 season, the minimum interval
 			- the shot is not ignored
 	then
 		Create a Recommendation as $r for the Series $targetSeries
-		Add "8w" to $mostRecentShotDate and make note of the newly calculated date as $dtCalculatedEarliest
-		Add "6m" to $mostRecentShotDate and make note of the newly calculated date as $dtCalculatedRecommended
+		Add "4m" to $mostRecentShotDate and make note of the newly calculated date as $dtCalculatedEarliest
+		Add "4m" to $mostRecentShotDate and make note of the newly calculated date as $dtCalculatedRecommended
 		Set the recommendation Earliest Forecast Date for $r to $dtCalculatedEarliest
 		Set the recommendation Recommended Forecast Date for $r to $dtCalculatedRecommended
 		Include the Recommendation $r for Consideration in the final forecast of the Series
@@ -409,8 +409,8 @@ rule "COVID-19(Sep2023+ >= 5yrs): For the 2024-2025 season, the minimum interval
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
-rule "COVID-19(Sep2023+ >= 5yrs): For the 2024-2025 season, the minimum interval and recommended interval from dose 1 to dose 2 are, respectively, to 8w and 6m (*earliestIntevalCheck*)"
-		extends "COVID-19(Sep2023+ >= 5yrs): For the 2024-2025 season, the minimum interval and recommended interval from dose 1 to dose 2 are, respectively, to 8w and 6m (*recommendationIntervalCheck*)"
+rule "COVID-19(Sep2023+ >= 5yrs): For the 2023-2024 season, the minimum interval and recommended interval from dose 1 to dose 2 are, respectively, to 4m and 4m (*earliestIntevalCheck*)"
+		extends "COVID-19(Sep2023+ >= 5yrs): For the 2023-2024 season, the minimum interval and recommended interval from dose 1 to dose 2 are, respectively, to 4m and 4m (*recommendationIntervalCheck*)"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "earliestIntervalCheck"
@@ -541,40 +541,14 @@ rule "COVID-19(Sep2023+ >= 5yrs): If there are no shots in the current season bu
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// END Recommendation Age / Interval Rules
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////
+// If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1 (DC: should this be "target dose 1" or "dose 1"?), evaluate and recommend using the following intervals from the last shot, if none of the following exceptions apply: 
+//    Absolute Minimum Interval = 8 weeks - 4 days
+//    Minimum Interval = 8 weeks
+//    Recommended Interval = 8 weeks
+/////////////////////
 
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Target Dose 1 Evaluation Logic
-// 
-// If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, evaluate and recommend using the following intervals from the last shot, if none of the following exceptions apply: 
-//     Absolute Minimum Interval = 8 weeks - 4 days
-//     Minimum Interval = 8 weeks
-//     Recommended Interval = 8 weeks
-//
-// Exceptions:
-//     Exception 1: If a shot has been ignored (e.g., due to the CVX Code Absolute Maximum Age rule above or due to an inadvertent bivalent shot administered in the previous season), there is no absolute minimum interval 
-//         from the ignored shot to the next target dose and no minimum interval or recommended interval from the ignored shot to the next target dose.
-//     Exception 2: If a dose of CVX 313 is administered and it is the only dose on record, target dose 1 is not fulfilled, evaluate as Accepted with reason code VACCINE_NOT_PART_OF_THIS_SERIES.
-//         Absolute minimum interval to fulfill target dose 1 = 24 days
-//         Minimum interval = 28 days
-//         Recommended interval = 28 days. If the patient is < 12 years as of the evaluation date and is < 12 years at the recommended due date), return recommended reason code ADMINISTER_mRNA_VACCINE.
-//     Exception 3: If a dose of CVX 211 is administered this season (i.e., between 9/12/23 and 10/3/23), evaluate as Accepted with reason code VACCINE_NOT_PART_OF_THIS_SERIES.
-//         Absolute minimum interval to fulfill target dose 1 = 24 days
-//         Minimum interval = 28 days
-//         Recommended interval = 28 days
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-///////
-// START 
-// TargetDose 1 Happy Path
-// If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, evaluate and recommend using the following intervals from the last shot, if none of the following exceptions apply: 
-//     Minimum Interval = 8 weeks
-//     Recommended Interval = 8 weeks
-///////
-rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Happy Path: If an unignored shot was administered (regardless of whether it is in a past season or present season) and the series is not complete, recommend earliest & recommended interval of 8w from target dose 1 to the next target dose (*recommendationIntervalCheck*)"
+rule "COVID-19(Sep2023+ >= 5yrs): If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, the absolute minimum interval to target dose 1 is 8w-4d, recommend earliest & recommended interval of 8w from target dose 1 to the next target dose (*recommendationIntervalCheck*)"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "recommendationIntervalCheck"
@@ -603,8 +577,8 @@ rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Happy Path: If an unignored shot 
 end
 
 
-rule "COVID-19(Sep2023+ >= 5yrs): activation-group extension => if a shot was administered (regardless of whether it is in the past season or present season) but the series is not complete, recommend earliest interval of 8w to the next target dose (*earliestIntervalCheck*)"
-		extends "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Happy Path: If an unignored shot was administered (regardless of whether it is in a past season or present season) and the series is not complete, recommend earliest & recommended interval of 8w from target dose 1 to the next target dose (*recommendationIntervalCheck*)"
+rule "COVID-19(Sep2023+ >= 5yrs): If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, the absolute minimum interval to target dose 1 is 8w-4d, recommend earliest & recommended interval of 8w from target dose 1 to the next target dose  (*earliestIntervalCheck*)"
+		extends "COVID-19(Sep2023+ >= 5yrs): If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, the absolute minimum interval to target dose 1 is 8w-4d, recommend earliest & recommended interval of 8w from target dose 1 to the next target dose (*recommendationIntervalCheck*)"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "earliestIntervalCheck"
@@ -616,28 +590,31 @@ rule "COVID-19(Sep2023+ >= 5yrs): activation-group extension => if a shot was ad
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
-////////
-// END TargetDose 1 Happy Path
-/////// 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// END Recommendation Age / Interval Rules
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-///////
-// START 
-// Exception 1 
-//     If a shot has been ignored (e.g., due to the CVX Code Absolute Maximum Age rule above or due to an inadvertent bivalent shot administered in the previous season), there is no absolute minimum interval from the ignored shot to the next target dose and no minimum interval 
-//     or recommended interval from the ignored shot to the next target dose.
-///////
-
-// Nothing to do - ignored shots are automatically 0 day earliest & recommended interval per default rules
-
-
-///////
-// START
-// Exception 2: If a dose of CVX 313 is administered and it is the only dose on record, target dose 1 is not fulfilled, evaluate as Accepted with reason code VACCINE_NOT_PART_OF_THIS_SERIES.
-//     + Absolute minimum interval to fulfill target dose 1 = 24 days
-//     + Minimum interval = 28 days
-//     + Recommended interval = 28 days. If the patient is < 12 years as of the evaluation date and is < 12 years at the recommended due date), return recommended reason code ADMINISTER_mRNA_VACCINE.
-///////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Target Dose 1 Evaluation Logic
+// 
+// If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, evaluate and recommend using the following intervals from the last shot, if none of the following exceptions apply: 
+//     Absolute Minimum Interval = 8 weeks - 4 days
+//     Minimum Interval = 8 weeks
+//     Recommended Interval = 8 weeks
+//
+// Exceptions:
+//     Exception 1: If a shot has been ignored (e.g., due to the CVX Code Absolute Maximum Age rule above or due to an inadvertent bivalent shot administered in the previous season), there is no absolute minimum interval 
+//         from the ignored shot to the next target dose and no minimum interval or recommended interval from the ignored shot to the next target dose.
+//     Exception 2: If a dose of CVX 313 is administered and it is the only dose on record, target dose 1 is not fulfilled, evaluate as Accepted with reason code VACCINE_NOT_PART_OF_THIS_SERIES.
+//         Absolute minimum interval to fulfill target dose 1 = 24 days
+//         Minimum interval = 28 days
+//         Recommended interval = 28 days. If the patient is < 12 years as of the evaluation date and is < 12 years at the recommended due date), return recommended reason code ADMINISTER_mRNA_VACCINE.
+//     Exception 3: If a dose of CVX 211 is administered this season (i.e., between 9/12/23 and 10/3/23), evaluate as Accepted with reason code VACCINE_NOT_PART_OF_THIS_SERIES.
+//         Absolute minimum interval to fulfill target dose 1 = 24 days
+//         Minimum interval = 28 days
+//         Recommended interval = 28 days
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If a previous shot of CVX 313 administered for target dose 1 was determined to be COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1, the recommended interval to the next dose is 28 days. Administer mRNA vaccine."
 	dialect "mvel"
@@ -688,6 +665,7 @@ end
 rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If the patient is < 12y as of the evaluation date and the recommended due date, and the most recent shot was COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1, return recommended reason code ADMINISTER_mRNA_VACCINE"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
+	salience 10
 	when
 		There is a Series $targetSeries
 			- a forecast for the Series has been made and a recommendation date has been determined
@@ -700,13 +678,6 @@ rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If the patient is < 
 			- that has associated series $targetSeries
 			- that has finding "COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1"
 			- make note of the date the associated shot was administered as $cvx313administrationDate	
-		//There is an administered shot $previousShot
-		//	- the shot belongs to the Series $targetSeries
-		//	- the dose number in the series is == 1
-		//	- the vaccine administered is "ICE313"
-		//	- that has already been evaluated and whose shot validity is ACCEPTED
-		//	- make note of Accepted evaluation reasons for this shot as $acceptedReasons
-		//	- the collection $acceptedReasons contains "EVALUATION_REASON_CONCEPT.VACCINE_NOT_ALLOWED_FOR_THIS_DOSE" 
 		The Patient information $patientInfo must be known to complete writing this rule
 			- make note of the Patient's birthdate as $birthDate
 		Confirm elapsed time between $birthDate and evalTime < "12y" && elapsed time between $birthDate and $recommendationDate < "12y"
@@ -718,21 +689,11 @@ rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If the patient is < 
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
-////////
-// END TargetDose 1 Exception 2
-/////// 
-
-
-///////
-// TargetDose 1 / Exception 3: If a dose of CVX 211 is administered this season (i.e., between 9/12/23 and 10/3/23), evaluate as Accepted with reason code VACCINE_NOT_PART_OF_THIS_SERIES.
-//    Absolute minimum interval to fulfill target dose 1 = 24 days
-//    Minimum interval = 28 days
-//    Recommended interval = 28 days
-///////
 
 rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 3: If a shot of CVX 211 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_PART_OF_THIS_SERIES, the recommended interval from that shot to target dose 1 is 28 days"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
+	salience 10
 	when
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
@@ -759,8 +720,6 @@ rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 3: If a shot of CVX 211
 end
 
 
-// We include override rules here because the new interval, 28 days, is less than the default interval of 4 months in the Series (interval from dose 1 to dose 2 in the COVID19Sep2023gte5Series series). 
-// Typically, we never wrote rules like this because we always wanted to longest recommended interval to apply. In this case, we do not want the series table's interval to apply.
 rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 3: There are no other shots administered after the CVX 211; therefore, _also_ override default recommendationIntervalCheck"
 		extends "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 3: If a shot of CVX 211 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_PART_OF_THIS_SERIES, the recommended interval from that shot to target dose 1 is 28 days"
 	dialect "mvel"
@@ -793,9 +752,10 @@ rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 3: There are no other s
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
-////////
-// END TargetDose 1 Exception 3
-///////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// END TargetDose 1: Exception Rules
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TargetDose 2: the recommended date is the latter of the calculated forecast date or February 28, 2024.
