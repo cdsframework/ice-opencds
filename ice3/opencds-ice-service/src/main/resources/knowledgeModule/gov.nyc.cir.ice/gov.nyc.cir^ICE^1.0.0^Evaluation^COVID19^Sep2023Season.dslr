@@ -227,13 +227,13 @@ rule "COVID-19(Sep2023+ >= 5yrs Series): If the patient has >= 1 COVID-19 shot(s
 			- the dose number in the Series is == 1
 			- make note of the date this shot was administered as $dtAdministrationDateCurrentShot
 			- make note of the Associated Series as $associatedTargetSeries
-		- There is a Series $targetSeries identified by $associatedTargetSeries
+		There is a Series $targetSeries identified by $associatedTargetSeries
 			- make note of the season start date as $seasonStartDate
 		There is an administered shot $previousDose
 			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
 			- the shot does not belong to the Series $associatedTargetSeries
 			/////// - the administration date of the shot is < $dtAdministrationDateCurrentShot
-			- the administration date of the shot is < $seasonStartDate
+		- the administration date of the shot is < $seasonStartDate
 			- that has already been evaluated
 			- the shot is not ignored
 			- make note of the date this shot was administered as $dtAdministrationDatePreviousDose
