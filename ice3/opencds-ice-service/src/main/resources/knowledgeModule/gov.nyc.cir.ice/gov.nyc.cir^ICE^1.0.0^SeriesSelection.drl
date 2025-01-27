@@ -925,7 +925,6 @@ end
 rule "SeriesSelection(RSV): Select the RSV Adult Series if the patient is >= 20 months of age"
 	dialect "mvel"
 	agenda-group "SeriesSelection^customSeriesSelectionRules"
-	/////// salience 10
 	when
 		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.875", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS)
 		not TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.875", selectedSeries == true, seriesRules.seriesGroup == $tss.seriesGroup)
@@ -957,6 +956,7 @@ end
 rule "SeriesSelection(COVID-19): Select already _completed_ series if a different, _incomplete_ series was previously selected"
 	dialect "mvel"
 	agenda-group "SeriesSelection^customSeriesSelectionRules"
+	activation-group "SeriesSelection^COVID19Sep2023^customSeriesSelectionCompletionRules"
 	salience 5
 	when
 		$tss : TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS || seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_POSTPROCESS)
@@ -973,6 +973,22 @@ rule "SeriesSelection(COVID-19): Select already _completed_ series if a differen
 		update($tss);
 		update($ts1);
 		update($ts2);
+end
+
+
+rule "SeriesSelection(COVID-19 Sep2023+ Adult Series): Do NOT select already _completed_ Sep2023+ _Child_ series if a different, _incomplete_ Sep2023+ _Adult_ series was previously selected and there are no doses at < 5 years of age"
+	dialect "mvel"
+	agenda-group "SeriesSelection^customSeriesSelectionRules"
+	activation-group "SeriesSelection^COVID19Sep2023^customSeriesSelectionCompletionRules"
+	salience 6
+	when
+		$tss: TargetSeriesSelection(seriesSelectionVaccineGroup == "VACCINE_GROUP_CONCEPT.850", seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_PROCESS || seriesSelectionStatus == SeriesSelectionStatus.SERIES_SELECTION_IN_POSTPROCESS)
+		$ts1 : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", selectedSeries == true, isSeriesComplete() == false, targetSeason != null && targetSeason == $tss.seriesSelectionSeason, seriesRules.seriesName in ("COVID19Sep2023gte5Series", "COVID19Sep2023NovavaxSeries"))
+		$ts2 : TargetSeries(seriesRules.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", selectedSeries == false, isSeriesComplete() == true, targetSeason != null && targetSeason == $tss.seriesSelectionSeason, 
+			seriesRules.seriesName in ("COVID19Sep2023MixedProductLT5ySeries", "COVID19Sep2023PfizerLT5ySeries", "COVID19Sep2023ModernaLT5ySeries"))
+	then
+		String _RULENAME = kcontext.rule.name;
+		ICELogicHelper.logDRLDebugMessage(_RULENAME, "Previously Selected TargetSeries NOT Reverted");
 end
 
 
@@ -1236,7 +1252,6 @@ end
  */
 
 rule "SeriesSelection(COVID-19): In Sep2023+ season, select the Mixed Product Series < 5 yrs if at least one dose (if any) in the prior season doses was administered at < 5 yrs of age, all doses (if any) in the prior season are a mix of vaccines, and all shots (if any) in the current season are a mix of 2023 vaccines"
-/////// rule "SeriesSelection(COVID-19): In Sep2023+ season, if there is a dose administered at < 5 yrs of age and NOT all doses are all Pfizer or all Moderna vaccines, then the Mixed Product < 5yrs Series applies"
 		extends "SeriesSelection(COVID-19 Abstract): In Sep2023+ season, determine date at which patients turns 5 years of age"
 	dialect "mvel"
 	agenda-group "SeriesSelection^customSeriesSelectionRules"
