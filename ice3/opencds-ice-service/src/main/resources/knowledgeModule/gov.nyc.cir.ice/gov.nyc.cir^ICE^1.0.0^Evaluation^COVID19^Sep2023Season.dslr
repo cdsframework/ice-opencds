@@ -95,6 +95,8 @@ rule "COVID-19(Sep2023+): If a COVID-19 shot that does not count towards U.S. va
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheck"
+	// Indicate a salience here, to override 2023-2024 interval written for >= 5y series
+	salience 10
 	when
 		Confirm Elapsed time between $previousShotDate and $currentShotDate < "8w-4d"
 	then
@@ -109,12 +111,14 @@ rule "COVID-19(Sep2023+): If a COVID-19 shot that does not count towards U.S. va
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheck"
+	// Indicate a salience here, to override 2023-2024 interval written for >= 5y series
+	salience 10
 	when
-		There is a Series $targetSeries identified by $associatedTargetSeries
-			- make note of the absolute minimum interval for dose 1 in this Series as $absMinimumInterval
-		Confirm that the following is true: $absMinimumInterval.isGreaterThan(new TimePeriod("8w-4d"))
+		/////// There is a Series $targetSeries identified by $associatedTargetSeries
+		///////	- make note of the absolute minimum interval for dose 1 in this Series as $absMinimumInterval
+		/////// Confirm that the following is true: $absMinimumInterval.isGreaterThan(new TimePeriod("8w-4d"))
+		/////// Confirm Elapsed time between $previousShotDate and $currentShotDate < $absMinimumInterval
 		Confirm Elapsed time between $previousShotDate and $currentShotDate >= "8w-4d"
-		Confirm Elapsed time between $previousShotDate and $currentShotDate < $absMinimumInterval
 	then
 		// Override general interval rule; do nothing
 		Record that this dose rule was Processed for the TargetDose $currentShot
