@@ -68,7 +68,7 @@ rule "COVID-19: If CVX 218, CVX 219, CVX 227, CVX 228, CVX 229, CVX 230, CVX 301
 			- make note of the Associated Series as $associatedTargetSeries
 	then
 		Mark the shot $administeredShot as Ignored
-		Refresh all facts in the shot $administeredShot
+		Refresh all facts for the shot $administeredShot
 		Record that this dose rule was Processed for the TargetDose $administeredShot
 		Log that this dose rule fired for the dose $administeredShot in the Series $associatedTargetSeries
 end

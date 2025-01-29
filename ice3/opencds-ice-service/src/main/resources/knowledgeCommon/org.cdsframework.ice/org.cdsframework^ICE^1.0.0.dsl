@@ -362,7 +362,7 @@
 [consequence][][Rr]emove [Ss]upplemental [Tt]ext {sSupplementalText} from [Aa]ccpeted [Ss]hot {refer_oTargetDose}={refer_oTargetDose}.removeSupplementalTextForAcceptedShot({sSupplementalText});
 [consequence][][Ii]nclude [Ss]upplemental [Tt]ext {sSupplementalText} for [Ii]nvalid [Ss]hot {refer_oTargetDose}={refer_oTargetDose}.addInvalidReason("EVALUATION_REASON_CONCEPT.SUPPLEMENTAL_TEXT"); {refer_oTargetDose}.addSupplementalTextForInvalidShot({sSupplementalText});
 [consequence][][Rr]emove [Ss]upplemental [Tt]ext {sSupplementalText} from [Ii]nvalid [Ss]hot {refer_oTargetDose}={refer_oTargetDose}.removeSupplementalTextForInvalidShot({sSupplementalText});
-
+[consequence][][Rr]efresh all [Ff]acts for the [Ss]hot {refer_oTargetDose}=update({refer_oTargetDose});
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TargetSeries Actions
@@ -379,7 +379,6 @@
 [consequence][][Rr]efresh all [Ff]acts in the [Ss]eries {refer_oTargetSeries:[\\$]?[a-zA-Z0-9\\.\\_\\]+} for [Ee]valuation=modify ({refer_oTargetSeries}) \{ setRecommendationStatus(RecommendationStatus.NOT_FORECASTED); \}
 [consequence][][Rr]efresh all [Ff]acts in the [Ss]eries {refer_oTargetSeries:[\\$]?[a-zA-Z0-9\\.\\_\\]+} for [Ff]orecasting=modify ({refer_oTargetSeries}) \{ setRecommendationStatus(RecommendationStatus.FORECASTING_IN_PROGRESS); \}
 [consequence][][Rr]efresh all [Ff]acts in the [Ss]eries {refer_oTargetSeries:[\\$]?[a-zA-Z0-9\\.\\_\\]+}=update({refer_oTargetSeries});
-[consequence][][Rr]efresh all [Ff]acts in the [Ss]hot {refer_oTargetDose}=update({refer_oTargetDose});
 /////// [consequence][][Mm]ark that the [Ss]eries {refer_oTargetSeries} cannot be forecasted as [Cc]omplete={refer_oTargetSeries}.setSeriesComplete(false);
 /////// [consequence][][Mm]ark that the [Ss]eries {refer_oTargetSeries} as [Cc]omplete={refer_oTargetSeries}.setSeriesComplete(true);
 [consequence][][Mm]anually [Mm]ark the [Ss]eries {refer_oTargetSeries} [Nn]ot [Cc]omplete={refer_oTargetSeries}.setSeriesComplete(false);
