@@ -400,10 +400,12 @@ end
 
 // This rule is encompassed by the one above it, but we put the more precise rule because we need to know that this occurred
 
-rule "COVID-19(Sep2023+ >= 5yrs Series)-->TargetDose 1/Exception 2: Exception 2: If a shot of CVX 313 is administered for target dose 1 to a patient age 5y and < 12y-4d, and it is the only dose on record, and the CVX 313 would otherwise be considered valid, target dose 1 is not fulfilled"
+rule "COVID-19(Sep2023+ >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of CVX 313 is administered for target dose 1 to a patient age 5y and < 12y-4d, and it is the only dose on record, and the CVX 313 would otherwise be considered valid, target dose 1 is not fulfilled"
 		extends "COVID-19(Sep2023+ >= 5yrs Series): If a shot of CVX 313 is administered for target dose 1, and there are no previous doses on record, evaluate the shot as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
+	// This rule must fire before its parent, since the parent rule refreshes its facts
+	salience 10
 	when
 		The patient information $patientInformation must be known to complete writing this rule
 			- make note of the patient's birthdate as $birthdate
