@@ -364,48 +364,7 @@ rule "COVID-19(Sep2023+): For the 2023-2024 season, the minimum interval and rec
 end
 
 
-/////////////////////
-// If one of the CVX codes in the ICE vaccine table on the Wiki is administered above the absolute maximum age for that CVX code, then the Evaluation is Invalid and the reason code is ABOVE_MAXIMUM_AGE_VACCINE, there is no interval required between the Invalid shot and the next target dose.
-///////////////////// 
-/*
-rule "COVID-19: If CVX 218, CVX 219, CVX 227, CVX 228, CVX 229, CVX 230, CVX 301, CVX 302, CVX 308, CVX 310, CVX 311 was evaluated and Not Valid due to ABOVE_MAXIMUM_AGE_VACCINE, there is no minimum/recommended interval to the next target dose (*recommendationIntervalCheck*)"
-	dialect "mvel"
-	activation-group "recommendationIntervalCheck"
-	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
-	when
-		There is a Series $targetSeries that needs forecasting
-			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
-		There is an administered shot $administeredShot
-			- the shot belongs to the Series $targetSeries
-			- the vaccine administered a member of  ("ICE218", "ICE219", "ICE227", "ICE228", "ICE229", "ICE230", "ICE301", "ICE302", "ICE308", "ICE309", "ICE310", "ICE311", "ICE312", "ICE313")
-			- that has already been evaluated and whose Shot Validity Status is not VALID
-			- make note of all evaluation reasons for this shot as $collectionOfStrReasons
-			- the collection $collectionOfStrReasons contains "EVALUATION_REASON_CONCEPT.ABOVE_MAXIMUM_AGE_VACCINE"
-			- the shot is ignored
-			- make note of the date this shot was administered as $administrationDate	
-	then
-		Create a Recommendation as $r for the Series $targetSeries
-		Add "0d" to $administrationDate and make note of the newly calculated date as $dtCalculated
-		Set the recommendation Earliest Forecast Date for $r to $dtCalculated
-		Set the recommendation Recommended Forecast Date for $r to $dtCalculated
-		Include the Recommendation $r for Consideration in the final forecast of the Series
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-       	Log that this Series Rule fired for the Series $targetSeries
-end
 
-
-rule "COVID-19: If CVX 218, CVX 219, CVX 227, CVX 228, CVX 229, CVX 230, CVX 301, CVX 302, CVX 308, CVX 310, CVX 311 was evaluated and Not Valid due to ABOVE_MAXIMUM_AGE_VACCINE, there is no minimum/recommended interval to the next target dose (*earliestIntervalCheck*)"
-		extends "COVID-19: If CVX 218, CVX 219, CVX 227, CVX 228, CVX 229, CVX 230, CVX 301, CVX 302, CVX 308, CVX 310, CVX 311 was evaluated and Not Valid due to ABOVE_MAXIMUM_AGE_VACCINE, there is no minimum/recommended interval to the next target dose (*recommendationIntervalCheck*)"
-	dialect "mvel"
-	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
-	activation-group "earliestIntervalCheck"
-	when
-		// Nothing to do	
-	then
-		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-       	Log that this Series Rule fired for the Series $targetSeries
-end
-*/
 
 /*****************************************************************************************************************************************************************************************************************
  ===> Series: >= 5 yrs START
