@@ -1130,6 +1130,8 @@ rule "COVID-19(Sep2023+ Novavax Series): For the 2023-2024 season, the absolute 
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheck"
+	// Since this is essentially a table-based series rule, run this rule after all of the other custom rules have run
+	salience -1
 	when
 		There is an Administered Shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -1792,6 +1794,7 @@ rule "COVID-19(Sep2023+): Remove evaluation reason VACCINE_NOT_ALLOWED_FOR_THIS_
 			- that has finding SupportedFactConcept._INVALID_VACCINE.conceptCodeValue	
 	then
 		Remove Evaluation Reason "EVALUATION_REASON_CONCEPT.VACCINE_NOT_ALLOWED_FOR_THIS_DOSE" from Shot $notAllowedShot
+		Refresh all facts for the shot $notAllowedShot
 		Record that this dose rule was processed for the TargetDose $notAllowedShot
 		Log that this dose rule fired for the dose $notAllowedShot in the Series $associatedTargetSeries
 end
