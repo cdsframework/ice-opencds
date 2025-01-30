@@ -81,13 +81,14 @@ rule "COVID-19: Invoke separate agenda group for recommendations in the COVID19S
 		There is a Series $targetSeries that needs forecasting
 			- the Series belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
 			- the Series belongs to the Season with name a member of ("COVID19Sep2023Season", "COVID19Aug2024Season")
+			- make note of the Season name as $seasonNameForSeriesToBeForecasted
 		There is a Season $sept2023season
-			- the name of the Season is "COVID19Sep2023Season"
+			- the name of the Season is $seasonNameForSeriesToBeForecasted
 			- the Season belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			- make note of the fully specified season start date as $dtSeasonStartDateSep2023			
+			- make note of the fully specified season start date as $dtSeasonStartDate
 		There is a Series $associatedTargetSeries identified by $targetSeries
 			- the Series is a seasonal series
-			- the season start date for the Series is == $dtSeasonStartDateSep2023
+			- the season start date for the Series is == $dtSeasonStartDate
 	then
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
