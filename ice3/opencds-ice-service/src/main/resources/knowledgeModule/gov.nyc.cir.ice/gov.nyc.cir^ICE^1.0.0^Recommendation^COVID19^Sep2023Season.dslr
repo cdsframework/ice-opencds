@@ -1485,7 +1485,6 @@ rule "COVID-19(Sep2023+ __Moderna__ < 5yrs Series): For target dose > 1: If 2 or
 		// Obtain the most recent dose in the prior season
 		There is an administered shot $previousShot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
-			/////// - the administration date of the shot is < "12-Sep-2023"
 			- the administration date of the shot is < $seasonStartDate
 			- that has already been evaluated and whose shot validity is VALID
 			- the vaccine administered a member of ("ICE207", "ICE221", "ICE227", "ICE228", "ICE229", "ICE230", "ICE311", "ICE312", "ICE519")
@@ -1495,7 +1494,6 @@ rule "COVID-19(Sep2023+ __Moderna__ < 5yrs Series): For target dose > 1: If 2 or
 		There does not exist an administered shot
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the shot belongs to the series $priorSeasonSeries
-			/////// - the administration date of the shot is < "12-Sep-2023"
 			- the administration date of the shot is < $seasonStartDate
 			- the administration date of the shot is > $mostRecentShotDatePriorSeason
 			- that has already been evaluated and whose shot validity is VALID
@@ -1504,7 +1502,6 @@ rule "COVID-19(Sep2023+ __Moderna__ < 5yrs Series): For target dose > 1: If 2 or
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- that is not the same shot as $previousShot
 			- the shot belongs to the series $priorSeasonSeries
-			/////// - the administration date of the shot is < "12-Sep-2023"
 			- the administration date of the shot is < $seasonStartDate
 			- the administration date of the shot is != $mostRecentShotDatePriorSeason
 			- that has already been evaluated and whose shot validity is VALID
