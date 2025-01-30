@@ -95,8 +95,6 @@ rule "COVID-19(Sep2023+): If a COVID-19 shot that does not count towards U.S. va
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheck"
-	// Indicate a salience here, to override 2023-2024 interval written for >= 5y series
-	salience 10
 	when
 		Confirm Elapsed time between $previousShotDate and $currentShotDate < "8w-4d"
 	then
@@ -111,8 +109,6 @@ rule "COVID-19(Sep2023+): If a COVID-19 shot that does not count towards U.S. va
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheck"
-	// Indicate a salience here, to override 2023-2024 interval written for >= 5y series
-	salience 10
 	when
 		/////// There is a Series $targetSeries identified by $associatedTargetSeries
 		///////	- make note of the absolute minimum interval for dose 1 in this Series as $absMinimumInterval
@@ -165,10 +161,12 @@ end
 //////////////////////
 
 /////////////////////
-// For the 2023-2024 season, if the patient has >= 1 (invalid) COVID-19 shot(s) administered prior to 9/12/2023, but no doses on record, the intervals from the last shot, if prior to 9/12/2023, are:
+// For the 2023-2024 season, if the patient has >= 1 (invalid) COVID-19 shot(s) administered PRIOR to 9/12/2023, but no doses on record, the intervals from the last shot, if prior to 9/12/2023, are:
 //    Absolute Minimum Interval = 8 weeks - 4 days
 //    Minimum Interval = 8 weeks  
-//    Recommended Interval = 8 weeks  
+//    Recommended Interval = 8 weeks
+//
+// NOTE that this interval should override the table-based intervals for the 2023-2024 season from target dose 1 to dose 1.
 /////////////////////
 
 rule "COVID-19(Sep2023+): For the 2023-2024 season, if the patient has >= 1 (invalid) COVID-19 shot(s) administered prior to 9/12/2023, and there are no doses on record, the absolute minimum interval from (invalid) dose 1 is 8w-4d (*doseIntervalCheck*)"
@@ -222,6 +220,8 @@ rule "COVID-19(Sep2023+ >= 5yrs Series): For the 2023-2024 season, the absolute 
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheck"
+	// Since this is essentially a table-based rule (but for the 2023-2024 season), this rule should run after the custom rules. As such, the salience is set to a negative value
+	salience -1
 	when
 		There is an Administered Shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -249,18 +249,15 @@ end
 
 
 /////////////////////
-// If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1 (DC: should this be "target dose 1" or "dose 1"?), evaluate and recommend using the following intervals from the last shot, if none of the following exceptions apply: 
+// If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, evaluate and recommend using the following intervals from the last shot, if none of the following exceptions apply: 
 //    Absolute Minimum Interval = 8 weeks - 4 days
 //    Minimum Interval = 8 weeks
 //    Recommended Interval = 8 weeks
 /////////////////////
 
-rule "COVID-19(Sep2023+ >= 5yrs Series): If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, the absolute minimum interval to target dose 1 is 8w-4d (*doseIntervalCheck*)"
+rule "COVID-19(Sep2023+ >= 5yrs Series Abstract): If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, the absolute minimum interval of 8w-4d is not met (*doseIntervalCheck*)"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
-	activation-group "doseIntervalCheck"
-	// This rule overrides the default series recommendation interval rules for 2023-2024, above
-	salience 10
 	when
 		There is an Administered Shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -268,23 +265,29 @@ rule "COVID-19(Sep2023+ >= 5yrs Series): If the patient has >= 1 COVID-19 shot(s
 			- the dose number in the Series is == 1
 			- make note of the date this shot was administered as $dtAdministrationDateCurrentShot
 			- make note of the Associated Series as $associatedTargetSeries
-		There is a Series $targetSeries identified by $associatedTargetSeries
-			- make note of the season start date as $seasonStartDate
 		There is an administered shot $previousDose
 			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
-			- the shot does not belong to the Series $associatedTargetSeries
-			/////// - the administration date of the shot is < $dtAdministrationDateCurrentShot
-		- the administration date of the shot is < $seasonStartDate
+			- the administration date of the shot is < $dtAdministrationDateCurrentShot
 			- that has already been evaluated
 			- the shot is not ignored
 			- make note of the date this shot was administered as $dtAdministrationDatePreviousDose
 		There does not exist an administered shot
 			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
-			- the shot does not belong to the Series $associatedTargetSeries
+			- the administration date of the shot is < $dtAdministrationDateCurrentShot
 			- the administration date of the shot is > $dtAdministrationDatePreviousDose
-			/////// - the administration date of the shot is < $dtAdministrationDateCurrentShot
-			- the administration date of the shot is < $seasonStartDate
 			- the shot is not ignored
+	then
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
+end
+
+
+rule "COVID-19(Sep2023+ >= 5yrs Series): If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, evaluate the shot as Invalid / BELOW_MINIMUM_INTERVAL if the absolute minimum interval of 8w-4d is not met (*doseIntervalCheck*)"
+		extends "COVID-19(Sep2023+ >= 5yrs Series Abstract): If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, the absolute minimum interval of 8w-4d is not met (*doseIntervalCheck*)"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
+	activation-group "doseIntervalCheck"
+	when
 		Confirm Elapsed time between $dtAdministrationDatePreviousDose and $dtAdministrationDateCurrentShot < "8w-4d"
 	then
 		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
@@ -293,8 +296,28 @@ rule "COVID-19(Sep2023+ >= 5yrs Series): If the patient has >= 1 COVID-19 shot(s
 end
 
 
+rule "COVID-19(Sep2023+ >= 5yrs Series): If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, evaluate the shot as Valid if the absolute minimum interval of 8w-4d is met (*doseIntervalCheck*)"
+		extends "COVID-19(Sep2023+ >= 5yrs Series Abstract): If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, the absolute minimum interval of 8w-4d is not met (*doseIntervalCheck*)"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
+	activation-group "doseIntervalCheck"
+	when
+		Confirm Elapsed time between $dtAdministrationDatePreviousDose and $dtAdministrationDateCurrentShot >= "8w-4d"
+	then
+		Record that this dose rule was Processed for the TargetDose $currentShot
+		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
+end
+
+/////////////////////
+// END 8w-4d absolute minimum interval for shots prior to target dose 1
+/////////////////////
+
+
+/////////////////////
 // If a shot of CVX 313 is administered for target dose 1 and it is the only dose on record, and the CVX 313 would otherwise be considered valid, target dose 1 is not fulfilled, evaluate as Accepted with reason code VACCINE_NOT_ALLOWED_FOR_THIS_DOSE.
-rule "COVID-19(Sep2023+ >= 5yrs Series): If a shot of CVX 313 is administered for target dose 1, and there are no previous doses on record, evaluate the shot as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE"
+/////////////////////
+
+rule "COVID-19(Sep2023+ >= 5yrs Series Parent Rule): If a shot of CVX 313 is administered for target dose 1, and there are no previous doses on record, evaluate the shot as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
 	when
@@ -313,11 +336,38 @@ rule "COVID-19(Sep2023+ >= 5yrs Series): If a shot of CVX 313 is administered fo
 			- that has already been evaluated and whose shot validity is VALID
 			- the administration date of the shot is < $seasonStartDate
 	then
-		Remove all evaluation reasons from shot $currentShot
 		Set the shot status of $currentShot to Accepted
+		Remove all evaluation reasons from shot $currentShot
 		Include the reason for shot $currentShot Accepted due to "Vaccine Not Allowed For This Dose"
+		Refresh all facts for the shot $currentShot
 		Record that this dose rule was Processed for the TargetDose $currentShot
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries
+end
+
+
+rule "COVID-19(Sep2023+ >= 5yrs Series): If dose 1 is subsequently fulfilled after a CVX 313 for target dose 1 was evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE, change the evaluation for the CVX 313 to Accepted / VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN"
+	dialect "mvel"
+	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
+	when
+		There is an administered shot $currentShot
+			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the shot belongs to the Series with name "COVID19Sep2023gte5Series"
+			- the dose number in the Series is == 1
+			- that has already been evaluated and whose shot validity is VALID
+			- make note of the date this shot was administered as $administrationDate
+			- make note of the associated series as $associatedTargetSeries
+		There is an administered shot $priorShotCVX313
+			- the shot belongs to the Series $associatedTargetSeries
+			- the vaccine administered is "ICE313"
+			- the dose number in the Series is == 1
+			- that has already been evaluated and whose shot validity is ACCEPTED
+			- make note of all evaluation reasons for this shot as $collectionOfStrReasons
+			- the collection $collectionOfStrReasons contains "EVALUATION_REASON_CONCEPT.VACCINE_NOT_ALLOWED_FOR_THIS_DOSE" 
+	then
+		Remove all evaluation reasons from shot $priorShotCVX313
+		Include the reason for shot $priorShotCVX313 Accepted due to "Vaccine Not Counted Based on Most Recent Vaccine Given"
+		Record that this dose rule was Processed for the TargetDose $priorShotCVX313
+		Log that this dose rule fired for the dose $priorShotCVX313 in the Series $associatedTargetSeries
 end
 
 
@@ -339,10 +389,12 @@ end
 
 // This rule is encompassed by the one above it, but we put the more precise rule because we need to know that this occurred
 
-rule "COVID-19(Sep2023+ >= 5yrs Series)-->TargetDose 1/Exception 2: Exception 2: If a shot of CVX 313 is administered for target dose 1 to a patient age 5y and < 12y-4d, and it is the only dose on record, and the CVX 313 would otherwise be considered valid, target dose 1 is not fulfilled"
-		extends "COVID-19(Sep2023+ >= 5yrs Series): If a shot of CVX 313 is administered for target dose 1, and there are no previous doses on record, evaluate the shot as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE"
+rule "COVID-19(Sep2023+ >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of CVX 313 is administered for target dose 1 to a patient age 5y and < 12y-4d, and it is the only dose on record, and the CVX 313 would otherwise be considered valid, target dose 1 is not fulfilled"
+		extends "COVID-19(Sep2023+ >= 5yrs Series Parent Rule): If a shot of CVX 313 is administered for target dose 1, and there are no previous doses on record, evaluate the shot as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^postEvaluationCheck^COVID19Sep2023Season"
+	// This rule must fire before its parent, since the parent rule refreshes its facts to a state not expected by this rule; as such, it is set to a higher salience
+	salience 10
 	when
 		The patient information $patientInformation must be known to complete writing this rule
 			- make note of the patient's birthdate as $birthdate
@@ -357,6 +409,7 @@ end
 rule "COVID-19(Sep2023+ >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If a previous shot of CVX 313 administered for target dose 1 was determined to be COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1, the absolute minimum interval from that shot to target dose 1 is 24 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
+	// Exception rules to run before other rules in this Series
 	salience 20
 	when
 		There is an administered shot $currentShot that needs to be evaluated
@@ -386,6 +439,7 @@ rule "COVID-19(Sep2023+ >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheck"
 	no-loop true
+	// Exception rules to run before other rules in this Series
 	salience 20
 	when
 		Confirm Elapsed time between $cvx313administrationDate and $currentShotDate < "24d"
@@ -402,6 +456,7 @@ rule "COVID-19(Sep2023+ >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheck"
 	no-loop true
+	// Exception rules to run before other rules in this Series
 	salience 20
 	when
 		Confirm Elapsed time between $cvx313administrationDate and $currentShotDate >= "24d"
@@ -423,6 +478,7 @@ rule "COVID-19(Sep2023+ >= 5yrs Series)-->TargetDose 1/Exception 3: If a CVX 211
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "allowableVaccineCheck"
+	// Exception rules to run before other rules in this Series
 	salience 20
 	when
 		There is an administered shot $currentShot that needs to be evaluated
@@ -441,6 +497,7 @@ end
 rule "COVID-19(Sep2023+ >= 5yrs Series Abstract)-->TargetDose 1/Exception 3: If a shot of CVX 211 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_PART_OF_THIS_SERIES, the absolute minimum interval from that shot to target dose 1 is 24 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
+	// Exception rules to run before other rules in this Series
 	salience 20
 	when
 		There is an administered shot $currentShot that needs to be evaluated
@@ -475,6 +532,7 @@ rule "COVID-19(Sep2023+ >= 5yrs Series)-->TargetDose 1/Exception 3: If a shot of
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheck"
 	no-loop true
+	// Exception rules to run before other rules in this Series
 	salience 20
 	when
 		There does not exist an IceFact
@@ -494,6 +552,7 @@ rule "COVID-19(Sep2023+ >= 5yrs Series)-->TargetDose 1/Exception 3: If a shot of
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheck"
 	no-loop true
+	// Exception rules to run before other rules in this Series
 	salience 20
 	when
 		Confirm Elapsed time between $previousShotDate and $currentShotDate >= "24d"
@@ -1067,6 +1126,8 @@ rule "COVID-19(Sep2023+ Novavax Series): For the 2023-2024 season, the absolute 
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheck"
+	// Since this is essentially a table-based series rule, run this rule after all of the other custom rules have run
+	salience -1
 	when
 		There is an Administered Shot $currentShot that needs to be evaluated
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
@@ -1729,6 +1790,7 @@ rule "COVID-19(Sep2023+): Remove evaluation reason VACCINE_NOT_ALLOWED_FOR_THIS_
 			- that has finding SupportedFactConcept._INVALID_VACCINE.conceptCodeValue	
 	then
 		Remove Evaluation Reason "EVALUATION_REASON_CONCEPT.VACCINE_NOT_ALLOWED_FOR_THIS_DOSE" from Shot $notAllowedShot
+		Refresh all facts for the shot $notAllowedShot
 		Record that this dose rule was processed for the TargetDose $notAllowedShot
 		Log that this dose rule fired for the dose $notAllowedShot in the Series $associatedTargetSeries
 end
