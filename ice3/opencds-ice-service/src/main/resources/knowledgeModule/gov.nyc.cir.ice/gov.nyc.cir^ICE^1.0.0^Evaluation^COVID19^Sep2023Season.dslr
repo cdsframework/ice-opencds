@@ -644,7 +644,7 @@ end
 // For the 2023-2024 COVID-19 vaccine season, there is no absolute maximum age for CVX 308 for doses 2 and 3
 rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If a CVX 308 is administered for target dose 2 or target dose 3 in the 2023-2024 season, then there is no maximum vaccine age for CVX 308"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule^COVID192023Season"
+	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "maximumAgeVaccineCheck"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
@@ -832,9 +832,9 @@ end
 /*****************************************************************************************************************************************************************************************************************/
 
 // For the 2023-2024 COVID-19 vaccine season, there is no absolute maximum age for CVX 308 for doses 2 and 3
-rule "COVID-19(Sep2023+ Moderna < 5yrs Series): If a CVX 308 is administered for target dose 2 or target dose 3 in the 2023-2024 season, then there is no maximum vaccine age for CVX 308"
+rule "COVID-19(Sep2023+ Mixed Product < 5yrs Series): If a CVX 308 is administered for target dose 2 or target dose 3 in the 2023-2024 season, then there is no maximum vaccine age for CVX 308"
 	dialect "mvel"
-	agenda-group "HistoryEvaluation^customEvaluationRule^COVID192023Season"
+	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "maximumAgeVaccineCheck"
 	when
 		There is an administered shot $currentShot that needs to be evaluated
