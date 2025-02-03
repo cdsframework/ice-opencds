@@ -110,10 +110,6 @@ rule "COVID-19(Sep2023+): If a COVID-19 shot that does not count towards U.S. va
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheck"
 	when
-		/////// There is a Series $targetSeries identified by $associatedTargetSeries
-		///////	- make note of the absolute minimum interval for dose 1 in this Series as $absMinimumInterval
-		/////// Confirm that the following is true: $absMinimumInterval.isGreaterThan(new TimePeriod("8w-4d"))
-		/////// Confirm Elapsed time between $previousShotDate and $currentShotDate < $absMinimumInterval
 		Confirm Elapsed time between $previousShotDate and $currentShotDate >= "8w-4d"
 	then
 		// Override general interval rule; do nothing
@@ -265,7 +261,7 @@ rule "COVID-19(Sep2023+ >= 5yrs Series Abstract): If the patient has >= 1 COVID-
 			- the dose number in the Series is == 1
 			- make note of the date this shot was administered as $dtAdministrationDateCurrentShot
 			- make note of the Associated Series as $associatedTargetSeries
-		There is an administered shot $previousDose
+		There is an administered shot $previousShot
 			- the shot belongs to the vaccine group "VACCINE_GROUP_CONCEPT.850"
 			- the administration date of the shot is < $dtAdministrationDateCurrentShot
 			- that has already been evaluated
@@ -288,6 +284,10 @@ rule "COVID-19(Sep2023+ >= 5yrs Series): If the patient has >= 1 COVID-19 shot(s
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheck"
 	when
+		There does not exist an IceFact
+			- that has associated Series $associatedTargetSeries
+			- that has associated administered shot $previousShot
+			- that has finding "COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1"
 		Confirm Elapsed time between $dtAdministrationDatePreviousDose and $dtAdministrationDateCurrentShot < "8w-4d"
 	then
 		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
@@ -302,6 +302,10 @@ rule "COVID-19(Sep2023+ >= 5yrs Series): If the patient has >= 1 COVID-19 shot(s
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
 	activation-group "doseIntervalCheck"
 	when
+		There does not exist an IceFact
+			- that has associated Series $associatedTargetSeries
+			- that has associated administered shot $previousShot
+			- that has finding "COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1"
 		Confirm Elapsed time between $dtAdministrationDatePreviousDose and $dtAdministrationDateCurrentShot >= "8w-4d"
 	then
 		Record that this dose rule was Processed for the TargetDose $currentShot
@@ -437,12 +441,12 @@ rule "COVID-19(Sep2023+ >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of
 		extends "COVID-19(Sep2023+ >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If a previous shot of CVX 313 administered for target dose 1 was determined to be COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1, the absolute minimum interval from that shot to target dose 1 is 24 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
-	activation-group "doseIntervalCheck"
+	/////// activation-group "doseIntervalCheck"
 	no-loop true
 	// Exception rules to run before other rules in this Series
 	salience 20
 	when
-		Confirm Elapsed time between $cvx313administrationDate and $currentShotDate < "24d"
+		Confirm the date $currentShotDate is after $cvx313administrationDate && elapsed time between $cvx313administrationDate and $currentShotDate < "24d"
 	then
 		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
 		Record that this dose rule was Processed for the TargetDose $currentShot
@@ -454,7 +458,7 @@ rule "COVID-19(Sep2023+ >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of
 		extends "COVID-19(Sep2023+ >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If a previous shot of CVX 313 administered for target dose 1 was determined to be COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1, the absolute minimum interval from that shot to target dose 1 is 24 days"
 	dialect "mvel"
 	agenda-group "HistoryEvaluation^customEvaluationRule^COVID19Sep2023Season"
-	activation-group "doseIntervalCheck"
+	/////// activation-group "doseIntervalCheck"
 	no-loop true
 	// Exception rules to run before other rules in this Series
 	salience 20
