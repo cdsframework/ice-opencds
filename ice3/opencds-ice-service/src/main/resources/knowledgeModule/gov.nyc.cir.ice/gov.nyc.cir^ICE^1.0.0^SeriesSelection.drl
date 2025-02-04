@@ -1204,7 +1204,7 @@ rule "SeriesSelection(COVID-19): In the Sep2023+ season, if the first dose admin
 		// Identify the first (valid) dose in this series (the Novavax 2023 series)
 		$td : TargetDose(associatedTargetSeries == $ts, doseNumberInSeries == 1, isValid == true, administrationDate >= $dateAt12yrs)
 		not TargetDose(associatedTargetSeries.vaccineGroup == "VACCINE_GROUP_CONCEPT.850", associatedTargetSeries != $ts, associatedTargetSeries.seriesRules.seriesName == "COVID19Sep2023gte5Series", associatedTargetSeries!.targetSeason == $tss.seriesSelectionSeason, 
-			isValid == true, administrationDate >= $td.administrationDate)
+			isValid == true) //), administrationDate >= $td.administrationDate)
 	then
 		String _RULENAME = kcontext.rule.name;
 		$ts.setSelectedSeries(true);

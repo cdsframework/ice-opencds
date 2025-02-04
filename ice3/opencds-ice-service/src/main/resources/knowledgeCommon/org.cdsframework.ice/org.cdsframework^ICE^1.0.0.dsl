@@ -532,11 +532,13 @@
 [condition][]There does not exist {entity:an | another |}IceFact=not ICEFactTypeFinding()
 [condition][]There is {entity:an |another |}IceFact {oICEFactTypeFinding}={oICEFactTypeFinding} : ICEFactTypeFinding()
 [condition][]- [Tt]hat has [Ff]inding {sIceResultFinding}=iceResultFinding == {sIceResultFinding}
-[condition][]- [Tt]hat has [Aa]ssociated [Ss]eries {oTargetSeries}=associatedTargetSeries == {oTargetSeries}
-[condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot [Dd]ate {aOp:[\=\\<\\>\\!]+}  {dtOtherDate}=targetDose.administrationDate {aOp} {dtOtherDate}
-[condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot {oTargetDose} {attr}=targetDose == {oTargetDose} {attr}
-[condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot {oTargetDose}=targetDose == {oTargetDose}
-[condition][]- [Tt]here is an [Aa]ssociated [Aa]dministered [Ss]hot in the [Ss]eries {refer_oTargetSeries}=associatedTargetSeries == {refer_oTargetSeries}, targetDose != null 
+[condition][]- [Tt]hat has [Aa]ssociated [Ss]eries {oTargetSeries}=associatedTargetSeries != null, associatedTargetSeries == {oTargetSeries}
+[condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot [Dd]ate {aOp:[\=\\<\\>\\!]+}  {dtOtherDate}=targetDose != null, targetDose.administrationDate {aOp} {dtOtherDate}
+[condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot {oTargetDose} {attr}=targetDose != null, targetDose == {oTargetDose} {attr}
+[condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot {oTargetDose}=targetDose != null, targetDose == {oTargetDose}
+[condition][]- [Tt]hat has [Aa]ssociated [Vv]accine [Gg]roup {dd_oVaccineGroupCdsListItem}=associatedTargetSeries != null, associatedTargetSeries.vaccineGroup == {dd_oVaccineGroupCdsListItem}
+[condition][]- [Tt]hat has [Aa]ssociated [Vv]accine [Aa]dministered {dd_oVaccineCdsListItem:[a-zA-Z0-9\\.\\-\\_\\"]+}=targetDose != null && (targetDose.vaccineComponent.cdsConceptName == {dd_oVaccineCdsListItem} || targetDose.administeredVaccine.cdsConceptName == {dd_oVaccineCdsListItem})
+[condition][]- [Tt]here is an [Aa]ssociated [Aa]dministered [Ss]hot in the [Ss]eries {refer_oTargetSeries}=associatedTargetSeries != null, associatedTargetSeries == {refer_oTargetSeries}, targetDose != null 
 [condition][]- [Mm]ake [Nn]ote of the IceResult [Ff]inding as {assign_sIceResultFinding}={assign_sIceResultFinding} : iceResultFinding
 [condition][]- [Mm]ake [Nn]ote of the [Aa]ssociated [Aa]dministered [Ss]hot as {assign_oTargetDose}=targetDose != null, {assign_oTargetDose} : targetDose
 [condition][]- [Mm]ake [Nn]ote of the [Dd]ate the [Aa]ssociated [Ss]hot was [Aa]dministered as {assign_oTargetDoseDate}=targetDose != null, {assign_oTargetDoseDate} : targetDose.administrationDate

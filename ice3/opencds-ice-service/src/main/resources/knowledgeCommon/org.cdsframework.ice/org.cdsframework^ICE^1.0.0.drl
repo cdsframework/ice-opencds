@@ -1327,14 +1327,13 @@ rule "HistoryEvaluation.evaluateVaccineGroupMinimumInterval" ruleflow-group "His
 	activation-group "doseIntervalCheck"
 	salience 100
 	when
-		$td : TargetDose(status == DoseStatus.EVALUATION_IN_PROCESS, $admindose: administeredShotNumberInSeries >= 2, $doseNumber : doseNumberInSeries, $tddate : administrationDate, 
-			$tdAssociatedTargetSeries : associatedTargetSeries)
-		$tdprev : TargetDose(associatedTargetSeries == $tdAssociatedTargetSeries, administeredShotNumberInSeries < $admindose, administrationDate < $tddate, 
-			isShotIgnored() == false, $tdprevdate : administrationDate)
+		$td : TargetDose(status == DoseStatus.EVALUATION_IN_PROCESS, $admindose: administeredShotNumberInSeries >= 2, $doseNumber : doseNumberInSeries, $tddate : administrationDate, $tdAssociatedTargetSeries : associatedTargetSeries)
+		$tdprev : TargetDose(associatedTargetSeries == $tdAssociatedTargetSeries, administeredShotNumberInSeries < $admindose, administrationDate < $tddate, isShotIgnored() == false, $tdprevdate : administrationDate)
 		not TargetDose(associatedTargetSeries == $tdAssociatedTargetSeries, administrationDate > $tdprevdate, administrationDate < $tddate, isShotIgnored() == false)
 		$ts : TargetSeries(this == $td.associatedTargetSeries, this == $tdprev.associatedTargetSeries, seriesRules.numberOfDosesInSeries >= $doseNumber)
-		not (ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._BELOW_MINIMUM_AGE.conceptCodeValue, associatedTargetDose == $tdprev, associatedTargetDose.doseNumberInSeries == 1, 
-			associatedTargetDose.administeredShotNumberInSeries == $admindose-1))
+		not (ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._BELOW_MINIMUM_AGE.conceptCodeValue, associatedTargetDose == $tdprev, associatedTargetDose.doseNumberInSeries == 1, associatedTargetDose.administeredShotNumberInSeries == $admindose-1))
+		not ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue, associatedTargetDose != null && associatedTargetDose == $td)
+		not ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue, associatedTargetDose != null && associatedTargetDose == $tdprev)
 	then
 		String _RULENAME = kcontext.rule.name;
 		$ts.evaluateVaccineGroupMinimumIntervalAndRecordReason($td, $tdprev);
