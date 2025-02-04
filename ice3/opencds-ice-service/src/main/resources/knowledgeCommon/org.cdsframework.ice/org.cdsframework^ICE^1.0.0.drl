@@ -2450,6 +2450,7 @@ rule "RecommendationForecast.recommendBasedOnEarliestIntervalRule" ruleflow-grou
 	when
 		$evalTime : EvalTime()
 		$ts : TargetSeries(recommendationStatus == RecommendationStatus.FORECASTING_IN_PROGRESS)
+		not Recommendation(targetDoseIdentifier != null && targetDoseIdentifier == $ts.lastShotAdministeredInSeriesExcludingIgnoredShots.uniqueId) 
 	then
 		String _RULENAME = kcontext.rule.name;
 		$ts.recommendNextShotBasedOnEarliestIntervalRule($evalTime.getEvalTimeValue());
@@ -2491,6 +2492,7 @@ rule "RecommendationForecast.recommendBasedOnLatestRecommendedIntervalRule" rule
 	when
 		$evalTime : EvalTime()
 		$ts : TargetSeries(recommendationStatus == RecommendationStatus.FORECASTING_IN_PROGRESS)
+		not Recommendation(targetDoseIdentifier != null && targetDoseIdentifier == $ts.lastShotAdministeredInSeriesExcludingIgnoredShots.uniqueId) 
 	then
 		String _RULENAME = kcontext.rule.name;
 		$ts.recommendNextShotBasedOnLatestRecommendedIntervalRule($evalTime.getEvalTimeValue());
@@ -2531,6 +2533,7 @@ rule "RecommendationForecast.recommendBasedOnRecommendedIntervalRule" ruleflow-g
 	when
 		$evalTime : EvalTime()
 		$ts : TargetSeries(recommendationStatus == RecommendationStatus.FORECASTING_IN_PROGRESS)
+		not Recommendation(targetDoseIdentifier != null && targetDoseIdentifier == $ts.lastShotAdministeredInSeriesExcludingIgnoredShots.uniqueId) 
 	then
 		String _RULENAME = kcontext.rule.name;
 		$ts.recommendNextShotBasedOnEarliestRecommendedIntervalRule($evalTime.getEvalTimeValue());

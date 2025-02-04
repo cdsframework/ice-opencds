@@ -313,7 +313,7 @@ end
 //    Recommended Interval = 8 weeks  
 /////////////////////
 
-rule "COVID-19(Sep2023+): For the 2023-2024 season, the minimum interval and recommended interval from invalid shot prior to 9/12/2023, when there are no doses on record, are 8w (*recommendationIntervalCheck*)"
+rule "COVID-19(Sep2023+): For the 2023-2024 season, the minimum interval and recommended interval from the most recent shot prior to 9/12/2023, when there are no doses on record, are 8w (*recommendationIntervalCheck*)"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	when
@@ -347,7 +347,7 @@ rule "COVID-19(Sep2023+): For the 2023-2024 season, the minimum interval and rec
 end
 
 rule "COVID-19(Sep2023+): For the 2023-2024 season, the minimum interval and recommended interval from invalid shot prior to 9/12/2023 are 8w (*earliestIntevalCheck*)"
-		extends "COVID-19(Sep2023+): For the 2023-2024 season, the minimum interval and recommended interval from invalid shot prior to 9/12/2023 are 8w (*recommendationIntervalCheck*)"
+		extends "COVID-19(Sep2023+): For the 2023-2024 season, the minimum interval and recommended interval from the most recent shot prior to 9/12/2023, when there are no doses on record, are 8w (*recommendationIntervalCheck*)"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	when
@@ -398,6 +398,8 @@ rule "COVID-19(Sep2023+ >= 5yrs): For the 2023-2024 season, the minimum interval
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the administration date of the shot is > $mostRecentShotDate
 			- the shot is not ignored
+		There does not exist a Recommendation
+			- the recommendation is associated with shot $mostRecentShot
 	then
 		Create a Recommendation as $r for the Series $targetSeries
 		Add "4m" to $mostRecentShotDate and make note of the newly calculated date as $dtCalculatedEarliest
@@ -431,7 +433,7 @@ end
 //    Recommended Interval = 8 weeks
 /////////////////////
 
-rule "COVID-19(Sep2023+ >= 5yrs): If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, the recommended earliest & recommended interval is 8w from target dose 1 to the next target dose (*recommendationIntervalCheck*)"
+rule "COVID-19(Sep2023+ >= 5yrs): If the patient has >= 1 COVID-19 shot(s) on record prior to dose 1, the recommended earliest & recommended interval is 8w from target dose 1 to the next target dose (*recommendationIntervalCheck*)"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "recommendationIntervalCheck"
@@ -462,12 +464,12 @@ rule "COVID-19(Sep2023+ >= 5yrs): If the patient has >= 1 COVID-19 shot(s) on re
 		Set the recommendation Recommended Forecast Date for $r to $dtCalculated
 		Include the Recommendation $r for Consideration in the final forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
-	   Log that this Series Rule fired for the Series $targetSeries
+	   	Log that this Series Rule fired for the Series $targetSeries
 end
 
 
-rule "COVID-19(Sep2023+ >= 5yrs): If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, the recommended earliest & recommended interval is 8w from target dose 1 to the next target dose  (*earliestIntervalCheck*)"
-	extends "COVID-19(Sep2023+ >= 5yrs): If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, the recommended earliest & recommended interval is 8w from target dose 1 to the next target dose (*recommendationIntervalCheck*)"
+rule "COVID-19(Sep2023+ >= 5yrs): If the patient has >= 1 COVID-19 shot(s) on record prior to dose 1, the recommended earliest & recommended interval is 8w from target dose 1 to the next target dose  (*earliestIntervalCheck*)"
+	extends "COVID-19(Sep2023+ >= 5yrs): If the patient has >= 1 COVID-19 shot(s) on record prior to dose 1, the recommended earliest & recommended interval is 8w from target dose 1 to the next target dose (*recommendationIntervalCheck*)"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	activation-group "earliestIntervalCheck"
@@ -617,10 +619,10 @@ end
 //         Recommended interval = 28 days
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If a previous shot of CVX 313 administered for target dose 1 was determined to be COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1, the recommended interval to the next dose is 28 days. Administer mRNA vaccine."
+rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If a previous shot of CVX 313 administered for target dose 1 was determined to be COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1, the recommended interval to the next dose is 28 days"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
-	/////// ??? activation-group "recommendationIntervalCheck"
+	/////// ? activation-group "recommendationIntervalCheck"
 	salience 20
 	when
 		There is a Series $targetSeries that needs forecasting
@@ -631,17 +633,17 @@ rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If a previous shot o
 		There is an IceFact $iceFactCVX313NotValid
 			- that has associated series $targetSeries
 			- that has finding "COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1"
+			- make note of the associated administered shot as $associatedAdministeredShot
 			- make note of the date the associated shot was administered as $cvx313administrationDate
-		//There does not exist an administered shot
-		//	- the shot belongs to the Series $targetSeries
-		/////// - the administration date of the shot is > $cvx313administrationDate
-		//	- that has already been evaluated
+		There does not exist an IceFact
+			- that has associated series $targetSeries
+			- that has finding "COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1"
+			- that has associated administered shot date > $cvx313administrationDate
 	then
-		Create a Recommendation as $r for the Series $targetSeries
+		Create a Recommendation as $r for the Series $targetSeries and Shot $associatedAdministeredShot
 		Add "28d" to $cvx313administrationDate and make note of the newly calculated date as $dtCalculated
 		Set the recommendation Earliest Forecast Date for $r to $dtCalculated
 		Set the recommendation Recommended Forecast Date for $r to $dtCalculated
-		// Set the Recommendation Reason for $r to "RECOMMENDATION_REASON_CONCEPT.ADMINISTER_mRNA_VACCINE"
 		Include the Recommendation $r for Consideration in the final forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
@@ -649,10 +651,10 @@ end
 
 
 rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: activation-group extension => If a shot of CVX 313 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE, and there are no prior doses on record, the earliest interval from that shot to target dose 1 is 28 days"
-		extends "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If a previous shot of CVX 313 administered for target dose 1 was determined to be COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1, the recommended interval to the next dose is 28 days. Administer mRNA vaccine."
+		extends "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If a previous shot of CVX 313 administered for target dose 1 was determined to be COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1, the recommended interval to the next dose is 28 days"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
-	/////// ??? activation-group "earliestIntervalCheck"
+	/////// ? activation-group "earliestIntervalCheck"
 	salience 20
 	when
 		// No condition required for this extension
@@ -711,11 +713,7 @@ rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 3: If a shot of CVX 211
 			- the collection $acceptedReasons contains "EVALUATION_REASON_CONCEPT.VACCINE_NOT_PART_OF_THIS_SERIES" 
 			- make note of the date this shot was administered as $previousShotDate
 	then
-		Create a Recommendation as $r for the Series $targetSeries
-		Add "28d" to $previousShotDate and make note of the newly calculated date as $dtCalculated
-		Set the recommendation Earliest Forecast Date for $r to $dtCalculated
-		Set the recommendation Recommended Forecast Date for $r to $dtCalculated
-		Include the Recommendation $r for Consideration in the final forecast of the Series
+		// Recommendations set in decedent rules
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
 end
@@ -725,7 +723,7 @@ rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 3: There are no other s
 		extends "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 3: If a shot of CVX 211 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_PART_OF_THIS_SERIES, the recommended interval from that shot to target dose 1 is 28 days"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
-	activation-group "recommendationIntervalCheck"
+	/////// ? activation-group "recommendationIntervalCheck"
 	salience 20
 	when
 		There does not exist an administered shot
@@ -733,7 +731,11 @@ rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 3: There are no other s
 			- the administration date of the shot is >= $cvx211administrationDate
 			- the vaccine administered is not "ICE211"
 	then
-		// Nothing to do; simply overriding default doseIntervalRule
+		Create a Recommendation as $r for the Series $targetSeries and Shot $shotOfInterest
+		Add "28d" to $previousShotDate and make note of the newly calculated date as $dtCalculated
+		Set the recommendation Earliest Forecast Date for $r to $dtCalculated
+		Set the recommendation Recommended Forecast Date for $r to $dtCalculated
+		Include the Recommendation $r for Consideration in the final forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
 end
@@ -743,12 +745,12 @@ rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 3: There are no other s
 		extends "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 3: There are no other shots administered after the CVX 211; therefore, _also_ override default recommendationIntervalCheck"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
-	activation-group "earliestIntervalCheck"
+	/////// ? activation-group "earliestIntervalCheck"
 	salience 20
 	when
 		// No additional checks needed
 	then
-		// Nothing to do; simply overriding default doseIntervalRule
+		// Nothing to do as this was set in the recommendationInterval rule; simply overriding default doseIntervalRule
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
        	Log that this Series Rule fired for the Series $targetSeries
 end

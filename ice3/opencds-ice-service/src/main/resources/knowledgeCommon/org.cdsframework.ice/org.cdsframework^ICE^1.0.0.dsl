@@ -247,6 +247,17 @@
 [condition][]- [Mm]ake [Nn]ote of the [Ff]ully [Ss]pecified [Ss]eason [Ss]tart [Dd]ate as {assign_dtSeasonStartDate}={assign_dtSeasonStartDate} : fullySpecifiedSeasonStartDate.toDate(), {assign_dtSeasonStartDate} != null
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Recommendation
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+[condition][]There exists {entity:a |another |}[Rr]ecommendation=exists Recommendation()
+[condition][]There does not exist {entity:a |another |}[Rr]ecommendation=not Recommendation()
+[condition][]There is {entity:a |}[Rr]ecommendation {assign_oRecommendation} distinct from {assign_oOtherRecommendation}={assign_oRecommendation} : Recommendation(this != {assign_oOtherRecommendation})
+[condition][]There is {entity:a |}[Rr]ecommendation {assign_oRecommendation}={assign_oRecommendation} : Recommendation()
+[condition][]- [Tt]he [Rr]ecommendation is [Aa]ssociated with [Ss]eries {refer_oTargetSeries}={refer_oTargetSeries} != null && targetSeriesIdentifier != null && targetSeriesIdentifier == {refer_oTargetSeries}.targetSeriesIdentifier
+[condition][]- [Tt]he [Rr]ecommendation is [Aa]ssociated with [Ss]hot {refer_oTargetDose}={refer_oTargetDose} != null && targetDoseIdentifier != null && targetDoseIdentifier == {refer_oTargetDose}.uniqueId
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TargetDose accumulates
@@ -399,6 +410,7 @@
 [consequence][][Mm]ake [Nn]ote of the [Rr]ecommended [Aa]ge for [Dd]ose {nDoseNumber} in the [Ss]eries {refer_oTargetSeries} as {assign_strTimePeriod}=String {assign_strTimePeriod}={refer_oTargetSeries}.getRecommendedAgeForTargetDoseInStringFormat({nDoseNumber});
 [consequence][][Mm]ake [Nn]ote of the [Rr]ecommended [Ii]nterval for [Dd]ose {nDoseNumber} in the [Ss]eries {refer_oTargetSeries} as {assign_strTimePeriod}=String {assign_strTimePeriod}={refer_oTargetSeries}.getRecommendedIntervalForTargetDoseInStringFormat({nDoseNumber});
 [consequence][][Cc]reate a [Rr]ecommendation as {assign_oRecommendation} with [Ss]tatus {enum_RecommendationStatus} for the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}); {assign_oRecommendation}.setRecommendationStatus({enum_RecommendationStatus});
+[consequence][][Cc]reate a [Rr]ecommendation as {assign_oRecommendation} for the [Ss]eries {refer_oTargetSeries} and [Ss]hot {refer_oTargetDose}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}, {refer_oTargetDose});
 [consequence][][Cc]reate a [Rr]ecommendation as {assign_oRecommendation} for the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries});
 [consequence][][Ss]et the [Rr]ecommendation [Ss]tatus for {refer_oRecommendation} to {enum_RecommendationStatus}={refer_oRecommendation}.setRecommendationStatus({enum_RecommendationStatus});
 [consequence][][Ss]et the [Rr]ecommendation [Ee]arliest [Ff]orecast [Dd]ate for {refer_oRecommendation} to the latter of {dtForecastDate} and {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}=if ({dtForecastDate} != null) \{ Date latterDate = {dtForecastDate}; Date strDate = TimePeriod.generateDateFromStringInDroolsDateFormat({strDate}); if (strDate != null && latterDate != null && strDate.after(latterDate)) \{ latterDate = strDate; \} {refer_oRecommendation}.setEarliestDate(latterDate); \}
@@ -416,6 +428,7 @@
 [consequence][][Ss]et the [Rr]ecommendation [Ss]upplemental [Tt]ext for {refer_oRecommendation} to {sSupplementalText}={refer_oRecommendation}.setRecommendationSupplementalText({sSupplementalText}); {refer_oRecommendation}.setRecommendationReason(BaseDataRecommendationReason._SUPPLEMENTAL_TEXT.getCdsListItemName());
 [consequence][][Ss]et the [Rr]ecommendation [Vv]accine for {refer_oRecommendation} to {dd_strCdsConceptValue}={refer_oRecommendation}.setRecommendedVaccine(schedule.getVaccineByCdsConceptValue({dd_strCdsConceptValue}));
 [consequence][][Uu]nset the [Rr]ecommendation [Vv]accine for {refer_oRecommendation}={refer_oRecommendation}.setRecommendedVaccine(null); 
+[consequence][][Ii]nclude a [Rr]ecommendation as {assign_oRecommendation} with [Ss]tatus {enum_RecommendationStatus} and [Rr]ecommended [Ff]orecast [Dd]ate {dtForecastDate} for [Cc]onsideration in the final [Ff]orecast of the [Ss]eries {refer_oTargetSeries} and [Ss]hot {refer_oTargetDose}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}, {refer_oTargetDose}); if ({dtForecastDate} != null) \{ {assign_oRecommendation}.setRecommendationDate({dtForecastDate}); {assign_oRecommendation}.setRecommendationStatus({enum_RecommendationStatus}); \} insert({assign_oRecommendation});
 [consequence][][Ii]nclude a [Rr]ecommendation as {assign_oRecommendation} with [Ss]tatus {enum_RecommendationStatus} and [Rr]ecommended [Ff]orecast [Dd]ate {dtForecastDate} for [Cc]onsideration in the final [Ff]orecast of the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}); if ({dtForecastDate} != null) \{ {assign_oRecommendation}.setRecommendationDate({dtForecastDate}); {assign_oRecommendation}.setRecommendationStatus({enum_RecommendationStatus}); \} insert({assign_oRecommendation});
 [consequence][][Ii]nclude a [Rr]ecommendation as {assign_oRecommendation} with [Ee]arliest [Ff]orecast [Dd]ate {dtForecastDate} for [Cc]onsideration in the final [Ff]orecast of the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}); if ({dtForecastDate} != null) \{ {assign_oRecommendation}.setEarliestDate({dtForecastDate}); \} insert({assign_oRecommendation}); 
 [consequence][][Ii]nclude a [Rr]ecommendation as {assign_oRecommendation} with [Rr]ecommended [Ff]orecast [Dd]ate {dtForecastDate} for [Cc]onsideration in the final [Ff]orecast of the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}); if ({dtForecastDate} != null) \{ {assign_oRecommendation}.setRecommendationDate({dtForecastDate}); \} insert({assign_oRecommendation}); 
