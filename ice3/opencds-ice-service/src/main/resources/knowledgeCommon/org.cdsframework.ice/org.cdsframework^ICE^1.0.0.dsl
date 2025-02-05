@@ -410,7 +410,7 @@
 [consequence][][Mm]ake [Nn]ote of the [Rr]ecommended [Aa]ge for [Dd]ose {nDoseNumber} in the [Ss]eries {refer_oTargetSeries} as {assign_strTimePeriod}=String {assign_strTimePeriod}={refer_oTargetSeries}.getRecommendedAgeForTargetDoseInStringFormat({nDoseNumber});
 [consequence][][Mm]ake [Nn]ote of the [Rr]ecommended [Ii]nterval for [Dd]ose {nDoseNumber} in the [Ss]eries {refer_oTargetSeries} as {assign_strTimePeriod}=String {assign_strTimePeriod}={refer_oTargetSeries}.getRecommendedIntervalForTargetDoseInStringFormat({nDoseNumber});
 [consequence][][Cc]reate a [Rr]ecommendation as {assign_oRecommendation} with [Ss]tatus {enum_RecommendationStatus} for the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}); {assign_oRecommendation}.setRecommendationStatus({enum_RecommendationStatus});
-[consequence][][Cc]reate a [Rr]ecommendation as {assign_oRecommendation} for the [Ss]eries {refer_oTargetSeries} and [Ss]hot {refer_oTargetDose}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}, {refer_oTargetDose});
+/////// [consequence][][Cc]reate a [Rr]ecommendation as {assign_oRecommendation} for the [Ss]eries {refer_oTargetSeries} and [Ss]hot {refer_oTargetDose}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}, {refer_oTargetDose});
 [consequence][][Cc]reate a [Rr]ecommendation as {assign_oRecommendation} for the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries});
 [consequence][][Ss]et the [Rr]ecommendation [Ss]tatus for {refer_oRecommendation} to {enum_RecommendationStatus}={refer_oRecommendation}.setRecommendationStatus({enum_RecommendationStatus});
 [consequence][][Ss]et the [Rr]ecommendation [Ee]arliest [Ff]orecast [Dd]ate for {refer_oRecommendation} to the latter of {dtForecastDate} and {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}=if ({dtForecastDate} != null) \{ Date latterDate = {dtForecastDate}; Date strDate = TimePeriod.generateDateFromStringInDroolsDateFormat({strDate}); if (strDate != null && latterDate != null && strDate.after(latterDate)) \{ latterDate = strDate; \} {refer_oRecommendation}.setEarliestDate(latterDate); \}
@@ -584,13 +584,13 @@
 [condition][]- [Tt]hat has [Ff]inding {sIceResultFinding}=iceResultFinding == {sIceResultFinding}
 [condition][]- [Tt]hat has [Aa]ssociated [Pp]revious [Aa]dministered [Ss]hot {oPreviousTargetDose}=associatedPreviousTargetDose != null, associatedPreviousTargetDose == {oPreviousTargetDose}
 [condition][]- [Tt]hat has [Aa]ssociated [Cc]urrent [Aa]dministered [Ss]hot {oTargetDose}=associatedCurrentTargetDose != null, associatedCurrentTargetDose == {oTargetDose}
-
+[condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot {oTargetDose}=associatedCurrentTargetDose != null, associatedCurrentTargetDose == {oTargetDose}
 
 ///////// ***
 // IceResult Fact Object Consequences START
 /////// [consequence][][Ll]ogically [Ii]nsert an IceIntervalFact {sIceResultFinding} with TargetDoses {oTargetDosePrevious} and {oTargetDose} into [Ww]orking [Mm]emory=insertLogical(new ICEIntervalFactTypeFinding({sIceResultFinding}, {oTargetDosePrevious}, {oTargetDose}));
 [consequence][][Ii]nsert an [Ee]valuation IceIntervalFact {sIceResultFinding} with TargetDoses {oTargetDosePrevious} and {oTargetDose} into [Ww]orking [Mm]emory=insert(new ICEIntervalFactTypeFinding({sIceResultFinding}, {oTargetDosePrevious}, {oTargetDose}));
-[consequence][][Ii]nsert an [Rr]ecommendation IceIntervalFact {sIceResultFinding} with TargetDose {oTargetDose} into [Ww]orking [Mm]emory=insert(new ICEIntervalFactTypeFinding({sIceResultFinding}, {oTargetDose}));
+[consequence][][Ii]nsert a [Rr]ecommendation IceIntervalFact {sIceResultFinding} with TargetDose {oTargetDose} into [Ww]orking [Mm]emory=insert(new ICEIntervalFactTypeFinding({sIceResultFinding}, {oTargetDose}));
 [consequence][][Rr]etract IceIntervalFact {oICEIntervalFactTypeFinding} from [Ww]orking [Mm]emory=retract({oICEIntervalFactTypeFinding});
 ///////// ***
 

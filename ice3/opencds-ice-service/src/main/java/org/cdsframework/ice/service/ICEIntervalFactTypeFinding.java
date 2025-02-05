@@ -37,7 +37,9 @@ public class ICEIntervalFactTypeFinding extends ICEFactTypeFinding {
 
 	public enum IntervalFactType {
 		EVALUATION,
-		RECOMMENDATION
+		EARLIEST_RECOMMENDED,
+		RECOMMENDED,
+		LATEST_RECOMMENDED
 	}
 
 	/**
@@ -60,7 +62,7 @@ public class ICEIntervalFactTypeFinding extends ICEFactTypeFinding {
 	public ICEIntervalFactTypeFinding(String pIceResultFinding, TargetDose pTargetDose) {
 		super(pIceResultFinding);
 		this.associatedTargetDose = pTargetDose;
-		this.intervalFactType = IntervalFactType.RECOMMENDATION;
+		this.intervalFactType = IntervalFactType.RECOMMENDED;
 	}
 
 	public IntervalFactType getIntervalFactType() {
