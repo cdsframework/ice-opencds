@@ -552,6 +552,7 @@
 [consequence][][Ll]ogically [Ii]nsert an IceFact {sIceResultFinding} with TargetDose {oTargetDose} into [Ww]orking [Mm]emory=insertLogical(new ICEFactTypeFinding({sIceResultFinding}, {oTargetDose}));
 [consequence][][Ll]ogically [Ii]nsert an IceFact {sIceResultFinding} with TargetSeries {oTargetSeries} into [Ww]orking [Mm]emory=insertLogical(new ICEFactTypeFinding({sIceResultFinding}, {oTargetSeries}));
 [consequence][][Ll]ogically [Ii]nsert an IceFact {sIceResultFinding} into [Ww]orking [Mm]emory=insertLogical(new ICEFactTypeFinding({sIceResultFinding}));
+[consequence][][Ii]nsert an IceFact {sIceResultFinding} with TargetDose {oTargetDose} and TargetSeries {oTargetSeries} into [Ww]orking [Mm]emory=insert(new ICEFactTypeFinding({sIceResultFinding}, {oTargetDose}));
 [consequence][][Ii]nsert an IceFact {sIceResultFinding} with TargetDose {oTargetDose} into [Ww]orking [Mm]emory=insert(new ICEFactTypeFinding({sIceResultFinding}, {oTargetDose}));
 [consequence][][Ii]nsert an IceFact {sIceResultFinding} with TargetSeries {oTargetSeries} into [Ww]orking [Mm]emory=insert(new ICEFactTypeFinding({sIceResultFinding}, {oTargetSeries}));
 [consequence][][Ii]nsert an IceFact {sIceResultFinding} into [Ww]orking [Mm]emory=insert(new ICEFactTypeFinding({sIceResultFinding}));
@@ -572,4 +573,19 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IceResult Fact Object END
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+///////// ***
+// Primary IceIntervalResult Fact Object conditions and sub-conditions
+[condition][]There exists {entity:an |another |}IceIntervalFact=exists ICEIntervalFactTypeFinding()
+[condition][]There does not exist {entity:an | another |}IceIntervalFact=not ICEIntervalFactTypeFinding()
+[condition][]There is {entity:an |another |}IceIntervalFact {oICEFactTypeFinding}={oICEFactTypeFinding} : ICEIntervalFactTypeFinding()
+
+
+///////// ***
+// IceResult Fact Object Consequences START
+[consequence][][Ll]ogically [Ii]nsert an IceIntervalFact {sIceResultFinding} with TargetDoses {oTargetDosePrevious} and {oTargetDose} into [Ww]orking [Mm]emory=insertLogical(new ICEIntervalFactTypeFinding({sIceResultFinding}, {oTargetDosePrevious}, {oTargetDose}));
+[consequence][][Ii]nsert an IceIntervalFact {sIceResultFinding} with TargetDoses {oTargetDosePrevious} and {oTargetDose} into [Ww]orking [Mm]emory=insert(new ICEIntervalFactTypeFinding({sIceResultFinding}, {oTargetDosePrevious}, {oTargetDose}));
+[consequence][][Rr]etract IceIntervalFact {oICEIntervalFactTypeFinding} from [Ww]orking [Mm]emory=retract({oICEIntervalFactTypeFinding});
+///////// ***
 
