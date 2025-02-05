@@ -297,7 +297,7 @@ rule "COVID-19(Sep2023+ >= 5yrs Series Abstract): If the patient has >= 1 COVID-
 		There does not exist an IceIntervalFact
 			- that has IceIntervalFact type IntervalFactType.EVALUATION
 			- that has IceIntervalFact finding SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue
-			- that has IceIntervalFact previously administered shot $previousShot
+		//	- that has IceIntervalFact previously administered shot $previousShot
 			- that has IceIntervalFact current administered shot $currentShot
 	then
 		Record that this dose rule was Processed for the TargetDose $currentShot

@@ -1334,7 +1334,8 @@ rule "HistoryEvaluation.evaluateVaccineGroupMinimumInterval" ruleflow-group "His
 		not TargetDose(associatedTargetSeries == $tdAssociatedTargetSeries, administrationDate > $tdprevdate, administrationDate < $tddate, isShotIgnored() == false)
 		$ts : TargetSeries(this == $td.associatedTargetSeries, this == $tdprev.associatedTargetSeries, seriesRules.numberOfDosesInSeries >= $doseNumber)
 		not (ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._BELOW_MINIMUM_AGE.conceptCodeValue, associatedTargetDose == $tdprev, associatedTargetDose.doseNumberInSeries == 1, associatedTargetDose.administeredShotNumberInSeries == $admindose-1))
-		not ICEIntervalFactTypeFinding(intervalFactType == IntervalFactType.EVALUATION, iceResultFinding == SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue, associatedTargetDose != null && associatedTargetDose == $td, associatedPreviousTargetDose != null && associatedPreviousTargetDose == $tdprev)
+		not ICEIntervalFactTypeFinding(intervalFactType == IntervalFactType.EVALUATION, iceResultFinding == SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue, associatedCurrentTargetDose != null && associatedCurrentTargetDose == $td, 
+			associatedPreviousTargetDose != null && associatedPreviousTargetDose == $tdprev)
 	then
 		String _RULENAME = kcontext.rule.name;
 		$ts.evaluateVaccineGroupMinimumIntervalAndRecordReason($td, $tdprev);
@@ -2452,8 +2453,8 @@ rule "RecommendationForecast.recommendBasedOnEarliestIntervalRule" ruleflow-grou
 		$ts : TargetSeries(recommendationStatus == RecommendationStatus.FORECASTING_IN_PROGRESS)
 		$td : TargetDose(associatedTargetSeries == $ts, isShotIgnored() == false)
 		not TargetDose(associatedTargetSeries == $ts, administeredShotNumberInSeries > $td.administeredShotNumberInSeries, isShotIgnored() == false)
-		not ICEIntervalFactTypeFinding(intervalFactType == IntervalFactType.RECOMMENDED, iceResultFinding == SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue, associatedTargetDose == $td)
-		/////// not ICEIntervalFactTypeFinding(intervalFactType == IntervalFactType.RECOMMENDED, associatedTargetDose == $td)
+		not ICEIntervalFactTypeFinding(intervalFactType == IntervalFactType.RECOMMENDED, iceResultFinding == SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue, associatedCurrentTargetDose == $td)
+		/////// not ICEIntervalFactTypeFinding(intervalFactType == IntervalFactType.RECOMMENDED, currentTargetDose == $td)
 		// $ts.lastShotAdministeredInSeriesExcludingIgnoredShots) 
 	then
 		String _RULENAME = kcontext.rule.name;
@@ -2498,8 +2499,8 @@ rule "RecommendationForecast.recommendBasedOnLatestRecommendedIntervalRule" rule
 		$ts : TargetSeries(recommendationStatus == RecommendationStatus.FORECASTING_IN_PROGRESS)
 		$td : TargetDose(associatedTargetSeries == $ts, isShotIgnored() == false)
 		not TargetDose(associatedTargetSeries == $ts, administeredShotNumberInSeries > $td.administeredShotNumberInSeries, isShotIgnored() == false)
-		not ICEIntervalFactTypeFinding(intervalFactType == IntervalFactType.RECOMMENDED, iceResultFinding == SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue, associatedTargetDose == $td)
-		/////// not ICEIntervalFactTypeFinding(intervalFactType == IntervalFactType.RECOMMENDED, associatedTargetDose == $ts.lastShotAdministeredInSeriesExcludingIgnoredShots) 
+		not ICEIntervalFactTypeFinding(intervalFactType == IntervalFactType.RECOMMENDED, iceResultFinding == SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue, associatedCurrentTargetDose == $td)
+		/////// not ICEIntervalFactTypeFinding(intervalFactType == IntervalFactType.RECOMMENDED, currentTargetDose == $ts.lastShotAdministeredInSeriesExcludingIgnoredShots) 
 	then
 		String _RULENAME = kcontext.rule.name;
 		$ts.recommendNextShotBasedOnLatestRecommendedIntervalRule($evalTime.getEvalTimeValue());
@@ -2542,8 +2543,8 @@ rule "RecommendationForecast.recommendBasedOnRecommendedIntervalRule" ruleflow-g
 		$ts : TargetSeries(recommendationStatus == RecommendationStatus.FORECASTING_IN_PROGRESS)
 		$td : TargetDose(associatedTargetSeries == $ts, isShotIgnored() == false)
 		not TargetDose(associatedTargetSeries == $ts, administeredShotNumberInSeries > $td.administeredShotNumberInSeries, isShotIgnored() == false)
-		not ICEIntervalFactTypeFinding(intervalFactType == IntervalFactType.RECOMMENDED, iceResultFinding == SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue, associatedTargetDose == $td)
-		/////// not ICEIntervalFactTypeFinding(intervalFactType == IntervalFactType.RECOMMENDED, associatedTargetDose == $ts.lastShotAdministeredInSeriesExcludingIgnoredShots) 
+		not ICEIntervalFactTypeFinding(intervalFactType == IntervalFactType.RECOMMENDED, iceResultFinding == SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue, associatedCurrentTargetDose == $td)
+		/////// not ICEIntervalFactTypeFinding(intervalFactType == IntervalFactType.RECOMMENDED, currentTargetDose == $ts.lastShotAdministeredInSeriesExcludingIgnoredShots) 
 	then
 		String _RULENAME = kcontext.rule.name;
 		$ts.recommendNextShotBasedOnEarliestRecommendedIntervalRule($evalTime.getEvalTimeValue());
