@@ -84,6 +84,10 @@ rule "COVID-19(Sep2023+ Abstract): If a COVID-19 shot that does not count toward
 			- the vaccine administered a member of ("ICE500", "ICE501", "ICE503", "ICE504", "ICE505", "ICE506", "ICE507", "ICE508", "ICE509", "ICE513", "ICE514", "ICE515", "ICE516", "ICE517", "ICE518", "ICE521")
 			- the administration date of the shot is > $previousShotDate
 			- the administration date of the shot is < $currentShotDate
+		There does not exist an IceIntervalFact
+			- that has finding SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue
+			- that has associated previous administered shot $previousShot
+			- that has associated current administered shot $currentShot
 	then
 		// Nothing to do
 		Record that this dose rule was Processed for the TargetDose $currentShot
@@ -230,7 +234,7 @@ rule "COVID-19(Sep2023+ >= 5yrs Series): For the 2023-2024 season, the absolute 
 			- make note of the Associated Series as $associatedTargetSeries
 		There is a Series $targetSeries identified by $associatedTargetSeries
 			- the Series belongs to the Season with name "COVID19Sep2023Season"
-		There is an administered shot $previousDose
+		There is an administered shot $previousShot
 			- the shot belongs to the Series $associatedTargetSeries
 			- the administration date of the shot is < $dtAdministrationDateCurrentShot
 			- that has already been evaluated
@@ -239,12 +243,16 @@ rule "COVID-19(Sep2023+ >= 5yrs Series): For the 2023-2024 season, the absolute 
 			- the shot belongs to the Series $associatedTargetSeries
 			- the administration date of the shot is > $dtAdministrationDatePreviousDose
 			- the administration date of the shot is < $dtAdministrationDateCurrentShot
-		There does not exist an IceFact
-			- that has associated administered shot $currentShot
+		//There does not exist an IceFact
+		//	- that has associated administered shot $currentShot
+		//	- that has finding SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue
+		//There does not exist an IceFact
+		//	- that has associated administered shot $previousDose
+		//	- that has finding SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue'
+		There does not exist an IceIntervalFact
 			- that has finding SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue
-		There does not exist an IceFact
-			- that has associated administered shot $previousDose
-			- that has finding SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue
+			- that has associated previous administered shot $previousShot
+			- that has associated current administered shot $currentShot
 		Confirm Elapsed time between $dtAdministrationDatePreviousDose and $dtAdministrationDateCurrentShot < "4m-4d"
 	then
 		Include the reason for shot $currentShot Invalid due to "Below Minimum Interval"
@@ -281,13 +289,17 @@ rule "COVID-19(Sep2023+ >= 5yrs Series Abstract): If the patient has >= 1 COVID-
 			- the administration date of the shot is < $dtAdministrationDateCurrentShot
 			- the administration date of the shot is > $dtAdministrationDatePreviousDose
 			- the shot is not ignored
-		There does not exist an IceFact
-			- that has associated administered shot $currentShot
+		//There does not exist an IceFact
+		//	- that has associated administered shot $currentShot
+		//	- that has finding SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue
+		//There does not exist an IceFact
+		//	- that has associated vaccine group "VACCINE_GROUP_CONCEPT.850"	
+		//	- that has associated administered shot date == $dtAdministrationDatePreviousDose
+		//	- that has finding SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue
+		There does not exist an IceIntervalFact
 			- that has finding SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue
-		There does not exist an IceFact
-			- that has associated vaccine group "VACCINE_GROUP_CONCEPT.850"	
-			- that has associated administered shot date == $dtAdministrationDatePreviousDose
-			- that has finding SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue
+			- that has associated previous administered shot $previousShot
+			- that has associated current administered shot $currentShot
 	then
 		Record that this dose rule was Processed for the TargetDose $currentShot
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries

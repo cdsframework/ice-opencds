@@ -47,4 +47,8 @@ public class ICEIntervalFactTypeFinding extends ICEFactTypeFinding {
 	public TargetDose getAssociatedTargetDose() {
 		return associatedTargetDose;
 	}
+
+	public TargetDose getAssociatedCurrentTargetDose() {
+		return associatedTargetDose;
+	}
 }
