@@ -456,7 +456,7 @@ rule "COVID-19(Sep2023+ >= 5yrs): If the patient has >= 1 COVID-19 shot(s) on re
 		There does not exist an IceFact
 			- that has associated series $targetSeries
 			- that has associated administered shot $mostRecentShot
-			- that has finding "COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1"
+			- that has finding a member of ("COVID19_SEPT2023GTE5SERIES_EXCEPTION_2_FOR_TARGET_DOSE_1", "COVID19_SEPT2023GTE5SERIES_EXCEPTION_3_FOR_TARGET_DOSE_1")
 	then
 		Create a Recommendation as $r for the Series $targetSeries
 		Add "8w" to $mostRecentShotDate and make note of the newly calculated date as $dtCalculated
