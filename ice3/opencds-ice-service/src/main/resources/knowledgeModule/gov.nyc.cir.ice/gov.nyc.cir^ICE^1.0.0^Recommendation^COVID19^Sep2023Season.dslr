@@ -154,6 +154,7 @@ rule "COVID-19(Sep2023+ Moderna < 5yrs Series): If the next recommended dose is 
 		extends "COVID-19(Sep2023+ Moderna < 5yrs Series Abstract): Recommend the appropriate age-specific vaccine"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
+	activation-group "RecommendationForecast^postRecommendationCheck^COVID19Sep2023Season^VaccineGroupOrVaccineRecommendation"
 	when
 		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "6m" && elapsed time between $dtBirthDate and $recommendationDate < "12y" && elapsed time between $dtBirthDate and evalTime < "12y"
 	then
@@ -169,6 +170,7 @@ rule "COVID-19(Sep2023+ Moderna < 5yrs Series): If the next recommended dose is 
 		extends "COVID-19(Sep2023+ Moderna < 5yrs Series Abstract): Recommend the appropriate age-specific vaccine"	
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
+	activation-group "RecommendationForecast^postRecommendationCheck^COVID19Sep2023Season^VaccineGroupOrVaccineRecommendation"
 	when
 		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "12y" || $recommendationDate <= evalTime && elapsed time between $dtBirthDate and evalTime >= "12y"
 	then
@@ -202,6 +204,7 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If the next recommended dose is a
 		extends "COVID-19(Sep2023+ Pfizer < 5yrs Series Abstract): Recommend the appropriate age-specific vaccine"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
+	activation-group "RecommendationForecast^postRecommendationCheck^COVID19Sep2023Season^VaccineGroupOrVaccineRecommendation"
 	when
 		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "6m" && elapsed time between $dtBirthDate and $recommendationDate < "5y" && elapsed time between $dtBirthDate and evalTime < "5y" 
 	then
@@ -217,8 +220,8 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If the next recommended dose is a
 		extends "COVID-19(Sep2023+ Pfizer < 5yrs Series Abstract): Recommend the appropriate age-specific vaccine"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
+	activation-group "RecommendationForecast^postRecommendationCheck^COVID19Sep2023Season^VaccineGroupOrVaccineRecommendation"
 	when
-		/////// Confirm elapsed time between $dtBirthDate and $recommendationDate >= "5y" && elapsed time between $dtBirthDate and $recommendationDate < "12y" || elapsed time between $dtBirthDate and evalTime >= "5y" && elapsed time between $dtBirthDate and evalTime < "12y" && that the following is true: $recommendationDate <= evalTime
 		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "5y" && elapsed time between $dtBirthDate and $recommendationDate < "12y" || $recommendationDate <= evalTime && elapsed time between $dtBirthDate and evalTime >= "5y" && elapsed time between $dtBirthDate and evalTime < "12y"
 	then
 		Create a Recommendation as $oRecommendation for the Series $targetSeries
@@ -233,6 +236,7 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If the next recommended dose is a
 		extends "COVID-19(Sep2023+ Pfizer < 5yrs Series Abstract): Recommend the appropriate age-specific vaccine"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
+	activation-group "RecommendationForecast^postRecommendationCheck^COVID19Sep2023Season^VaccineGroupOrVaccineRecommendation"
 	when
 		Confirm elapsed time between $dtBirthDate and $recommendationDate >= "12y" || $recommendationDate <= evalTime && elapsed time between $dtBirthDate and evalTime >= "12y"
 	then
@@ -243,10 +247,43 @@ rule "COVID-19(Sep2023+ Pfizer < 5yrs Series): If the next recommended dose is a
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
+
 /////////////////////
 // END Recommending at the CVX code level for Moderna/Pfizer < 5yrs Series... 
 /////////////////////
 
+
+/////////////////////
+// Exception to vaccine-specific recommendation rules above.
+// When recommending in the Seasonal COVID-19 Pfizer Series (< 5 years) or the Seasonal COVID-19 Moderna Series (< 5 years), recommend at the CVX code level and recommend the vaccine product applicable for the series and the patient's age, 
+// based on the COVID-19 Vaccines table, unless the following exception applies: 
+//     + If the patient is >= 5 years as of the recommended date or the evaluation date, and either the recommendation date or the evaluation date is >= 8 weeks from the last administered COVID-19 shot, recommend at the vaccine group level.
+//       This rule overrides specific CVX code vaccine recommendations above.
+/////////////////////
+
+rule "COVID-19(Sep2023+): If the patient is >= 5 years as of the recommended date or the evaluation date, and either the recommendation date or the evaluation date is >= 8 weeks from the last administered COVID-19 shot, recommend at the vaccine group level"
+	dialect "mvel"
+	agenda-group "RecommendationForecast^postCustomRecommendationCheck^COVID19Sep2023Season"
+	activation-group "RecommendationForecast^postRecommendationCheck^COVID19Sep2023Season^VaccineGroupOrVaccineRecommendation"
+	salience 10
+	when
+		There is a Series $targetSeries
+			- a Forecast for the Series has been made and a Recommendation Date has been determined
+			- the Series belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
+			- the name of the Series a member of ("COVID19Sep2023PfizerLT5ySeries", "COVID19Sep2023ModernaLT5ySeries")
+			- post processing on the Series forecast has not already been run
+			- make note of the recommendation date as $recommendationDate
+			- make note of the date that the most recent shot was administered as $lastAdministeredShotDate
+		The patient information $assign_oEvaluatedPerson must be known to complete writing this rule
+			- make note of the patient's birthdate as $dtBirthDate
+			- make note of the date as $dateAt5yrs when the patient is "5y" of age
+		Confirm the date evalTime is on the same date or after $dateAt5yrs || the date $recommendationDate is on the same date or after $dateAt5yrs
+		Confirm elapsed time between $lastAdministeredShotDate and evalTime >= "8w" || elapsed time between $lastAdministeredShotDate and $recommendationDate >= "8w"
+	then
+		Unset the Recommended Vaccine for the forecast in the Series $targetSeries 
+		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+       	Log that this Series Rule fired for the Series $targetSeries
+end
 
 /////////////////////
 // START
