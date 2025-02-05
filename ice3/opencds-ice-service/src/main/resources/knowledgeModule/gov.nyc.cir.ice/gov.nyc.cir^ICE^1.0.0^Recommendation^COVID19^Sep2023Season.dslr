@@ -35,6 +35,7 @@ import org.cdsframework.ice.service.DiseaseImmunity
 import org.cdsframework.ice.service.DoseRule
 import org.cdsframework.ice.service.DoseStatus
 import org.cdsframework.ice.service.ICEFactTypeFinding
+import org.cdsframework.ice.service.ICEIntervalFactTypeFinding
 import org.cdsframework.ice.service.ICELogicHelper
 import org.cdsframework.ice.service.Recommendation
 import org.cdsframework.ice.service.RecommendationStatus
@@ -398,8 +399,10 @@ rule "COVID-19(Sep2023+ >= 5yrs): For the 2023-2024 season, the minimum interval
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the administration date of the shot is > $mostRecentShotDate
 			- the shot is not ignored
-		There does not exist a Recommendation
-			- the recommendation is associated with shot $mostRecentShot
+		There does not exist an IceIntervalFact
+			- that has IceIntervalFact type IntervalFactType.RECOMMENDED
+			- that has IceIntervalFact finding SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue
+			- that has IceIntervalFact current administered shot $mostRecentShot
 	then
 		Create a Recommendation as $r for the Series $targetSeries
 		Add "4m" to $mostRecentShotDate and make note of the newly calculated date as $dtCalculatedEarliest
@@ -409,6 +412,7 @@ rule "COVID-19(Sep2023+ >= 5yrs): For the 2023-2024 season, the minimum interval
 		Include the Recommendation $r for Consideration in the final forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
 		Log that this Series Rule fired for the Series $targetSeries
+		Log Debugging Information about Object Named "mostRecentShot" and Value $mostRecentShot
 end
 
 rule "COVID-19(Sep2023+ >= 5yrs): For the 2023-2024 season, the minimum interval and recommended interval from dose 1 to dose 2 are, respectively, to 4m and 4m (*earliestIntevalCheck*)"
@@ -453,10 +457,14 @@ rule "COVID-19(Sep2023+ >= 5yrs): If the patient has >= 1 COVID-19 shot(s) on re
 			- the shot belongs to the Vaccine Group "VACCINE_GROUP_CONCEPT.850"
 			- the administration date of the shot is > $mostRecentShotDate
 			- the shot is not ignored
-		There does not exist an IceFact
-			- that has associated series $targetSeries
-			- that has associated administered shot $mostRecentShot
-			- that has finding "COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1"
+		//There does not exist an IceFact
+		//	- that has associated series $targetSeries
+		//	- that has associated administered shot $mostRecentShot
+		//	- that has finding a member of ("COVID19_SEPT2023GTE5SERIES_EXCEPTION_2_FOR_TARGET_DOSE_1", "COVID19_SEPT2023GTE5SERIES_EXCEPTION_3_FOR_TARGET_DOSE_1")
+		There does not exist an IceIntervalFact
+			- that has IceIntervalFact type IntervalFactType.RECOMMENDED
+			- that has IceIntervalFact finding SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue
+			- that has IceIntervalFact current administered shot $mostRecentShot
 	then
 		Create a Recommendation as $r for the Series $targetSeries
 		Add "8w" to $mostRecentShotDate and make note of the newly calculated date as $dtCalculated
@@ -640,12 +648,14 @@ rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If a previous shot o
 			- that has finding "COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1"
 			- that has associated administered shot date > $cvx313administrationDate
 	then
-		Create a Recommendation as $r for the Series $targetSeries and Shot $associatedAdministeredShot
+		Insert a Recommendation IceIntervalFact SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue with TargetDose $associatedAdministeredShot into working memory 
+		Create a Recommendation as $r for the Series $targetSeries
 		Add "28d" to $cvx313administrationDate and make note of the newly calculated date as $dtCalculated
 		Set the recommendation Earliest Forecast Date for $r to $dtCalculated
 		Set the recommendation Recommended Forecast Date for $r to $dtCalculated
 		Include the Recommendation $r for Consideration in the final forecast of the Series
 		Record that this Series Rule was Processed for the TargetSeries $targetSeries
+		Log Debugging Information about Object Named "associatedAdministeredShot" and Value $associatedAdministeredShot
        	Log that this Series Rule fired for the Series $targetSeries
 end
 
@@ -693,7 +703,7 @@ rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 2: If the patient is < 
 end
 
 
-rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 3: If a shot of CVX 211 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_PART_OF_THIS_SERIES, the recommended interval from that shot to target dose 1 is 28 days"
+rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 3: If a shot of CVX 211 was previously administered for target dose 1 and evaluated as Accepted, the recommended interval from that shot to target dose 1 is 28 days"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	salience 20
@@ -720,18 +730,20 @@ end
 
 
 rule "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 3: There are no other shots administered after the CVX 211; therefore, _also_ override default recommendationIntervalCheck"
-		extends "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 3: If a shot of CVX 211 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_PART_OF_THIS_SERIES, the recommended interval from that shot to target dose 1 is 28 days"
+		extends "COVID-19(Sep2023+ >= 5yrs)->TargetDose 1/Exception 3: If a shot of CVX 211 was previously administered for target dose 1 and evaluated as Accepted, the recommended interval from that shot to target dose 1 is 28 days"
 	dialect "mvel"
 	agenda-group "RecommendationForecast^customRecommendationRule^COVID19Sep2023Season"
 	/////// ? activation-group "recommendationIntervalCheck"
 	salience 20
+	no-loop true
 	when
 		There does not exist an administered shot
 			- the shot belongs to the Series $targetSeries
 			- the administration date of the shot is >= $cvx211administrationDate
 			- the vaccine administered is not "ICE211"
 	then
-		Create a Recommendation as $r for the Series $targetSeries and Shot $shotOfInterest
+		Insert a Recommendation IceIntervalFact SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue with TargetDose $shotOfInterest into working memory 
+		Create a Recommendation as $r for the Series $targetSeries
 		Add "28d" to $previousShotDate and make note of the newly calculated date as $dtCalculated
 		Set the recommendation Earliest Forecast Date for $r to $dtCalculated
 		Set the recommendation Recommended Forecast Date for $r to $dtCalculated

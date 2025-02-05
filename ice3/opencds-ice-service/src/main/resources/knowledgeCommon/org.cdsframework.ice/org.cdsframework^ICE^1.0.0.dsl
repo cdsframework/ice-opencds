@@ -410,7 +410,7 @@
 [consequence][][Mm]ake [Nn]ote of the [Rr]ecommended [Aa]ge for [Dd]ose {nDoseNumber} in the [Ss]eries {refer_oTargetSeries} as {assign_strTimePeriod}=String {assign_strTimePeriod}={refer_oTargetSeries}.getRecommendedAgeForTargetDoseInStringFormat({nDoseNumber});
 [consequence][][Mm]ake [Nn]ote of the [Rr]ecommended [Ii]nterval for [Dd]ose {nDoseNumber} in the [Ss]eries {refer_oTargetSeries} as {assign_strTimePeriod}=String {assign_strTimePeriod}={refer_oTargetSeries}.getRecommendedIntervalForTargetDoseInStringFormat({nDoseNumber});
 [consequence][][Cc]reate a [Rr]ecommendation as {assign_oRecommendation} with [Ss]tatus {enum_RecommendationStatus} for the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}); {assign_oRecommendation}.setRecommendationStatus({enum_RecommendationStatus});
-[consequence][][Cc]reate a [Rr]ecommendation as {assign_oRecommendation} for the [Ss]eries {refer_oTargetSeries} and [Ss]hot {refer_oTargetDose}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}, {refer_oTargetDose});
+/////// [consequence][][Cc]reate a [Rr]ecommendation as {assign_oRecommendation} for the [Ss]eries {refer_oTargetSeries} and [Ss]hot {refer_oTargetDose}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries}, {refer_oTargetDose});
 [consequence][][Cc]reate a [Rr]ecommendation as {assign_oRecommendation} for the [Ss]eries {refer_oTargetSeries}=Recommendation {assign_oRecommendation} = new Recommendation({refer_oTargetSeries});
 [consequence][][Ss]et the [Rr]ecommendation [Ss]tatus for {refer_oRecommendation} to {enum_RecommendationStatus}={refer_oRecommendation}.setRecommendationStatus({enum_RecommendationStatus});
 [consequence][][Ss]et the [Rr]ecommendation [Ee]arliest [Ff]orecast [Dd]ate for {refer_oRecommendation} to the latter of {dtForecastDate} and {strDate:[\\"]{1}[0-9]+[\\-]{1}[a-zA-Z]+[\\-]{1}[0-9]+[\\"]{1}}=if ({dtForecastDate} != null) \{ Date latterDate = {dtForecastDate}; Date strDate = TimePeriod.generateDateFromStringInDroolsDateFormat({strDate}); if (strDate != null && latterDate != null && strDate.after(latterDate)) \{ latterDate = strDate; \} {refer_oRecommendation}.setEarliestDate(latterDate); \}
@@ -531,12 +531,15 @@
 [condition][]There exists {entity:an |another |}IceFact=exists ICEFactTypeFinding()
 [condition][]There does not exist {entity:an | another |}IceFact=not ICEFactTypeFinding()
 [condition][]There is {entity:an |another |}IceFact {oICEFactTypeFinding}={oICEFactTypeFinding} : ICEFactTypeFinding()
+[condition][]- [Tt]hat has [Ff]inding a member of {list_oIceResultFindingList:[\\(]+[a-zA-Z0-9\\.\\-_\\"\\,\\ \\(\\)]+[\\)]+}=iceResultFinding in {list_oIceResultFindingList}
 [condition][]- [Tt]hat has [Ff]inding {sIceResultFinding}=iceResultFinding == {sIceResultFinding}
-[condition][]- [Tt]hat has [Aa]ssociated [Ss]eries {oTargetSeries}=associatedTargetSeries == {oTargetSeries}
-[condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot [Dd]ate {aOp:[\=\\<\\>\\!]+}  {dtOtherDate}=targetDose.administrationDate {aOp} {dtOtherDate}
-[condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot {oTargetDose} {attr}=targetDose == {oTargetDose} {attr}
-[condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot {oTargetDose}=targetDose == {oTargetDose}
-[condition][]- [Tt]here is an [Aa]ssociated [Aa]dministered [Ss]hot in the [Ss]eries {refer_oTargetSeries}=associatedTargetSeries == {refer_oTargetSeries}, targetDose != null 
+[condition][]- [Tt]hat has [Aa]ssociated [Ss]eries {oTargetSeries}=associatedTargetSeries != null, associatedTargetSeries == {oTargetSeries}
+[condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot [Dd]ate {aOp:[\=\\<\\>\\!]+}  {dtOtherDate}=targetDose != null, targetDose.administrationDate {aOp} {dtOtherDate}
+[condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot {oTargetDose} {attr}=targetDose != null, targetDose == {oTargetDose} {attr}
+[condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot {oTargetDose}=targetDose != null, targetDose == {oTargetDose}
+[condition][]- [Tt]hat has [Aa]ssociated [Vv]accine [Gg]roup {dd_oVaccineGroupCdsListItem}=associatedTargetSeries != null, associatedTargetSeries.vaccineGroup == {dd_oVaccineGroupCdsListItem}
+[condition][]- [Tt]hat has [Aa]ssociated [Vv]accine [Aa]dministered {dd_oVaccineCdsListItem:[a-zA-Z0-9\\.\\-\\_\\"]+}=targetDose != null && (targetDose.vaccineComponent.cdsConceptName == {dd_oVaccineCdsListItem} || targetDose.administeredVaccine.cdsConceptName == {dd_oVaccineCdsListItem})
+[condition][]- [Tt]here is an [Aa]ssociated [Aa]dministered [Ss]hot in the [Ss]eries {refer_oTargetSeries}=associatedTargetSeries != null, associatedTargetSeries == {refer_oTargetSeries}, targetDose != null 
 [condition][]- [Mm]ake [Nn]ote of the IceResult [Ff]inding as {assign_sIceResultFinding}={assign_sIceResultFinding} : iceResultFinding
 [condition][]- [Mm]ake [Nn]ote of the [Aa]ssociated [Aa]dministered [Ss]hot as {assign_oTargetDose}=targetDose != null, {assign_oTargetDose} : targetDose
 [condition][]- [Mm]ake [Nn]ote of the [Dd]ate the [Aa]ssociated [Ss]hot was [Aa]dministered as {assign_oTargetDoseDate}=targetDose != null, {assign_oTargetDoseDate} : targetDose.administrationDate
@@ -550,6 +553,7 @@
 [consequence][][Ll]ogically [Ii]nsert an IceFact {sIceResultFinding} with TargetDose {oTargetDose} into [Ww]orking [Mm]emory=insertLogical(new ICEFactTypeFinding({sIceResultFinding}, {oTargetDose}));
 [consequence][][Ll]ogically [Ii]nsert an IceFact {sIceResultFinding} with TargetSeries {oTargetSeries} into [Ww]orking [Mm]emory=insertLogical(new ICEFactTypeFinding({sIceResultFinding}, {oTargetSeries}));
 [consequence][][Ll]ogically [Ii]nsert an IceFact {sIceResultFinding} into [Ww]orking [Mm]emory=insertLogical(new ICEFactTypeFinding({sIceResultFinding}));
+[consequence][][Ii]nsert an IceFact {sIceResultFinding} with TargetDose {oTargetDose} and TargetSeries {oTargetSeries} into [Ww]orking [Mm]emory=insert(new ICEFactTypeFinding({sIceResultFinding}, {oTargetDose}));
 [consequence][][Ii]nsert an IceFact {sIceResultFinding} with TargetDose {oTargetDose} into [Ww]orking [Mm]emory=insert(new ICEFactTypeFinding({sIceResultFinding}, {oTargetDose}));
 [consequence][][Ii]nsert an IceFact {sIceResultFinding} with TargetSeries {oTargetSeries} into [Ww]orking [Mm]emory=insert(new ICEFactTypeFinding({sIceResultFinding}, {oTargetSeries}));
 [consequence][][Ii]nsert an IceFact {sIceResultFinding} into [Ww]orking [Mm]emory=insert(new ICEFactTypeFinding({sIceResultFinding}));
@@ -570,4 +574,23 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IceResult Fact Object END
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+///////// ***
+// Primary IceIntervalResult Fact Object conditions and sub-conditions
+[condition][]There exists {entity:an |another |}IceIntervalFact=exists ICEIntervalFactTypeFinding()
+[condition][]There does not exist {entity:an | another |}IceIntervalFact=not ICEIntervalFactTypeFinding()
+[condition][]There is {entity:an |another |}IceIntervalFact {oICEFactTypeFinding}={oICEFactTypeFinding} : ICEIntervalFactTypeFinding()
+[condition][]- that has IceIntervalFact [Tt]ype {oIntervalFactType}=intervalFactType == {oIntervalFactType}
+[condition][]- that has IceIntervalFact [Ff]inding {sIceResultFinding}=iceResultFinding == {sIceResultFinding}
+[condition][]- that has IceIntervalFact [Pp]reviously [Aa]dministered [Ss]hot {oPreviousTargetDose}=associatedPreviousTargetDose != null, associatedPreviousTargetDose == {oPreviousTargetDose}
+[condition][]- that has IceIntervalFact [Cc]urrent [Aa]dministered [Ss]hot {oTargetDose}=associatedCurrentTargetDose != null, associatedCurrentTargetDose == {oTargetDose}
+
+///////// ***
+// IceResult Fact Object Consequences START
+/////// [consequence][][Ll]ogically [Ii]nsert an IceIntervalFact {sIceResultFinding} with TargetDoses {oTargetDosePrevious} and {oTargetDose} into [Ww]orking [Mm]emory=insertLogical(new ICEIntervalFactTypeFinding({sIceResultFinding}, {oTargetDosePrevious}, {oTargetDose}));
+[consequence][][Ii]nsert an [Ee]valuation IceIntervalFact {sIceResultFinding} with TargetDoses {oTargetDosePrevious} and {oTargetDose} into [Ww]orking [Mm]emory=insert(new ICEIntervalFactTypeFinding({sIceResultFinding}, {oTargetDosePrevious}, {oTargetDose}));
+[consequence][][Ii]nsert a [Rr]ecommendation IceIntervalFact {sIceResultFinding} with TargetDose {oTargetDose} into [Ww]orking [Mm]emory=insert(new ICEIntervalFactTypeFinding({sIceResultFinding}, {oTargetDose}));
+[consequence][][Rr]etract IceIntervalFact {oICEIntervalFactTypeFinding} from [Ww]orking [Mm]emory=retract({oICEIntervalFactTypeFinding});
+///////// ***
 
