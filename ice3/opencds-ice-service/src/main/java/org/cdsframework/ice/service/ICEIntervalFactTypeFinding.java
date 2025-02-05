@@ -32,12 +32,39 @@ import org.kie.api.definition.type.ClassReactive;
 @ClassReactive
 
 public class ICEIntervalFactTypeFinding extends ICEFactTypeFinding {
-
 	private TargetDose associatedTargetDose;
+	private IntervalFactType intervalFactType;
 
+	public enum IntervalFactType {
+		EVALUATION,
+		RECOMMENDATION
+	}
+
+	/**
+	 * Evaluation Interval Fact Type
+	 * @param pIceResultFinding Finding
+	 * @param pPreviousTargetDose Previous Shot (Interval from)
+	 * @param pTargetDose Current Shot (Interval to)
+	 */
 	public ICEIntervalFactTypeFinding(String pIceResultFinding, TargetDose pPreviousTargetDose, TargetDose pTargetDose) {
 		super(pIceResultFinding, pPreviousTargetDose);
 		this.associatedTargetDose = pTargetDose;
+		this.intervalFactType = IntervalFactType.EVALUATION;
+	}
+
+	/**
+	 * Recommendation Interval Fact Type
+	 * @param pIceResultFinding Finding
+	 * @param pTargetDose Shot to Recommend from
+	 */
+	public ICEIntervalFactTypeFinding(String pIceResultFinding, TargetDose pTargetDose) {
+		super(pIceResultFinding);
+		this.associatedTargetDose = pTargetDose;
+		this.intervalFactType = IntervalFactType.RECOMMENDATION;
+	}
+
+	public IntervalFactType getIntervalFactType() {
+		return this.intervalFactType;
 	}
 
 	public TargetDose getAssociatedPreviousTargetDose() {

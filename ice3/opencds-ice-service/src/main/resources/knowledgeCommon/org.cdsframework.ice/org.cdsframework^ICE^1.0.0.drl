@@ -59,6 +59,7 @@ import org.cdsframework.ice.service.DoseRule
 import org.cdsframework.ice.service.DoseStatus
 import org.cdsframework.ice.service.ICEFactTypeFinding
 import org.cdsframework.ice.service.ICEIntervalFactTypeFinding
+import org.cdsframework.ice.service.ICEIntervalFactTypeFinding.IntervalFactType
 import org.cdsframework.ice.service.LiveVirusFact
 import org.cdsframework.ice.service.InconsistentConfigurationException
 import org.cdsframework.ice.service.ICELogicHelper
@@ -1333,7 +1334,7 @@ rule "HistoryEvaluation.evaluateVaccineGroupMinimumInterval" ruleflow-group "His
 		not TargetDose(associatedTargetSeries == $tdAssociatedTargetSeries, administrationDate > $tdprevdate, administrationDate < $tddate, isShotIgnored() == false)
 		$ts : TargetSeries(this == $td.associatedTargetSeries, this == $tdprev.associatedTargetSeries, seriesRules.numberOfDosesInSeries >= $doseNumber)
 		not (ICEFactTypeFinding(iceResultFinding == SupportedFactConcept._BELOW_MINIMUM_AGE.conceptCodeValue, associatedTargetDose == $tdprev, associatedTargetDose.doseNumberInSeries == 1, associatedTargetDose.administeredShotNumberInSeries == $admindose-1))
-		not ICEIntervalFactTypeFinding(iceResultFinding == SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue, associatedTargetDose != null && associatedTargetDose == $td, associatedPreviousTargetDose != null && associatedPreviousTargetDose == $tdprev)
+		not ICEIntervalFactTypeFinding(intervalFactType == IntervalFactType.EVALUATION, iceResultFinding == SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue, associatedTargetDose != null && associatedTargetDose == $td, associatedPreviousTargetDose != null && associatedPreviousTargetDose == $tdprev)
 	then
 		String _RULENAME = kcontext.rule.name;
 		$ts.evaluateVaccineGroupMinimumIntervalAndRecordReason($td, $tdprev);
