@@ -583,7 +583,9 @@
 [condition][]There is {entity:an |another |}IceIntervalFact {oICEFactTypeFinding}={oICEFactTypeFinding} : ICEIntervalFactTypeFinding()
 [condition][]- that has IceIntervalFact [Tt]ype {oIntervalFactType}=intervalFactType == {oIntervalFactType}
 [condition][]- that has IceIntervalFact [Ff]inding {sIceResultFinding}=iceResultFinding == {sIceResultFinding}
+/////// [condition][]- that has IceIntervalFact [Pp]reviously [Aa]dministered [Ss]hot [Aa]dministration [Dd]ate {aOp:[\=\\<\\>\\!]+}  {dtOtherDate}=associatedPreviousTargetDose != null, associatedPreviousTargetDose.administrationDate {aOp} {dtOtherDate}
 [condition][]- that has IceIntervalFact [Pp]reviously [Aa]dministered [Ss]hot {oPreviousTargetDose}=associatedPreviousTargetDose != null, associatedPreviousTargetDose == {oPreviousTargetDose}
+/////// [condition][]- that has IceIntervalFact [Cc]urrent [Aa]dministered [Ss]hot [Aa]dministration [Dd]ate {aOp:[\=\\<\\>\\!]+}  {dtOtherDate}=associatedCurrentTargetDose != null, associatedCurrentTargetDose.administrationDate {aOp} {dtOtherDate}
 [condition][]- that has IceIntervalFact [Cc]urrent [Aa]dministered [Ss]hot {oTargetDose}=associatedCurrentTargetDose != null, associatedCurrentTargetDose == {oTargetDose}
 
 ///////// ***
