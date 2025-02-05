@@ -581,10 +581,10 @@
 [condition][]There exists {entity:an |another |}IceIntervalFact=exists ICEIntervalFactTypeFinding()
 [condition][]There does not exist {entity:an | another |}IceIntervalFact=not ICEIntervalFactTypeFinding()
 [condition][]There is {entity:an |another |}IceIntervalFact {oICEFactTypeFinding}={oICEFactTypeFinding} : ICEIntervalFactTypeFinding()
-[condition][]- [Tt]hat has [Ff]inding {sIceResultFinding}=iceResultFinding == {sIceResultFinding}
-[condition][]- [Tt]hat has [Aa]ssociated [Pp]revious [Aa]dministered [Ss]hot {oPreviousTargetDose}=associatedPreviousTargetDose != null, associatedPreviousTargetDose == {oPreviousTargetDose}
-[condition][]- [Tt]hat has [Aa]ssociated [Cc]urrent [Aa]dministered [Ss]hot {oTargetDose}=associatedCurrentTargetDose != null, associatedCurrentTargetDose == {oTargetDose}
-[condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot {oTargetDose}=associatedCurrentTargetDose != null, associatedCurrentTargetDose == {oTargetDose}
+[condition][]- that has IceIntervalFact [Tt]ype {oIntervalFactType}=intervalFactType == {oIntervalFactType}
+[condition][]- that has IceIntervalFact [Ff]inding {sIceResultFinding}=iceResultFinding == {sIceResultFinding}
+[condition][]- that has IceIntervalFact [Pp]reviously [Aa]dministered [Ss]hot {oPreviousTargetDose}=associatedPreviousTargetDose != null, associatedPreviousTargetDose == {oPreviousTargetDose}
+[condition][]- that has IceIntervalFact [Cc]urrent [Aa]dministered [Ss]hot {oTargetDose}=associatedCurrentTargetDose != null, associatedCurrentTargetDose == {oTargetDose}
 
 ///////// ***
 // IceResult Fact Object Consequences START
