@@ -289,17 +289,9 @@ rule "COVID-19(Sep2023+ >= 5yrs Series Abstract): If the patient has >= 1 COVID-
 			- the administration date of the shot is < $dtAdministrationDateCurrentShot
 			- the administration date of the shot is > $dtAdministrationDatePreviousDose
 			- the shot is not ignored
-		//There does not exist an IceFact
-		//	- that has associated administered shot $currentShot
-		//	- that has finding SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue
-		//There does not exist an IceFact
-		//	- that has associated vaccine group "VACCINE_GROUP_CONCEPT.850"	
-		//	- that has associated administered shot date == $dtAdministrationDatePreviousDose
-		//	- that has finding SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue
-		There does not exist an IceIntervalFact
-			- that has finding SupportedFactConcept._DOSE_INTERVAL_OVERRIDE.conceptCodeValue
-			- that has associated previous administered shot $previousShot
-			- that has associated current administered shot $currentShot
+		There does not exist an IceFact
+			- that has finding a member of ("COVID19_SEPT2023GTE5SERIES_EXCEPTION_2_FOR_TARGET_DOSE_1", "COVID19_SEPT2023GTE5SERIES_EXCEPTION_3_FOR_TARGET_DOSE_1")
+			- that has associated administered shot $currentShot
 	then
 		Record that this dose rule was Processed for the TargetDose $currentShot
 		Log that this dose rule fired for the dose $currentShot in the Series $associatedTargetSeries

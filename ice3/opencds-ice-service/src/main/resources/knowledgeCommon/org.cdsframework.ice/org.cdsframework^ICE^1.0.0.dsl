@@ -531,6 +531,7 @@
 [condition][]There exists {entity:an |another |}IceFact=exists ICEFactTypeFinding()
 [condition][]There does not exist {entity:an | another |}IceFact=not ICEFactTypeFinding()
 [condition][]There is {entity:an |another |}IceFact {oICEFactTypeFinding}={oICEFactTypeFinding} : ICEFactTypeFinding()
+[condition][]- [Tt]hat has [Ff]inding a member of {list_oIceResultFindingList:[\\(]+[a-zA-Z0-9\\.\\-_\\"\\,\\ \\(\\)]+[\\)]+}=iceResultFinding in {list_oIceResultFindingList}
 [condition][]- [Tt]hat has [Ff]inding {sIceResultFinding}=iceResultFinding == {sIceResultFinding}
 [condition][]- [Tt]hat has [Aa]ssociated [Ss]eries {oTargetSeries}=associatedTargetSeries != null, associatedTargetSeries == {oTargetSeries}
 [condition][]- [Tt]hat has [Aa]ssociated [Aa]dministered [Ss]hot [Dd]ate {aOp:[\=\\<\\>\\!]+}  {dtOtherDate}=targetDose != null, targetDose.administrationDate {aOp} {dtOtherDate}
