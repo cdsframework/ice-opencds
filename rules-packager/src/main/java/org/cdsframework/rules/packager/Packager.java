@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,12 +15,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cdsframework.ice.service.InconsistentConfigurationException;
 import org.cdsframework.ice.util.KnowledgeModuleUtils;
+import org.drools.core.common.DroolsObjectOutputStream;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.Message;
-import org.kie.api.builder.ReleaseId;
 import org.kie.api.io.Resource;
 import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieContainer;
@@ -51,6 +52,18 @@ public class Packager {
 
 		String lRequestedKmId = args[1];
 		String lBaseRulesScopingKmId = args[2];
+
+		boolean writeOutputFile = true;
+		if (args.length > 3) {
+			final String optionalArg = args[3];
+			if ("--no-output-file".equals(optionalArg)) {
+				writeOutputFile = false;
+			}
+			else {
+				logger.error("Unknown option: {}", optionalArg);
+				System.exit(1);
+			}
+		}
 
 		logger.info(_METHODNAME + "loading knowledge from source files");
 		if (lRequestedKmId != null && lRequestedKmId.equals("org.nyc.cir^ICE^1.0.0")) {
@@ -253,20 +266,25 @@ public class Packager {
 			int i=1;
 			for (Message lMessage : kieBuilder.getResults().getMessages()) {
 				lErrStr += "\n(" + i + "): " + lMessage.getLevel().toString() + " " + lMessage.getText();
+				i++;
 			}
 			throw new RuntimeException(lErrStr);
-		}	
+		}
+
+		if (!writeOutputFile) {
+			logger.info(_METHODNAME + "Completed without generating the pkg file (due to the --no-output-file option)");
+			System.exit(0);
+		}
+		
 		//////////////////////////////////////////////////////////////////////
 		/////// ReleaseId kieContainerRelease = kieServices.newReleaseId(lKMId.getScopingEntityId(), lKMId.getBusinessId(), lKMId.getVersion());
 		/////// KieContainer kieContainer = kieServices.newKieContainer(kieServices.getRepository().getDefaultReleaseId());
 		KieContainer kieContainer = kieServices.newKieContainer(kieServices.getRepository().getDefaultReleaseId());
 		kieBase = kieContainer.getKieBase();
 
-		File pkgFile = new File(lKnowledgeModulesDirectory, lRequestedKmId + ".pkg");;
-		try {
-			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(pkgFile.getAbsolutePath()) );
-			out.writeObject( kieBase );
-			out.close();
+		final File pkgFile = new File(lKnowledgeModulesDirectory, lRequestedKmId + ".pkg");
+		try (final OutputStream fos = new FileOutputStream(pkgFile.getAbsolutePath()); final ObjectOutputStream out = new DroolsObjectOutputStream(fos)) {
+			out.writeObject(kieBase);
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Failed to write serialized pkg file", e);
